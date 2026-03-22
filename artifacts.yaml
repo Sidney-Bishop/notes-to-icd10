@@ -1,0 +1,78 @@
+# artifacts.yaml
+project:
+  name: "icd10-prediction"
+  version: "1.1.0"
+  description: "Surgical ICD-10 prediction from clinical text (Surgical Era)"
+  repository: "https://github.com/your-org/icd10-prediction"
+
+paths:
+  # Data paths (Medallion Architecture)
+  data:
+    raw: "data/raw/"           # Immutable original MedSynth records
+    silver: "data/silver/"     # Polars-cleaned, Pydantic-validated Parquet files [cite: 2026-01-29]
+    gold: "data/gold/"         # Final SOAP-extracted partitions for E-002 [cite: 2026-01-27]
+    cache: ".hf_cache/"        # Hugging Face cache
+    db: "db/"                  # DuckDB persistent metadata (audit_trail.ddb) [cite: 2026-02-10]
+  
+  # Model artifacts
+  models:
+    base: "models/"
+    transformer:
+      best: "models/transformer/best_model/"
+      checkpoints: "models/transformer/checkpoints/"
+      final: "models/transformer/final/"
+    baseline:
+      tfidf: "models/baseline/tfidf/"
+    
+  # Experiment tracking
+  experiments:
+    mlflow: "mlruns/"
+    logs: "logs/"
+    tensorboard: "logs/tensorboard/"
+    
+  # Outputs and results
+  outputs:
+    predictions: "outputs/predictions/"
+    evaluations: "outputs/evaluations/"
+    reports: "outputs/reports/"
+    visualizations: "outputs/visualizations/"
+    
+  # Source code
+  src:
+    modules: "src/"
+    notebooks: "notebooks/"
+    configs: "configs/"
+    scripts: "scripts/"
+
+# Dataset configurations
+datasets:
+  medsynth:
+    name: "Ahmad0067/MedSynth"
+    id_field: "ID"
+    text_fields: ["Note", "Dialogue"]
+    label_field: "ICD10"
+    default_test_size: 0.2
+
+# Experiment defaults (E-002 Surgical Era)
+experiment_defaults:
+  random_state: 42
+  test_size: 0.2
+  max_length: 512
+  batch_size: 8
+  learning_rate: 2e-5
+  num_epochs: 3
+  warmup_ratio: 0.1
+  weight_decay: 0.01
+
+# Artifact patterns (for cleanup/backup operations)
+artifacts:
+  model_files: ["*.safetensors", "*.bin", "*.pt"]
+  config_files: ["config.json", "tokenizer_config.json", "label_map.json"]
+  data_files: ["*.parquet", "*.csv", "*.json"]
+  experiment_files: ["mlruns/**", "logs/**", "outputs/**"]
+
+metadata:
+  created: "2026-01-23"
+  last_updated: "2026-02-20"
+  author: "Sidney Bishop"
+  status: "Surgical Pivot (DuckDB + Polars)"

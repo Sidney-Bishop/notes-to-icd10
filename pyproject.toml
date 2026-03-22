@@ -1,0 +1,53 @@
+[project]
+name = "icd10-code-prediction"
+version = "0.1.0"
+description = "Surgical ICD-10 prediction from clinical text using ClinicalBERT and Polars/DuckDB"
+requires-python = ">=3.10,<3.13"
+
+dependencies = [
+    # --- High-Performance Data Engineering (The Pivot) ---
+    "polars[all]>=1.0.0",
+    "duckdb>=1.1.0",
+    "pyarrow>=15.0.0",
+    # --- Core Data & Math ---
+    "numpy>=1.26.0",
+    "pandas>=2.2.0",
+    "scipy>=1.11.0",
+    # --- ML / Deep Learning (M4 Max Optimized) ---
+    "torch>=2.2.0",
+    "transformers>=4.38.0",
+    "sentence-transformers>=2.5.0",
+    "datasets>=2.18.0",
+    "tokenizers>=0.15.0",
+    "accelerate>=0.27.0",
+    "evaluate>=0.4.0",
+    "scikit-learn>=1.4.0",
+    # --- Validation & Schema ---
+    "pydantic>=2.6.0",
+    "pydantic-settings>=2.2.0",
+    # --- Experiment Tracking & Logging ---
+    "mlflow>=2.11.0",
+    "tensorboard>=2.19.0",
+    "tqdm>=4.66.0",
+    "psutil>=5.9.0",
+    # --- Notebooks & Visualization ---
+    "jupyter>=1.0.0",
+    "ipywidgets>=8.1.0",
+    "matplotlib>=3.8.0",
+    "seaborn>=0.13.0",
+    "plotly>=5.18.0",
+    "panel>=1.3.0",
+    "jupyter_bokeh",
+    # --- Utilities ---
+    "python-dotenv>=1.0.0",
+    "pathlib>=1.0.1",
+    # --- Compatibility fix ---
+    "setuptools<81",
+    "nbstripout>=0.9.1",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=8.0.0",
+    "black>=24.0.0",
+]
