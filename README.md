@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="notebooks/resources/images/notes-to-icd10-logo.png" alt="notes-to-icd10" width="700"/>
+</p>
+
 # Notes to ICD-10
 
 [![Python](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/)
