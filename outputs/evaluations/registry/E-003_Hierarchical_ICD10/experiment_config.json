@@ -1,0 +1,21 @@
+{
+    "experiment_id": "E-003",
+    "experiment_name": "E-003_Hierarchical_ICD10",
+    "description": "Two-stage hierarchical ICD-10 | Stage-1 chapter router | Stage-2 within-chapter resolvers",
+    "model_name": "emilyalsentzer/Bio_ClinicalBERT",
+    "payload_type": "note_only",
+    "label_scheme": "hierarchical",
+    "code_status_filter": "billable",
+    "stage1_num_epochs": 10,
+    "stage1_learning_rate": 2e-05,
+    "stage1_batch_size": 16,
+    "stage2_num_epochs": 20,
+    "stage2_learning_rate": 2e-05,
+    "stage2_batch_size": 16,
+    "max_length": 512,
+    "weight_decay": 0.01,
+    "warmup_ratio": 0.1,
+    "use_special_tokens": false,
+    "seed": 42,
+    "stage1_init_model": "E-001_Baseline_ICD3"
+}

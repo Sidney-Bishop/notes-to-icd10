@@ -1,0 +1,20 @@
+{
+    "experiment": "E-001_Baseline_ICD3",
+    "timestamp": "2026-04-11T21:12:46.433785",
+    "gold_parquet": "medsynth_gold_apso_20260408_171111.parquet",
+    "payload_col": "apso_note",
+    "label_col": "standard_icd10",
+    "label_scheme": "icd3",
+    "num_labels": 675,
+    "samples": {
+        "train": 8192,
+        "val": 1024,
+        "test": 1024
+    },
+    "class_coverage": {
+        "train": "675/675 (100.0%)",
+        "val": "515/675 (76.3%)",
+        "test": "489/675 (72.4%)"
+    },
+    "payload_preview": "**\n\n**Primary Diagnosis**: \n- [REDACTED] - Pain in left lower leg\n  - **Medical Reasoning**: The patient's pain, swelling, and redness, along with the..."
+}

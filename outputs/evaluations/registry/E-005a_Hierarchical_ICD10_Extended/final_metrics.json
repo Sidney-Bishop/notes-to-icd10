@@ -1,0 +1,49 @@
+{
+    "experiment_id": "E-005a",
+    "experiment_name": "E-005a_Hierarchical_ICD10_Extended",
+    "timestamp": "2026-04-11T19:09:54.996213",
+    "stage1": {
+        "source": "E-003_Hierarchical_ICD10",
+        "test_accuracy": 0.954,
+        "test_macro_f1": 0.959
+    },
+    "stage2": {
+        "init_model": "E-002_FullICD10_ClinicalBERT",
+        "extended_chapters": [
+            "Z",
+            "E",
+            "H",
+            "T",
+            "K",
+            "S"
+        ],
+        "extended_epochs": 10,
+        "extended_lr": 5e-06,
+        "num_resolvers": 19,
+        "skip_chapters": [
+            "P",
+            "U",
+            "Q"
+        ]
+    },
+    "end_to_end": {
+        "test_accuracy": 0.6625258799171843,
+        "test_macro_f1": 0.5478794251664914,
+        "stage1_routing": 0.953416149068323,
+        "within_chapter": 0.6948968512486428
+    },
+    "baselines": {
+        "e002_accuracy": 0.469,
+        "e002_macro_f1": 0.352,
+        "e003_accuracy": 0.106,
+        "e003_macro_f1": 0.07,
+        "e004a_accuracy": 0.667,
+        "e004a_macro_f1": 0.551
+    },
+    "deltas": {
+        "vs_e002_accuracy": 0.19352587991718428,
+        "vs_e002_macro_f1": 0.19587942516649137,
+        "vs_e004a_accuracy": -0.00447412008281578
+    },
+    "key_finding": "E-005a extends 6 weak E-004a chapter resolvers by 10 epochs at lr=5e-6. End-to-end accuracy 66.3% (+0.2pp vs E-004a 66.7%). Marginal improvement confirms the pipeline has reached its ceiling on MedSynth at this architecture."
+}

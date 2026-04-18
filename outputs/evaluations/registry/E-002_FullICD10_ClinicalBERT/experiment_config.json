@@ -1,0 +1,18 @@
+{
+    "experiment_id": "E-002",
+    "experiment_name": "E-002_FullICD10_ClinicalBERT",
+    "description": "Full ICD-10 classification | 1,926 billable classes | apso_note | billable only",
+    "model_name": "emilyalsentzer/Bio_ClinicalBERT",
+    "payload_type": "note_only",
+    "label_scheme": "icd10_full",
+    "code_status_filter": "billable",
+    "max_length": 512,
+    "num_epochs": 20,
+    "learning_rate": 2e-05,
+    "batch_size": 16,
+    "weight_decay": 0.01,
+    "warmup_ratio": 0.1,
+    "use_special_tokens": false,
+    "seed": 42,
+    "num_labels": 1926
+}

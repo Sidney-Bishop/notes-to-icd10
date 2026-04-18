@@ -1,0 +1,22 @@
+{
+    "experiment": "E-001_Baseline_ICD3",
+    "model": "emilyalsentzer/Bio_ClinicalBERT",
+    "label_scheme": "icd3",
+    "num_labels": 675,
+    "num_epochs": 20,
+    "best_epoch": 19.0,
+    "train_runtime": 6067.9569,
+    "train_samples_per_second": 27.001,
+    "train_steps_per_second": 1.688,
+    "total_flos": 4.336860021129216e+16,
+    "train_loss": 2.349705330748111,
+    "epoch": 19.0,
+    "eval_loss": 1.260770320892334,
+    "eval_accuracy": 0.8291015625,
+    "eval_macro_f1": 0.7613275831554954,
+    "eval_top_5_accuracy": 0.916015625,
+    "eval_runtime": 11.1154,
+    "eval_samples_per_second": 92.124,
+    "eval_steps_per_second": 11.516,
+    "step": 9728
+}

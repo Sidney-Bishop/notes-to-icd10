@@ -1,0 +1,53 @@
+{
+    "results": {
+        "Z": {
+            "chapter": "Z",
+            "num_labels": 263,
+            "train_loss": 2.593518436316288,
+            "val_macro_f1": 0.2577777777777778,
+            "val_accuracy": 0.36507936507936506,
+            "val_top5": 0.6190476417541504
+        },
+        "E": {
+            "chapter": "E",
+            "num_labels": 76,
+            "train_loss": 1.5047804069519044,
+            "val_macro_f1": 0.5116666666666666,
+            "val_accuracy": 0.6444444444444445,
+            "val_top5": 0.9111111164093018
+        },
+        "H": {
+            "chapter": "H",
+            "num_labels": 83,
+            "train_loss": 1.7303451356433688,
+            "val_macro_f1": 0.6504065040650406,
+            "val_accuracy": 0.7692307692307693,
+            "val_top5": 0.8974359035491943
+        },
+        "T": {
+            "chapter": "T",
+            "num_labels": 15,
+            "train_loss": 0.830530297756195,
+            "val_macro_f1": 1.0,
+            "val_accuracy": 1.0,
+            "val_top5": 1.0
+        },
+        "K": {
+            "chapter": "K",
+            "num_labels": 116,
+            "train_loss": 1.6636220997777478,
+            "val_macro_f1": 0.47959183673469385,
+            "val_accuracy": 0.6086956521739131,
+            "val_top5": 0.804347813129425
+        },
+        "S": {
+            "chapter": "S",
+            "num_labels": 87,
+            "train_loss": 1.7020897475155916,
+            "val_macro_f1": 0.6991452991452991,
+            "val_accuracy": 0.8157894736842105,
+            "val_top5": 0.9736841917037964
+        }
+    },
+    "failures": []
+}

@@ -1,0 +1,14 @@
+{
+    "e2e_accuracy": 0.10559006211180125,
+    "e2e_macro_f1": 0.07065987820704801,
+    "stage1_routing_acc": 0.953416149068323,
+    "within_chapter_acc": 0.11074918566775244,
+    "n_correct": 102,
+    "n_routing_correct": 921,
+    "n_routing_errors": 45,
+    "n_stage2_correct": 102,
+    "e002_accuracy": 0.469,
+    "e002_macro_f1": 0.352,
+    "delta_accuracy": -0.36340993788819875,
+    "delta_macro_f1": -0.281340121792952
+}

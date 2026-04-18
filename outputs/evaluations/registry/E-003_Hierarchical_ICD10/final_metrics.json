@@ -1,0 +1,42 @@
+{
+    "experiment_id": "E-003",
+    "experiment_name": "E-003_Hierarchical_ICD10",
+    "timestamp": "2026-04-10T09:51:44.651915",
+    "stage1": {
+        "init_model": "E-001_Baseline_ICD3",
+        "num_classes": 22,
+        "num_epochs": 10,
+        "val_accuracy": 0.9555,
+        "val_macro_f1": 0.9677,
+        "val_top5": 0.9855,
+        "test_accuracy": 0.9534,
+        "test_macro_f1": 0.9589,
+        "test_top5": 0.9834
+    },
+    "stage2": {
+        "num_resolvers": 19,
+        "skip_chapters": [
+            "P",
+            "U",
+            "Q"
+        ],
+        "weighted_val_f1": 0.092,
+        "weighted_val_acc": 0.136,
+        "init_model": "fresh Bio_ClinicalBERT"
+    },
+    "end_to_end": {
+        "test_accuracy": 0.1055,
+        "test_macro_f1": 0.0702,
+        "stage1_routing": 0.9534,
+        "within_chapter": 0.1107
+    },
+    "baseline_e002": {
+        "test_accuracy": 0.469,
+        "test_macro_f1": 0.352
+    },
+    "delta_vs_e002": {
+        "accuracy": -0.3635,
+        "macro_f1": -0.2818
+    },
+    "key_finding": "Stage-1 chapter router (95.3% accuracy) substantially exceeded E-002 flat chapter accuracy (82.9%). Stage-2 underperformed due to training data fragmentation and fresh initialisation. Fix: initialise Stage-2 from E-002 registry model in E-004a."
+}

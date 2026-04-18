@@ -1,0 +1,181 @@
+{
+    "results": {
+        "Z": {
+            "chapter": "Z",
+            "num_labels": 263,
+            "train_loss": 4.369084768584281,
+            "val_macro_f1": 0.1165644171779141,
+            "val_accuracy": 0.18253968253968253,
+            "val_top5": 0.4841269850730896,
+            "model_path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/evaluations/E-003_Hierarchical_ICD10/stage2/Z/model"
+        },
+        "R": {
+            "chapter": "R",
+            "num_labels": 196,
+            "train_loss": 4.134823589324951,
+            "val_macro_f1": 0.16851851851851854,
+            "val_accuracy": 0.23275862068965517,
+            "val_top5": 0.5775862336158752,
+            "model_path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/evaluations/E-003_Hierarchical_ICD10/stage2/R/model"
+        },
+        "T": {
+            "chapter": "T",
+            "num_labels": 15,
+            "train_loss": 2.1861948490142824,
+            "val_macro_f1": 0.0,
+            "val_accuracy": 0.0,
+            "val_top5": 0.4000000059604645,
+            "model_path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/evaluations/E-003_Hierarchical_ICD10/stage2/T/model"
+        },
+        "S": {
+            "chapter": "S",
+            "num_labels": 87,
+            "train_loss": 3.7052888436750933,
+            "val_macro_f1": 0.19791666666666666,
+            "val_accuracy": 0.2631578947368421,
+            "val_top5": 0.6052631735801697,
+            "model_path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/evaluations/E-003_Hierarchical_ICD10/stage2/S/model"
+        },
+        "B": {
+            "chapter": "B",
+            "num_labels": 31,
+            "train_loss": 2.9943475008010862,
+            "val_macro_f1": 0.053030303030303025,
+            "val_accuracy": 0.1111111111111111,
+            "val_top5": 0.2222222238779068,
+            "model_path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/evaluations/E-003_Hierarchical_ICD10/stage2/B/model"
+        },
+        "K": {
+            "chapter": "K",
+            "num_labels": 116,
+            "train_loss": 3.96558837890625,
+            "val_macro_f1": 0.036723163841807904,
+            "val_accuracy": 0.06521739130434782,
+            "val_top5": 0.28260868787765503,
+            "model_path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/evaluations/E-003_Hierarchical_ICD10/stage2/K/model"
+        },
+        "M": {
+            "chapter": "M",
+            "num_labels": 222,
+            "train_loss": 4.466382925851004,
+            "val_macro_f1": 0.02794871794871795,
+            "val_accuracy": 0.05084745762711865,
+            "val_top5": 0.3305084705352783,
+            "model_path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/evaluations/E-003_Hierarchical_ICD10/stage2/M/model"
+        },
+        "I": {
+            "chapter": "I",
+            "num_labels": 131,
+            "train_loss": 4.172065422751687,
+            "val_macro_f1": 0.1232876712328767,
+            "val_accuracy": 0.15517241379310345,
+            "val_top5": 0.2586206793785095,
+            "model_path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/evaluations/E-003_Hierarchical_ICD10/stage2/I/model"
+        },
+        "L": {
+            "chapter": "L",
+            "num_labels": 76,
+            "train_loss": 3.5609786184210526,
+            "val_macro_f1": 0.17886178861788618,
+            "val_accuracy": 0.30303030303030304,
+            "val_top5": 0.6666666865348816,
+            "model_path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/evaluations/E-003_Hierarchical_ICD10/stage2/L/model"
+        },
+        "D": {
+            "chapter": "D",
+            "num_labels": 76,
+            "train_loss": 3.6487735145970395,
+            "val_macro_f1": 0.07638888888888888,
+            "val_accuracy": 0.10810810810810811,
+            "val_top5": 0.2432432472705841,
+            "model_path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/evaluations/E-003_Hierarchical_ICD10/stage2/D/model"
+        },
+        "E": {
+            "chapter": "E",
+            "num_labels": 76,
+            "train_loss": 3.7017898750305176,
+            "val_macro_f1": 0.03451536643026005,
+            "val_accuracy": 0.06666666666666667,
+            "val_top5": 0.17777778208255768,
+            "model_path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/evaluations/E-003_Hierarchical_ICD10/stage2/E/model"
+        },
+        "G": {
+            "chapter": "G",
+            "num_labels": 68,
+            "train_loss": 3.495776008157169,
+            "val_macro_f1": 0.07608695652173914,
+            "val_accuracy": 0.09302325581395349,
+            "val_top5": 0.3720930218696594,
+            "model_path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/evaluations/E-003_Hierarchical_ICD10/stage2/G/model"
+        },
+        "O": {
+            "chapter": "O",
+            "num_labels": 63,
+            "train_loss": 3.5563039898872377,
+            "val_macro_f1": 0.0,
+            "val_accuracy": 0.0,
+            "val_top5": 0.20000000298023224,
+            "model_path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/evaluations/E-003_Hierarchical_ICD10/stage2/O/model"
+        },
+        "N": {
+            "chapter": "N",
+            "num_labels": 105,
+            "train_loss": 3.805616138599537,
+            "val_macro_f1": 0.1811263318112633,
+            "val_accuracy": 0.26153846153846155,
+            "val_top5": 0.6000000238418579,
+            "model_path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/evaluations/E-003_Hierarchical_ICD10/stage2/N/model"
+        },
+        "J": {
+            "chapter": "J",
+            "num_labels": 100,
+            "train_loss": 3.892007080078125,
+            "val_macro_f1": 0.04918032786885246,
+            "val_accuracy": 0.08,
+            "val_top5": 0.23999999463558197,
+            "model_path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/evaluations/E-003_Hierarchical_ICD10/stage2/J/model"
+        },
+        "F": {
+            "chapter": "F",
+            "num_labels": 94,
+            "train_loss": 3.9078024705251058,
+            "val_macro_f1": 0.04,
+            "val_accuracy": 0.07894736842105263,
+            "val_top5": 0.3684210479259491,
+            "model_path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/evaluations/E-003_Hierarchical_ICD10/stage2/F/model"
+        },
+        "H": {
+            "chapter": "H",
+            "num_labels": 83,
+            "train_loss": 3.8370750972202847,
+            "val_macro_f1": 0.0,
+            "val_accuracy": 0.0,
+            "val_top5": 0.1538461595773697,
+            "model_path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/evaluations/E-003_Hierarchical_ICD10/stage2/H/model"
+        },
+        "C": {
+            "chapter": "C",
+            "num_labels": 101,
+            "train_loss": 3.821203818688026,
+            "val_macro_f1": 0.06559139784946236,
+            "val_accuracy": 0.09433962264150944,
+            "val_top5": 0.35849055647850037,
+            "model_path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/evaluations/E-003_Hierarchical_ICD10/stage2/C/model"
+        },
+        "A": {
+            "chapter": "A",
+            "num_labels": 12,
+            "train_loss": 2.162048848470052,
+            "val_macro_f1": 0.0,
+            "val_accuracy": 0.0,
+            "val_top5": 1.0,
+            "model_path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/evaluations/E-003_Hierarchical_ICD10/stage2/A/model"
+        }
+    },
+    "failures": [],
+    "skip_chapters": {
+        "P": "P22.0",
+        "U": "U07.1",
+        "Q": "Q25.0"
+    }
+}

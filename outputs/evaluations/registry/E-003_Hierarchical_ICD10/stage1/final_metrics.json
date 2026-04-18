@@ -1,0 +1,16 @@
+{
+    "experiment": "E-003_Hierarchical_ICD10",
+    "stage": "Stage-1 Router",
+    "model": "emilyalsentzer/Bio_ClinicalBERT",
+    "num_labels": 22,
+    "best_epoch": 10.0,
+    "eval_loss": 0.30178549885749817,
+    "eval_accuracy": 0.9575569358178054,
+    "eval_macro_f1": 0.9675155492039906,
+    "eval_top_5_accuracy": 0.9813664555549622,
+    "eval_runtime": 10.7805,
+    "eval_samples_per_second": 89.606,
+    "eval_steps_per_second": 11.224,
+    "epoch": 10.0,
+    "step": 4830
+}

@@ -1,0 +1,22 @@
+{
+    "experiment": "E-002_FullICD10_ClinicalBERT",
+    "model": "emilyalsentzer/Bio_ClinicalBERT",
+    "label_scheme": "icd10_full",
+    "num_labels": 1926,
+    "num_epochs": 20,
+    "best_epoch": 20.0,
+    "train_runtime": 5765.7977,
+    "train_samples_per_second": 26.806,
+    "train_steps_per_second": 1.675,
+    "total_flos": 4.136895021514752e+16,
+    "train_loss": 5.45834919710337,
+    "epoch": 20.0,
+    "eval_loss": 4.323606014251709,
+    "eval_accuracy": 0.5227743271221532,
+    "eval_macro_f1": 0.4091089305183863,
+    "eval_top_5_accuracy": 0.8033125996589661,
+    "eval_runtime": 10.5107,
+    "eval_samples_per_second": 91.907,
+    "eval_steps_per_second": 11.512,
+    "step": 9660
+}
