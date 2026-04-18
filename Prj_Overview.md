@@ -348,16 +348,33 @@ class HybridRouter:
 
 ---
 
-### Immediate Next Steps
+---
 
-1. **Migrate notebook 01 (EDA / Gold layer pipeline) to `scripts/prepare_data.py`** — this notebook is self-contained and ready; no architectural decisions block it.
+## Project Status — April 2026
 
-2. **Design and implement the `ModelAdapter` interface in `src/`** — this is the foundation everything else builds on.
+### Git Setup
 
-3. **Implement `EncoderAdapter`** wrapping the existing ClinicalBERT pipeline as the first concrete adapter — validates the interface design and preserves all existing work.
+The project is under version control with three branches, all currently pointing at the same initial commit:
 
-4. **Write `scripts/train.py`** using the adapter interface — model is a config value, not a hard-coded import.
+| Branch | Purpose |
+|---|---|
+| `baseline` | Permanent snapshot — never touch it. Safe revert point for the refactored notebook pipeline. |
+| `main` | Stable trunk — receives merges from feature branches when they are ready and tested. |
+| `feature/script-layer` | Active working branch — all script layer and adapter work happens here. |
 
-5. **Write `scripts/evaluate.py`** with confidence calibration metrics alongside accuracy and Macro F1.
+### Completed
 
-6. **Leave a documented stub for `GenerativeAdapter`** — clear interface, clear entry point, ready to implement when MedGemma or another generative model is introduced.
+- All 5 `src/` files refactored and aligned to the notebook ground truth — `preprocessing.py`, `inference.py`, `config.py`, `data_loader.py`, `dataset.py`
+- Architectural decisions documented in this file (see section above)
+- Clean initial git commit with meaningful message and correct `.gitignore` — binaries, weights, and data excluded; all JSON metadata and source tracked
+- `baseline` branch created as a permanent snapshot
+
+### Next Up on `feature/script-layer`
+
+1. **`scripts/prepare_data.py`** — notebook 01 equivalent (EDA, APSO-Flip, redaction, Gold layer export). This notebook is self-contained and ready to migrate; no architectural decisions block it.
+
+2. **`src/adapters.py`** — the `ModelAdapter` interface and `EncoderAdapter` implementation. This is the foundation everything else builds on.
+
+3. **`scripts/train.py`** — training script using the adapter interface; model is a config value, not a hard-coded import.
+
+4. **`scripts/evaluate.py`** — evaluation script with confidence calibration metrics alongside accuracy and Macro F1.
