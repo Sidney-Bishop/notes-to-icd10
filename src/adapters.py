@@ -583,31 +583,42 @@ class EncoderAdapter(ModelAdapter):
         output_dir : Path
             Best checkpoint saved here.
         """
+        from transformers import DataCollatorWithPadding
+        from src.evaluation import hf_compute_metrics
+
         output_dir = Path(output_dir)
         output_dir.mkdir(parents=True, exist_ok=True)
 
         # Set model to training mode (it's in eval() after construction)
         self.model.train()
 
+        # Compute warmup_steps explicitly — mirrors notebook Phase 7 exactly.
+        # warmup_ratio is deprecated in HuggingFace v5.2.
+        num_epochs = cfg.get("num_epochs", 10)
+        batch_size = cfg.get("batch_size", 8)
+        total_steps = (len(train_dataset) // batch_size) * num_epochs
+        warmup_steps = int(cfg.get("warmup_ratio", 0.1) * total_steps)
+
         training_args = TrainingArguments(
             output_dir=str(output_dir),
-            num_train_epochs=cfg.get("num_epochs", 10),
-            per_device_train_batch_size=cfg.get("batch_size", 8),
-            per_device_eval_batch_size=cfg.get("batch_size", 8),
+            num_train_epochs=num_epochs,
+            per_device_train_batch_size=batch_size,
+            per_device_eval_batch_size=batch_size,
             learning_rate=cfg.get("learning_rate", 2e-5),
-            warmup_ratio=cfg.get("warmup_ratio", 0.1),
+            warmup_steps=warmup_steps,        # replaces deprecated warmup_ratio
             weight_decay=cfg.get("weight_decay", 0.01),
             eval_strategy="epoch",
             save_strategy="epoch",
             load_best_model_at_end=True,
-            metric_for_best_model="eval_loss",
-            greater_is_better=False,
-            logging_dir=str(output_dir / "logs"),
-            logging_steps=50,
-            report_to=[],             # disable Trainer's built-in logging;
-                                      # scripts/train.py handles MLflow externally
-            fp16=False,               # MPS doesn't support fp16
-            dataloader_num_workers=0, # avoid fork issues on macOS
+            metric_for_best_model="macro_f1", # matches notebook: best by F1 not loss
+            greater_is_better=True,
+            save_total_limit=3,
+            logging_steps=20,
+            report_to=[],                     # MLflow handled externally in train.py
+            fp16=False,                       # MPS doesn't support fp16
+            dataloader_num_workers=0,         # avoid fork issues on macOS
+            dataloader_pin_memory=False,      # MPS doesn't support pinned memory
+            seed=cfg.get("seed", 42),
         )
 
         trainer = Trainer(
@@ -615,6 +626,9 @@ class EncoderAdapter(ModelAdapter):
             args=training_args,
             train_dataset=train_dataset,
             eval_dataset=val_dataset,
+            processing_class=self.tokenizer,
+            data_collator=DataCollatorWithPadding(tokenizer=self.tokenizer),
+            compute_metrics=hf_compute_metrics,   # accuracy + macro_f1 + top5
             callbacks=[EarlyStoppingCallback(early_stopping_patience=3)],
         )
 
@@ -622,33 +636,33 @@ class EncoderAdapter(ModelAdapter):
         train_output = trainer.train()
         elapsed = time.perf_counter() - t0
 
-        # Extract training history from Trainer logs
+        # Extract training history — now includes macro_f1 from compute_metrics
         history = []
         for log in trainer.state.log_history:
             if "eval_loss" in log:
                 history.append({
-                    "epoch":        log.get("epoch"),
-                    "eval_loss":    log.get("eval_loss"),
-                    "train_loss":   log.get("loss"),          # may be None
+                    "epoch":      log.get("epoch"),
+                    "eval_loss":  log.get("eval_loss"),
+                    "eval_macro_f1":   log.get("eval_macro_f1"),
+                    "eval_accuracy":   log.get("eval_accuracy"),
+                    "train_loss": log.get("loss"),
                 })
 
-        # Best model is already loaded by Trainer (load_best_model_at_end=True)
-        best_val_loss = min(
-            (h["eval_loss"] for h in history if h.get("eval_loss") is not None),
-            default=float("inf"),
+        # Best epoch = highest eval_macro_f1 (matches load_best_model_at_end)
+        best_f1 = max(
+            (h["eval_macro_f1"] for h in history if h.get("eval_macro_f1") is not None),
+            default=-1.0,
         )
         best_epoch_entry = next(
-            (h for h in history if h.get("eval_loss") == best_val_loss),
+            (h for h in history if h.get("eval_macro_f1") == best_f1),
             {"epoch": -1},
         )
-        best_epoch = int(best_epoch_entry.get("epoch", -1))
+        best_epoch   = int(best_epoch_entry.get("epoch", -1))
+        best_acc     = best_epoch_entry.get("eval_accuracy", -1.0) or -1.0
 
-        # Accuracy and F1 are computed externally in scripts/evaluate.py —
-        # Trainer does not compute them during training to keep this fast.
-        # We store placeholder values that scripts/evaluate.py will populate.
         result = TrainingResult(
-            best_val_accuracy=-1.0,   # populated by evaluate.py post-hoc
-            best_val_f1=-1.0,         # populated by evaluate.py post-hoc
+            best_val_accuracy=float(best_acc),
+            best_val_f1=float(best_f1),
             best_epoch=best_epoch,
             training_history=history,
             output_dir=output_dir,

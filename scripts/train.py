@@ -99,8 +99,9 @@ from src.adapters import EncoderAdapter, TrainingResult         # noqa: E402
 # ==============================================================================
 
 def _stem_icd3(code: str) -> str:
-    """Collapse ICD-10 code to 3-char ICD-3 stem. E.g. 'M25.562' → 'M25'."""
-    return code.split(".")[0][:3].upper()
+    """Collapse ICD-10 code to 3-char ICD-3 stem. Matches notebook Phase 2 str.slice(0,3).
+    E.g. 'M25.562' → 'M25', 'N39.0' → 'N39', 'J18' → 'J18'."""
+    return code[:3].upper() if code else ""
 
 
 def _build_label_maps(
@@ -673,8 +674,12 @@ def parse_args() -> argparse.Namespace:
     p.add_argument(
         "--code-filter",
         choices=["all", "billable"],
-        default="billable",
-        help="Filter Gold layer by code_status: 'billable' (default) or 'all'.",
+        default="all",
+        help=(
+            "Filter Gold layer by code_status. "
+            "Default 'all' (10,240 records) matches E-001/E-002 notebooks. "
+            "Use 'billable' (9,660 records) for hierarchical experiments E-003/E-004a/E-005a."
+        ),
     )
     p.add_argument("--epochs",        type=int,   default=10)
     p.add_argument("--lr",            type=float, default=2e-5)

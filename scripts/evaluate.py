@@ -288,13 +288,43 @@ def evaluate_flat(
         for c in test_df["standard_icd10"].to_list()
     ]
 
-    # Batch prediction
+    # Batch prediction — tokenise apso_note directly.
+    # The test split already contains preprocessed apso_note text (APSO-flipped
+    # and ICD-10-redacted by the Gold layer pipeline). We must NOT call
+    # prepare_inference_input() again — the SOAP regex extraction would fail
+    # on already-reordered text and corrupt the input.
     print(f"   🔮 Running predictions (batch_size={batch_size})...")
-    results = adapter.predict_batch(
-        test_df["apso_note"].to_list(),
-        top_k=5,
-        batch_size=batch_size,
-    )
+    notes = test_df["apso_note"].to_list()
+    all_results = []
+    for i in range(0, len(notes), batch_size):
+        batch = notes[i : i + batch_size]
+        inputs = adapter.tokenizer(
+            batch,
+            truncation=True,
+            padding="max_length",
+            max_length=512,
+            return_tensors="pt",
+        )
+        inputs = {
+            k: v.to(adapter.device)
+            for k, v in inputs.items()
+            if k in adapter.tokenizer.model_input_names
+        }
+        import torch
+        with torch.no_grad():
+            logits = adapter.model(**inputs).logits
+            probs_batch = torch.softmax(logits, dim=-1).cpu().numpy()
+
+        for probs in probs_batch:
+            top_k_actual = min(5, len(adapter.id2label))
+            top_idx = probs.argsort()[::-1][:top_k_actual]
+            codes  = [adapter.id2label.get(int(j), "UNKNOWN") for j in top_idx]
+            scores = [float(probs[j]) for j in top_idx]
+            from src.adapters import PredictionResult
+            all_results.append(PredictionResult(
+                codes=codes, scores=scores, confidence=scores[0]
+            ))
+    results = all_results
 
     pred_labels  = [r.top1_code  for r in results]
     confidences  = np.array([r.confidence for r in results])
