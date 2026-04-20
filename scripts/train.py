@@ -504,6 +504,12 @@ def train_hierarchical_stage2(
             print(f"   ⏭  Chapter {chapter}: skipped (fallback={majority_code})")
             continue
 
+        # Chapter filter — only train specified chapters if --chapters was passed
+        chapters_filter = cfg.get("chapters_filter")
+        if chapters_filter and chapter not in chapters_filter:
+            print(f"   ⏭  Chapter {chapter}: not in --chapters filter, skipping")
+            continue
+
         ch_df = df.filter(pl.col("standard_icd10").str.starts_with(chapter))
 
         if len(ch_df) < 4:
@@ -689,6 +695,26 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--max-length",    type=int,   default=512)
     p.add_argument("--seed",          type=int,   default=42)
     p.add_argument(
+        "--chapters",
+        nargs="+",
+        default=None,
+        metavar="CHAPTER",
+        help=(
+            "Limit Stage-2 training to specific chapters (e.g. --chapters Z O). "
+            "Useful for retraining only weak chapters after augmentation. "
+            "Default: train all chapters."
+        ),
+    )
+    p.add_argument(
+        "--gold-path",
+        type=Path,
+        default=None,
+        help=(
+            "Path to a specific Gold layer parquet (e.g. augmented file). "
+            "Default: auto-detect most recent file in data/gold/."
+        ),
+    )
+    p.add_argument(
         "--dry-run",
         action="store_true",
         help="Load data and validate without training.",
@@ -729,6 +755,8 @@ def main() -> None:
         cfg["stage1_init"] = args.stage1_init
     if args.stage2_init:
         cfg["stage2_init"] = args.stage2_init
+    if args.chapters:
+        cfg["chapters_filter"] = [c.upper() for c in args.chapters]
 
     # Output directory
     output_base = (
@@ -739,7 +767,12 @@ def main() -> None:
 
     # Load Gold layer
     print("\n── Loading Gold layer ───────────────────────────────────────────────")
-    df = load_gold_parquet()
+    if args.gold_path:
+        import polars as pl
+        df = pl.read_parquet(args.gold_path)
+        print(f"   📂 Using specified gold path: {args.gold_path.name}")
+    else:
+        df = load_gold_parquet()
     df = _filter_gold(df, args.code_filter)
     print(f"   ✅ {len(df):,} records after filter='{args.code_filter}'")
 
