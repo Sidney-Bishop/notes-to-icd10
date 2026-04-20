@@ -141,6 +141,14 @@ class HierarchicalPredictor:
         ).to(self.device)
         self.stage1_model.eval()
 
+        # Load temperature (1.0 = uncalibrated)
+        s1_temp_path = stage1_path / "temperature.json"
+        self.stage1_temperature = 1.0
+        if s1_temp_path.exists():
+            with open(s1_temp_path) as f:
+                self.stage1_temperature = json.load(f).get("temperature", 1.0)
+            print(f"   🌡  Stage-1 temperature: {self.stage1_temperature:.4f}")
+
         # Build chapter id→label maps from Stage-1 model config
         self.id2chapter: dict[int, str] = {
             int(k): v
@@ -163,6 +171,7 @@ class HierarchicalPredictor:
         self.stage2_models: dict[str, AutoModelForSequenceClassification] = {}
         self.stage2_tokenizers: dict[str, AutoTokenizer] = {}
         self.stage2_id2label: dict[str, dict[int, str]] = {}
+        self.stage2_temperatures: dict[str, float] = {}
 
         chapters_found = 0
         for ch_dir in sorted(stage2_base.iterdir()):
@@ -191,6 +200,13 @@ class HierarchicalPredictor:
             self.stage2_id2label[ch] = {
                 int(k): v for k, v in lmap["id2label"].items()
             }
+            # Load temperature (defaults to 1.0 if not calibrated yet)
+            temp_path = hf_dir / "temperature.json"
+            if temp_path.exists():
+                with open(temp_path) as f:
+                    self.stage2_temperatures[ch] = json.load(f).get("temperature", 1.0)
+            else:
+                self.stage2_temperatures[ch] = 1.0
             chapters_found += 1
 
         print(f"   ✅ Stage-2: {chapters_found} resolvers loaded")
@@ -260,6 +276,7 @@ class HierarchicalPredictor:
 
         with torch.no_grad():
             s1_logits = self.stage1_model(**s1_inputs).logits
+        s1_logits = s1_logits / self.stage1_temperature
         pred_chapter_id = int(torch.argmax(s1_logits, dim=-1).item())
         pred_chapter = self.id2chapter.get(pred_chapter_id, "UNKNOWN")
 
@@ -300,7 +317,8 @@ class HierarchicalPredictor:
 
         with torch.no_grad():
             s2_logits = ch_model(**s2_inputs).logits
-            s2_probs  = torch.softmax(s2_logits, dim=-1).cpu().numpy()[0]
+            T = self.stage2_temperatures.get(pred_chapter, 1.0)
+            s2_probs  = torch.softmax(s2_logits / T, dim=-1).cpu().numpy()[0]
 
         top_k_actual = min(top_k, len(ch_id2label))
         top_indices  = np.argsort(s2_probs)[::-1][:top_k_actual]
