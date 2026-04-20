@@ -497,7 +497,7 @@ def evaluate_hierarchical(
     correct_ch    = []
 
     for rec in records:
-        result         = predictor.predict(rec["apso_note"], top_k=5)
+        result         = predictor.predict(rec["apso_note"], top_k=5, preprocessed=True)
         pred_code      = result["codes"][0]
         pred_chapter   = result.get("chapter", "UNKNOWN")
         confidence     = result["scores"][0]

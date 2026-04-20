@@ -45,12 +45,13 @@ def _registry_base() -> Path:
 def _stage1_model_path(stage1_experiment: str = "E-003_Hierarchical_ICD10") -> Path:
     """
     Stage-1 router lives under the E-003 experiment directory (not registry),
-    at: outputs/evaluations/{E003_name}/stage1/model/
+    at: outputs/evaluations/{E003_name}/stage1/model/model/
     """
     return (
         config.resolve_path("outputs", "evaluations")
         / stage1_experiment
         / "stage1"
+        / "model"
         / "model"
     )
 
@@ -169,22 +170,23 @@ class HierarchicalPredictor:
                 continue
             ch = ch_dir.name
             model_dir = ch_dir / "model"
+            hf_dir = model_dir / "model"   # weights live one level deeper
             label_map_path = model_dir / "label_map.json"
 
-            if not model_dir.exists() or not label_map_path.exists():
+            if not hf_dir.exists() or not label_map_path.exists():
                 continue
 
             with open(label_map_path) as f:
                 lmap = json.load(f)
 
             ch_model = AutoModelForSequenceClassification.from_pretrained(
-                str(model_dir)
+                str(hf_dir)
             ).to(self.device)
             ch_model.eval()
 
             self.stage2_models[ch] = ch_model
             self.stage2_tokenizers[ch] = AutoTokenizer.from_pretrained(
-                str(model_dir)
+                str(hf_dir)
             )
             self.stage2_id2label[ch] = {
                 int(k): v for k, v in lmap["id2label"].items()
@@ -210,7 +212,7 @@ class HierarchicalPredictor:
 
     # -----------------------------------------------------------------------
 
-    def predict(self, note: str, top_k: int = 5) -> dict:
+    def predict(self, note: str, top_k: int = 5, preprocessed: bool = False) -> dict:
         """
         Predict ICD-10 codes for a single clinical note.
 
@@ -233,8 +235,11 @@ class HierarchicalPredictor:
             chapter : str       — Predicted ICD-10 chapter (Stage-1 output)
             stage2_source : str — "resolver", "fallback", or "fallback_no_model"
         """
-        # Preprocessing — mirrors training pipeline exactly
-        text = prepare_inference_input(note)
+        # Preprocessing — mirrors training pipeline exactly.
+        # If the caller has already preprocessed the text (e.g. evaluation on
+        # Gold layer apso_note which is already APSO-flipped and redacted),
+        # pass preprocessed=True to skip this step and avoid double-processing.
+        text = note if preprocessed else prepare_inference_input(note)
 
         # --- Stage-1: chapter routing ---
         s1_inputs = self.stage1_tokenizer(
