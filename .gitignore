@@ -247,4 +247,6 @@ $RECYCLE.BIN/
 # Miscellaneous
 # -----------------------------------------------------------------------------
 *.log
-*.pid
+*.pidoutputs/
+gold.jsonl
+project_handoff.zip
