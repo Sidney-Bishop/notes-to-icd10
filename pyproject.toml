@@ -44,6 +44,8 @@ dependencies = [
     # --- Compatibility fix ---
     "setuptools<81",
     "nbstripout>=0.9.1",
+    "fastapi>=0.135.1",
+    "uvicorn>=0.42.0",
 ]
 
 [tool.uv]
