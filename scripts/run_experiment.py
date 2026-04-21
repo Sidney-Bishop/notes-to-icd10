@@ -194,6 +194,7 @@ def run_one(
     code_filter: str,
     epochs: int,
     chapters: list[str] | None,
+    max_length: int | None,
     skip_train: bool,
     skip_calibrate: bool,
     dry_run: bool,
@@ -247,6 +248,8 @@ def run_one(
             cmd += ["--gold-path", gold_path]
         if chapters:
             cmd += ["--chapters"] + chapters
+        if max_length:
+            cmd += ["--max-length", str(max_length)]
 
         ok, train_seconds = run_cmd(cmd, "Training", dry_run)
         result["train_seconds"] = round(train_seconds)
@@ -350,8 +353,8 @@ def parse_args() -> argparse.Namespace:
 
     # Shared options
     p.add_argument("--stage2-init",
-                   default="outputs/evaluations/E-002_FullICD10_ClinicalBERT/model/model",
-                   help="Path to E-002 flat model for stage-2 init.")
+                   default=None,
+                   help="Path to E-002 flat model for stage-2 init. Omit for non-BERT architectures (e.g. Longformer).")
     p.add_argument("--gold-path",
                    default="data/gold/medsynth_gold_augmented.parquet",
                    help="Gold layer parquet path.")
@@ -362,6 +365,8 @@ def parse_args() -> argparse.Namespace:
                    default="billable",
                    choices=["all", "billable"])
     p.add_argument("--epochs", type=int, default=10)
+    p.add_argument("--max-length", type=int, default=None,
+                   help="Max token length (default: model default, 512 for BERT, 4096 for Longformer).")
     p.add_argument("--chapters", nargs="+",
                    help="Limit training to specific chapters.")
 
@@ -415,6 +420,7 @@ def main() -> None:
             code_filter      = args.code_filter,
             epochs           = args.epochs,
             chapters         = args.chapters,
+            max_length       = args.max_length,
             skip_train       = args.skip_train,
             skip_calibrate   = args.skip_calibrate,
             dry_run          = args.dry_run,

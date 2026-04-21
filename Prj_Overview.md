@@ -495,3 +495,100 @@ Two models were identified but not yet tested:
 | `allenai/biomed_roberta_base` | RoBERTa architecture with biomedical pretraining — different architecture family from BERT, may generalise differently |
 
 Clinical-Longformer is the higher-priority experiment because it addresses a structural limitation (512-token context) rather than just swapping pretraining data.
+
+---
+
+## Clinical-Longformer Experiment — April 2026
+
+### Motivation
+
+64.7% of notes exceed ClinicalBERT's 512-token context window. The APSO-Flip mitigates this by placing the Assessment section at token 0, but truncation still discards Objective and Plan content. Clinical-Longformer (`yikuan8/Clinical-Longformer`) handles sequences up to 4,096 tokens natively, which would eliminate the truncation problem entirely.
+
+### Experiment E-008_ClinicalLongformer
+
+Run via the orchestration script with `--max-length 4096` and no `--stage2-init` (BERT weights cannot be transferred to Longformer — different architecture).
+
+### Findings
+
+**Not viable on this pipeline for two reasons:**
+
+**1. Speed.** Longformer at 4,096 tokens processes ~39 seconds per batch iteration on MPS vs ~0.3 seconds for ClinicalBERT at 512 tokens — approximately 130x slower. With 19 chapter resolvers each running 15 epochs, the full training run would take 60-80 hours. Not practical for local iteration.
+
+**2. No warm start.** The E-002 flat ICD-10 initialisation that gave E-004a its 6x improvement over E-003 cannot be applied to Longformer — the BERT position embeddings (hardcoded to 512) are incompatible with Longformer's 4,096-token position table. Without warm start, Longformer shows 0% val accuracy through the first two epochs with no signs of convergence.
+
+**Conclusion:** E-008 was killed after Chapter E epoch 2. ClinicalBERT with APSO-Flip is the correct architecture for this hardware and dataset. The APSO-flip was effectively solving the truncation problem by ensuring diagnostic signal appears at token 0 — Longformer's extended context provides no practical benefit here.
+
+### Architecture note for future work
+
+If Longformer is revisited on GPU hardware with sufficient memory, the correct approach is:
+
+1. First train a Longformer-based flat ICD-10 model (equivalent to E-002) at 4,096 tokens
+2. Use that as the stage-2 init for hierarchical training
+
+This would take ~1 week on a single A100 GPU. The speed problem on Apple Silicon MPS is fundamental — Longformer's sliding-window attention is not well-optimised for MPS.
+
+---
+
+## Experiment Orchestration — April 2026
+
+### scripts/run_experiment.py
+
+A Python driver script that chains train → calibrate → evaluate for one or more model configurations. Designed for local iteration without the overhead of a full orchestration framework (Airflow, Dagster, Prefect).
+
+**Key features:**
+- Skip logic: each stage is skipped if its output already exists — re-running after an interruption resumes automatically
+- Multi-experiment: run several model configs sequentially with a single command
+- Results CSV: appends to `outputs/experiment_results.csv` after each experiment
+- Comparison table: prints formatted summary at the end of each run
+- Dry-run: shows what would execute without running anything
+
+**Usage:**
+
+```bash
+# New model end-to-end
+uv run python scripts/run_experiment.py \
+    --experiment E-009_NewModel \
+    --model some/hf-model-id \
+    --stage2-init outputs/evaluations/E-002_FullICD10_ClinicalBERT/model/model \
+    --gold-path data/gold/medsynth_gold_augmented.parquet
+
+# Re-evaluate existing experiments
+uv run python scripts/run_experiment.py \
+    --experiments E-005c_Merged_ZO E-006_BiomedBERT E-007_PubMedBERT \
+    --skip-train
+
+# Dry-run preview
+uv run python scripts/run_experiment.py \
+    --experiment E-009_NewModel --model some/model --dry-run
+```
+
+**Design decision — custom script over framework:** The pipeline is linear (no branching), manually triggered (no scheduling), and single-machine (no distributed execution). Airflow/Dagster would add significant infrastructure overhead for no practical benefit at this stage. Prefect would be the natural next step if overnight batch runs, failure alerts, or parallel execution become requirements.
+
+---
+
+## Final Model Leaderboard — April 2026
+
+| Rank | Experiment | Model | E2E Acc | Macro F1 | ECE | Coverage@0.7 |
+|---|---|---|---|---|---|---|
+| 🥇 | E-005c_Merged_ZO | Bio_ClinicalBERT | **77.0%** | **0.679** | **0.027** | **68.5%** |
+| 🥈 | E-006_BiomedBERT | BiomedBERT | 73.1% | 0.651 | 0.030 | 64.3% |
+| 🥉 | E-007_PubMedBERT | PubMedBERT | 73.0% | 0.650 | 0.028 | 64.5% |
+| ❌ | E-008_ClinicalLongformer | Clinical-Longformer | DNF | — | — | — |
+
+**E-005c is the production pipeline.** It auto-codes 68.5% of cases at 93.6% accuracy and routes the remaining 31.5% to human review.
+
+---
+
+## Updated Next Steps — Prioritised Roadmap
+
+### 1. Chapter Z — Contrastive Fine-Tuning
+Z is stuck at 55.3% across all encoder models. The 263 Z codes are administratively too similar for cross-entropy training to discriminate. SimCSE or SupCon contrastive loss would explicitly pull Z code embeddings apart in representation space. This is the highest-value remaining accuracy improvement and does not require new data or new models.
+
+### 2. MIMIC-IV Validation
+MedSynth is synthetic. Running E-005c against real MIMIC-IV clinical notes without retraining would reveal the synthetic-to-real performance gap. Requires a PhysioNet data use agreement. This is the most important validation step before any production consideration.
+
+### 3. GenerativeAdapter
+The `GenerativeAdapter` stub and `HybridRouter` concept are already in `src/adapters.py`. When the encoder is uncertain, escalate to MedGemma for clinical reasoning. 2-3 week implementation project.
+
+### 4. Longformer on GPU
+If GPU hardware becomes available, E-008 can be revisited: train a Longformer flat ICD-10 model first (E-002 equivalent), then use it as stage-2 init. Expected training time ~1 week on A100.
