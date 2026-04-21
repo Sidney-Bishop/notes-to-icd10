@@ -423,3 +423,75 @@ MedBERT and PubMedBERT are direct drop-in replacements for Bio_ClinicalBERT via 
 | **E-005c (original)** | Markdown stripping before tokenisation | Low-effort, recovers context window space |
 | **E-005d** | Apply to real clinical dataset | Maps to MIMIC-IV validation above |
 | **E-006** | Ensemble E-002 flat + E-005c hierarchical | E-005c already far exceeds flat baseline; marginal gain expected |
+
+---
+
+## Model Comparison Study — April 2026
+
+### Motivation
+
+The `EncoderAdapter` interface makes swapping the backbone model a single `--model` flag change. Having established ClinicalBERT as the baseline, the natural question is whether a different pretrained encoder produces better ICD-10 representations on this dataset.
+
+Three models were evaluated under identical conditions: same hierarchical architecture, same E-002 initialisation, same augmented gold layer, same 10 epochs.
+
+### Models Tested
+
+| Model | HuggingFace ID | Pretraining Corpus |
+|---|---|---|
+| **Bio_ClinicalBERT** (baseline) | `emilyalsentzer/Bio_ClinicalBERT` | MIMIC-III clinical notes |
+| **BiomedBERT** | `microsoft/BiomedNLP-BiomedBERT-base-uncased-abstract-fulltext` | PubMed abstracts + full text |
+| **PubMedBERT** | `microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract` | PubMed abstracts only |
+
+### Calibration Bug Fixed
+
+During E-006 calibration, Chapter K's temperature scalar optimised to a negative value (`T=-1.4446`), causing Coverage@0.7 to collapse to 0% and chapter accuracy to 0.000. This is a calibration failure — the LBFGS optimiser found a local minimum with inverted confidence scores.
+
+The fix was to clamp the returned temperature to `[0.05, 10.0]` in `calibrate.py`:
+
+```python
+return float(max(0.05, min(10.0, T.item())))
+```
+
+This was applied to all subsequent calibration runs. The same issue appeared in E-007 (K also hit the floor at 0.05), confirming that K's resolver is systematically overconfident in the wrong direction for non-ClinicalBERT models — likely because the E-002 ClinicalBERT initialisation creates a mismatch with the BiomedBERT/PubMedBERT encoder weights.
+
+### Results
+
+| Metric | E-005c ClinicalBERT | E-006 BiomedBERT | E-007 PubMedBERT |
+|---|---|---|---|
+| **E2E Accuracy** | **77.0%** | 73.1% | 73.0% |
+| **Macro F1** | **0.679** | 0.651 | 0.650 |
+| **ECE** | **0.027** | 0.030 | 0.028 |
+| **Coverage @ τ=0.7** | **68.5%** | 64.3% | 64.5% |
+| Accuracy on auto-coded | **93.6%** | 92.0% | 92.0% |
+| Chapter O | 68.6% | **70.6%** | **70.6%** |
+| Chapter Z | **55.3%** | 42.2% | 42.2% |
+| Chapter K | **79.3%** | 79.3% | 79.3% |
+
+### Analysis
+
+**ClinicalBERT wins on every headline metric.** BiomedBERT and PubMedBERT are virtually identical to each other (0.1pp difference) and both trail ClinicalBERT by ~4 points E2E.
+
+The gap is driven almost entirely by Chapter Z. ClinicalBERT scores 55.3% on Z while both alternatives score 42.2% — a 13pp deficit. Every other chapter is within noise of ClinicalBERT.
+
+**Why ClinicalBERT wins:** Its pretraining corpus is MIMIC-III, a large dataset of real de-identified clinical notes in SOAP-like format. BiomedBERT and PubMedBERT are pretrained on PubMed abstracts, which are structurally very different — formal scientific prose rather than clinical documentation. Even though the MedSynth dataset is synthetic, it was generated to mimic real SOAP notes, so the MIMIC-III pretraining transfers better.
+
+**Why Z is the differentiator:** Chapter Z codes (Factors Influencing Health Status) describe administrative encounters — screening visits, vaccination records, social determinants of health. These are the most note-style codes in the dataset; their signal lies in subtle documentation patterns rather than diagnostic terminology. ClinicalBERT, having seen thousands of real clinical notes, has better representations for these patterns. BiomedBERT and PubMedBERT, trained on research abstracts, lack this register.
+
+**O improved slightly for non-ClinicalBERT models** — 70.6% vs 68.6%. This suggests obstetrics terminology is well represented in PubMed literature, giving BiomedBERT/PubMedBERT a small edge on the O resolver despite the overall deficit.
+
+### Conclusion
+
+The encoder comparison experiment confirms that **Bio_ClinicalBERT remains the best backbone** for this task. The MIMIC-III clinical note pretraining is the decisive factor. E-005c is the current best pipeline and should be the basis for all further work.
+
+The experiment also validates the `EncoderAdapter` interface design — running a full model comparison required only changing `--model` flags, with no other code changes.
+
+### Remaining Encoder Options
+
+Two models were identified but not yet tested:
+
+| Model | Rationale for trying |
+|---|---|
+| `yikuan8/Clinical-Longformer` | Handles 4,096 tokens natively — eliminates the truncation problem entirely without APSO-Flip; may particularly help Z where discriminating signal is spread across the full note |
+| `allenai/biomed_roberta_base` | RoBERTa architecture with biomedical pretraining — different architecture family from BERT, may generalise differently |
+
+Clinical-Longformer is the higher-priority experiment because it addresses a structural limitation (512-token context) rather than just swapping pretraining data.

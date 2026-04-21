@@ -131,7 +131,9 @@ def optimise_temperature(
         return loss
 
     optimiser.step(closure)
-    return float(T.item())
+    # Clamp to [0.05, 10.0] — negative temperatures are physically meaningless
+    # and indicate a calibration failure (overconfident in wrong direction).
+    return float(max(0.05, min(10.0, T.item())))
 
 
 def ece_from_logits(
