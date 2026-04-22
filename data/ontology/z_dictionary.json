@@ -1,0 +1,23 @@
+{
+  "general adult medical examination without abnormal findings": {"code": "Z00.00", "title": "Encounter for general adult medical examination without abnormal findings"},
+  "general adult medical examination with abnormal findings": {"code": "Z00.01", "title": "Encounter for general adult medical examination with abnormal findings"},
+  "encounter for general adult medical examination": {"code": "Z00.00", "title": "Encounter for general adult medical examination without abnormal findings"},
+  "annual wellness exam": {"code": "Z00.00", "title": "Encounter for general adult medical examination without abnormal findings"},
+  "annual wellness": {"code": "Z00.00", "title": "Encounter for general adult medical examination without abnormal findings"},
+  "routine physical exam": {"code": "Z00.00", "title": "Encounter for general adult medical examination without abnormal findings"},
+  "routine physical": {"code": "Z00.00", "title": "Encounter for general adult medical examination without abnormal findings"},
+  "wellness visit": {"code": "Z00.00", "title": "Encounter for general adult medical examination without abnormal findings"},
+  "health check": {"code": "Z00.00", "title": "Encounter for general adult medical examination without abnormal findings"},
+  "preventive visit": {"code": "Z00.00", "title": "Encounter for general adult medical examination without abnormal findings"},
+  "well child visit": {"code": "Z00.129", "title": "Encounter for routine child health examination without abnormal findings"},
+  "health supervision of infant": {"code": "Z00.129", "title": "Encounter for routine child health examination without abnormal findings"},
+  "preoperative examination": {"code": "Z01.818", "title": "Encounter for other preprocedural examination"},
+  "pre-op clearance": {"code": "Z01.818", "title": "Encounter for other preprocedural examination"},
+  "gastrostomy status": {"code": "Z93.1", "title": "Gastrostomy status"},
+  "gastrostomy tube check": {"code": "Z43.1", "title": "Encounter for attention to gastrostomy"},
+  "g-tube check": {"code": "Z43.1", "title": "Encounter for attention to gastrostomy"},
+  "encounter for attention to gastrostomy": {"code": "Z43.1", "title": "Encounter for attention to gastrostomy"},
+  "personal history of": {"code": "Z87.891", "title": "Personal history of other specified conditions"},
+  "family history of": {"code": "Z83.49", "title": "Family history of other endocrine nutritional and metabolic diseases"},
+  "screening for": {"code": "Z13.9", "title": "Encounter for screening for other specified diseases and disorders"}
+}
