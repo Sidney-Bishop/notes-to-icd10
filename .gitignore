@@ -250,3 +250,18 @@ $RECYCLE.BIN/
 *.pidoutputs/
 gold.jsonl
 project_handoff.zip
+
+# Local Claude setup
+Claude_Code_Local_Setup_Guide_v2.md
+start-claude-local-v2.sh
+
+# Large outputs
+outputs/
+graphify-out/
+data/graph/
+*.zip
+
+# Notebook backups
+notebooks/OLD_*.ipynb
+notebooks/*\ 1.ipynb
+
