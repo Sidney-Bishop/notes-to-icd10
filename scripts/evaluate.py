@@ -603,4 +603,119 @@ def parse_args() -> argparse.Namespace:
         description="Evaluate a trained ICD-10 classifier with confidence calibration."
     )
     p.add_argument(
-        "--
+        "--experiment", "-e",
+        required=True,
+        help="Experiment name (matches the output directory).",
+    )
+    p.add_argument(
+        "--mode",
+        choices=["flat", "hierarchical"],
+        default="flat",
+    )
+    p.add_argument(
+        "--stage1-experiment",
+        default="E-003_Hierarchical_ICD10",
+        help="Stage-1 experiment name (hierarchical mode only).",
+    )
+    p.add_argument(
+        "--threshold",
+        type=float,
+        default=0.7,
+        help="Confidence threshold for Use Case B coverage/accuracy reporting.",
+    )
+    p.add_argument(
+        "--sample",
+        type=int,
+        default=None,
+        help="Evaluate on a random sample of N records (for quick validation).",
+    )
+    p.add_argument(
+        "--batch-size",
+        type=int,
+        default=32,
+        help="Batch size for flat model predict_batch() (flat mode only).",
+    )
+    return p.parse_args()
+
+def main() -> None:
+    args = parse_args()
+
+    start = datetime.now()
+    print(f"\n{'='*70}")
+    print(f" evaluate.py — ICD-10 Classifier Evaluation")
+    print(f" Experiment: {args.experiment}")
+    print(f" Mode: {args.mode}")
+    print(f" Threshold: {args.threshold}")
+    print(f" Started: {start.strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"{'='*70}")
+
+    # Log start to experiment registry
+    from src.experiment_logger import ExperimentLogger
+    exp_logger = ExperimentLogger(args.experiment, script="evaluate.py")
+    exp_logger.log_start("evaluate", params={
+        "mode":             args.mode,
+        "stage1_experiment": getattr(args, "stage1_experiment", "—"),
+        "threshold":        args.threshold,
+        "sample":           args.sample or "all",
+    })
+
+    try:
+        if args.mode == "flat":
+            summary = evaluate_flat(
+                experiment_name=args.experiment,
+                sample=args.sample,
+                threshold=args.threshold,
+                batch_size=args.batch_size,
+            )
+        else:
+            summary = evaluate_hierarchical(
+                experiment_name=args.experiment,
+                stage1_experiment=args.stage1_experiment,
+                sample=args.sample,
+                threshold=args.threshold,
+            )
+    except Exception as e:
+        exp_logger.log_failed("evaluate", reason=str(e))
+        raise
+
+    elapsed = (datetime.now() - start).total_seconds()
+
+    # Log results
+    eval_dir = config.resolve_path("outputs", "evaluations") / args.experiment / "eval"
+    exp_logger.log_complete("evaluate", artifacts={
+        "eval_dir": str(eval_dir),
+    })
+    metrics = {}
+    if args.mode == "flat":
+        metrics = {
+            "e2e_accuracy":   summary.get("top1_accuracy", 0),
+            "macro_f1":       summary.get("macro_f1", 0),
+            "ece":            summary.get("ece", 0),
+            "coverage_07":    summary.get("coverage_at_threshold", 0),
+        }
+    else:
+        metrics = {
+            "stage1_accuracy": summary.get("stage1_accuracy", 0),
+            "stage2_accuracy": summary.get("within_chapter_accuracy", 0),
+            "e2e_accuracy":    summary.get("e2e_accuracy", 0),
+            "macro_f1":        summary.get("macro_f1", 0),
+            "ece":             summary.get("ece", 0),
+            "coverage_07":     summary.get("coverage_at_threshold",
+                               summary.get("coverage_07", 0)),
+        }
+    exp_logger.log_results(metrics)
+
+    print(f"\n{'='*70}")
+    if args.mode == "flat":
+        print(f" Top-1 Accuracy: {summary['top1_accuracy']:.3f} | "
+              f"Macro F1: {summary['macro_f1']:.3f} | "
+              f"ECE: {summary['ece']:.4f}")
+    else:
+        print(f" E2E Accuracy: {summary['e2e_accuracy']:.3f} | "
+              f"Macro F1: {summary['macro_f1']:.3f} | "
+              f"ECE: {summary['ece']:.4f}")
+    print(f" Elapsed: {elapsed:.1f}s")
+    print(f"{'='*70}")
+
+if __name__ == "__main__":
+    main()

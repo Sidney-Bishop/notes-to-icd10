@@ -309,6 +309,8 @@ def main() -> None:
 
     eval_base = config.resolve_path("outputs", "evaluations")
     exp_dir   = eval_base / args.experiment
+    from src.paths import ExperimentPaths
+    paths     = ExperimentPaths(args.experiment, stage1_experiment=args.stage1_experiment)
     s1_dir    = eval_base / args.stage1_experiment / "stage1"
     s2_dir    = exp_dir / "stage2"
 
@@ -329,6 +331,15 @@ def main() -> None:
     print(f"  Started:     {started}")
     print(BANNER)
 
+    # Log start to experiment registry
+    from src.experiment_logger import ExperimentLogger
+    exp_logger = ExperimentLogger(args.experiment, script="calibrate.py")
+    exp_logger.log_start("calibrate", params={
+        "stage1_experiment": args.stage1_experiment,
+        "threshold":         args.threshold,
+        "dry_run":           args.dry_run,
+    })
+
     report = {}
     t0 = time.time()
 
@@ -336,12 +347,12 @@ def main() -> None:
     # Stage-1 calibration
     # ------------------------------------------------------------------
     print("\n── Stage-1 Router ─────────────────────────────────────────────────")
-    s1_hf_dir    = s1_dir / "model" / "model"
-    s1_lmap      = s1_dir / "model" / "label_map.json"
-    s1_test      = s1_dir / "test_split.parquet"
+    s1_hf_dir    = paths.stage1_model_dir()
+    s1_lmap      = paths.stage1_label_map()
+    s1_test      = paths.stage1_test_split()
 
-    if not s1_hf_dir.exists():
-        print(f"   ⚠️  Stage-1 model not found at {s1_hf_dir}, skipping")
+    if s1_hf_dir is None or not s1_hf_dir.exists():
+        print(f"   ⚠️  Stage-1 model not found for {args.stage1_experiment}, skipping")
     else:
         result = calibrate_model(
             hf_model_dir   = s1_hf_dir,
@@ -360,7 +371,7 @@ def main() -> None:
               f"(acc={result['accuracy_on_covered_after']:.3f})")
 
         if not args.dry_run:
-            out = s1_hf_dir / "temperature.json"
+            out = paths.stage1_temperature()
             out.write_text(json.dumps({"temperature": T}, indent=2))
             print(f"   💾 Saved: {out}")
 
@@ -377,11 +388,12 @@ def main() -> None:
             if not ch_dir.is_dir():
                 continue
             ch = ch_dir.name
-            hf_dir    = ch_dir / "model" / "model"
-            lmap_path = ch_dir / "model" / "label_map.json"
-            test_path = ch_dir / "test_split.parquet"
+            ch        = ch_dir.name
+            hf_dir    = paths.stage2_model_dir(ch)
+            lmap_path = paths.stage2_label_map(ch)
+            test_path = paths.stage2_test_split(ch)
 
-            if not hf_dir.exists() or not test_path.exists():
+            if hf_dir is None or not hf_dir.exists() or not test_path.exists():
                 print(f"   ⏭  {ch}: no model or test split, skipping")
                 continue
 
@@ -402,7 +414,7 @@ def main() -> None:
                   f"(acc={result['accuracy_on_covered_after']:.3f})")
 
             if not args.dry_run:
-                out = hf_dir / "temperature.json"
+                out = paths.stage2_temperature(ch)
                 out.write_text(json.dumps({"temperature": T}, indent=2))
 
         report["stage2"] = chapter_results
@@ -424,6 +436,12 @@ def main() -> None:
         report_path = exp_dir / "calibration_report.json"
         report_path.write_text(json.dumps(report, indent=2))
         print(f"\n   💾 Report saved: {report_path}")
+        exp_logger.log_complete("calibrate", artifacts={
+            "calibration_report": str(report_path),
+            "resolvers_calibrated": len(report.get("stage2", {})),
+        })
+    else:
+        exp_logger.log_skipped("calibrate", reason="--dry-run flag set")
 
     # Summary stats
     if "stage2" in report:

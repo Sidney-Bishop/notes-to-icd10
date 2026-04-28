@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 run_experiment.py — Experiment Orchestration Driver
-=====================================================
+
 Runs the full train → calibrate → evaluate pipeline for one or more
 model configurations. Writes a results summary to CSV and prints a
 comparison table at the end.
@@ -10,7 +10,7 @@ Skip logic: each stage is skipped if its output already exists, so
 re-running after an interruption picks up where it left off.
 
 Usage
------
+
     # Single experiment
     uv run python scripts/run_experiment.py \\
         --experiment E-008_Longformer \\
@@ -38,9 +38,9 @@ Usage
         --stage1-experiment E-003_Hierarchical_ICD10
 
 Output
-------
-    outputs/experiment_results.csv   — appended after each experiment
-    Console comparison table         — printed at end of run
+
+    outputs/experiment_results.csv — appended after each experiment
+    Console comparison table — printed at end of run
 """
 
 from __future__ import annotations
@@ -54,8 +54,11 @@ import time
 from datetime import datetime
 from pathlib import Path
 
+# Experiment logging — must import after PROJECT_ROOT is set
+# (imported lazily inside functions to avoid circular import)
+
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-RESULTS_CSV  = PROJECT_ROOT / "outputs" / "experiment_results.csv"
+RESULTS_CSV = PROJECT_ROOT / "outputs" / "experiment_results.csv"
 
 BANNER = "=" * 70
 
@@ -67,60 +70,73 @@ CSV_FIELDS = [
     "train_seconds", "total_seconds", "status",
 ]
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
 def log(msg: str, indent: int = 0) -> None:
-    prefix = "  " * indent
+    prefix = " " * indent
     print(f"{prefix}{msg}", flush=True)
-
 
 def run_cmd(cmd: list[str], label: str, dry_run: bool = False) -> tuple[bool, float]:
     """
     Run a subprocess command. Returns (success, elapsed_seconds).
     Streams output live so the user sees progress.
     """
-    log(f"▶  {label}")
-    log(f"   {' '.join(cmd)}", indent=1)
+    log(f"▶ {label}")
+    log(f" {' '.join(cmd)}", indent=1)
 
     if dry_run:
-        log("   [DRY RUN — skipped]", indent=1)
+        log(" [DRY RUN — skipped]", indent=1)
         return True, 0.0
 
     t0 = time.time()
     result = subprocess.run(cmd, cwd=PROJECT_ROOT)
     elapsed = time.time() - t0
 
-    if result.returncode != 0:
-        log(f"   ✗ FAILED (exit {result.returncode}) after {elapsed:.1f}s", indent=1)
+    if result.returncode!= 0:
+        log(f" ✗ FAILED (exit {result.returncode}) after {elapsed:.1f}s", indent=1)
         return False, elapsed
 
-    log(f"   ✓ Done in {elapsed:.1f}s", indent=1)
+    log(f" ✓ Done in {elapsed:.1f}s", indent=1)
     return True, elapsed
 
-
 def should_skip_train(exp_dir: Path) -> bool:
-    """True if stage2 training outputs already exist for all expected chapters."""
+    """True if stage2 model weights already exist for key chapters."""
     stage2 = exp_dir / "stage2"
     if not stage2.exists():
         return False
-    chapters = [d for d in stage2.iterdir() if d.is_dir()]
-    # At minimum A and Z should be present for a complete run
-    trained = {d.name for d in chapters}
-    return "A" in trained and "Z" in trained
+    # Check for actual model weights, not just split parquets
+    # A chapter dir with only parquets (from prepare_splits.py) does NOT count
+    for ch in ["A", "Z"]:
+        ch_dir = stage2 / ch
+        has_weights = (
+            (ch_dir / "model.safetensors").exists() or
+            (ch_dir / "model" / "model.safetensors").exists() or
+            (ch_dir / "config.json").exists()
+        )
+        if not has_weights:
+            return False
+    return True
 
+def should_skip_stage1(exp_dir: Path) -> bool:
+    """True if stage1 router already exists."""
+    stage1 = exp_dir / "stage1"
+    if not stage1.exists():
+        return False
+    # Look for config.json in stage1 or nested model dirs
+    for candidate in [stage1, stage1 / "model", stage1 / "model" / "model"]:
+        if (candidate / "config.json").exists():
+            return True
+    return False
 
 def should_skip_calibrate(exp_dir: Path) -> bool:
     """True if calibration_report.json already exists."""
     return (exp_dir / "calibration_report.json").exists()
 
-
 def should_skip_evaluate(exp_dir: Path) -> bool:
     """True if eval results already exist."""
     return (exp_dir / "eval").exists()
-
 
 def read_eval_results(exp_dir: Path) -> dict:
     """Read evaluation metrics from the saved eval JSON."""
@@ -141,7 +157,6 @@ def read_eval_results(exp_dir: Path) -> dict:
 
     return {}
 
-
 def append_results_csv(row: dict) -> None:
     """Append a result row to the shared CSV, creating it with headers if needed."""
     RESULTS_CSV.parent.mkdir(parents=True, exist_ok=True)
@@ -153,33 +168,31 @@ def append_results_csv(row: dict) -> None:
             writer.writeheader()
         writer.writerow(row)
 
-
 def print_comparison_table(rows: list[dict]) -> None:
     """Print a formatted comparison table of all experiments in this run."""
     if not rows:
         return
 
     print(f"\n{BANNER}")
-    print(f"  Results Summary")
+    print(f" Results Summary")
     print(BANNER)
 
     # Header
-    print(f"  {'Experiment':<35} {'E2E Acc':>8} {'F1':>7} {'ECE':>6} "
+    print(f" {'Experiment':<35} {'E2E Acc':>8} {'F1':>7} {'ECE':>6} "
           f"{'Cov@0.7':>8} {'Status':>8}")
-    print(f"  {'-'*35} {'-'*8} {'-'*7} {'-'*6} {'-'*8} {'-'*8}")
+    print(f" {'-'*35} {'-'*8} {'-'*7} {'-'*6} {'-'*8} {'-'*8}")
 
     for r in rows:
-        acc  = f"{float(r.get('e2e_accuracy', 0)):.3f}" if r.get('e2e_accuracy') else "—"
-        f1   = f"{float(r.get('macro_f1', 0)):.3f}"     if r.get('macro_f1')     else "—"
-        ece  = f"{float(r.get('ece', 0)):.4f}"           if r.get('ece')          else "—"
-        cov  = f"{float(r.get('coverage_07', 0)):.3f}"  if r.get('coverage_07')  else "—"
-        st   = r.get('status', '?')
+        acc = f"{float(r.get('e2e_accuracy', 0)):.3f}" if r.get('e2e_accuracy') else "—"
+        f1 = f"{float(r.get('macro_f1', 0)):.3f}" if r.get('macro_f1') else "—"
+        ece = f"{float(r.get('ece', 0)):.4f}" if r.get('ece') else "—"
+        cov = f"{float(r.get('coverage_07', 0)):.3f}" if r.get('coverage_07') else "—"
+        st = r.get('status', '?')
 
-        print(f"  {r['experiment']:<35} {acc:>8} {f1:>7} {ece:>6} {cov:>8} {st:>8}")
+        print(f" {r['experiment']:<35} {acc:>8} {f1:>7} {ece:>6} {cov:>8} {st:>8}")
 
     print(BANNER)
-    print(f"\n  Full results: {RESULTS_CSV.relative_to(PROJECT_ROOT)}")
-
+    print(f"\n Full results: {RESULTS_CSV.relative_to(PROJECT_ROOT)}")
 
 # ---------------------------------------------------------------------------
 # Single experiment runner
@@ -190,37 +203,78 @@ def run_one(
     model: str | None,
     stage2_init: str | None,
     gold_path: str | None,
-    stage1_experiment: str,
+    stage1_experiment: str | None,
     code_filter: str,
     epochs: int,
     chapters: list[str] | None,
     max_length: int | None,
+    use_presplit: bool,
     skip_train: bool,
     skip_calibrate: bool,
     dry_run: bool,
+    stage1_model: str | None = None,
+    train_stage1: bool = False,
 ) -> dict:
     """
     Run train → calibrate → evaluate for a single experiment.
     Returns a result dict for the summary table.
     """
     eval_base = PROJECT_ROOT / "outputs" / "evaluations"
-    exp_dir   = eval_base / experiment
+    exp_dir = eval_base / experiment
+
+    # For clean rebuilds, default stage1 to same experiment if not specified
+    if stage1_experiment is None:
+        stage1_experiment = experiment
 
     log(f"\n{'─'*70}")
-    log(f"  Experiment: {experiment}")
+    log(f" Experiment: {experiment}")
     if model:
-        log(f"  Model:      {model}")
-    log(f"  Started:    {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        log(f" Model: {model}")
+    log(f" Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     log(f"{'─'*70}")
+
+    # Initialise experiment logger
+    from src.experiment_logger import ExperimentLogger
+    exp_logger = ExperimentLogger(experiment, script="run_experiment.py")
 
     result = {
         "experiment": experiment,
-        "model":      model or "—",
-        "timestamp":  datetime.now().isoformat(),
-        "status":     "pending",
+        "model": model or "—",
+        "timestamp": datetime.now().isoformat(),
+        "status": "pending",
     }
 
     t_total = time.time()
+
+    # ------------------------------------------------------------------
+    # Stage: Train Stage-1 (optional for clean rebuilds)
+    # ------------------------------------------------------------------
+    stage1_exp_dir = eval_base / stage1_experiment
+    if train_stage1 and not skip_train:
+        if should_skip_stage1(stage1_exp_dir):
+            log("⏭ Train Stage-1: skipping — router already exists")
+        else:
+            cmd_s1 = [
+                "uv", "run", "python", "scripts/train.py",
+                "--experiment", stage1_experiment,
+                "--mode", "hierarchical",
+                "--stage", "1",
+                "--code-filter", code_filter,
+                "--epochs", str(epochs),
+            ]
+            if stage1_model:
+                cmd_s1 += ["--model", stage1_model]
+            if gold_path:
+                cmd_s1 += ["--gold-path", gold_path]
+            if max_length:
+                cmd_s1 += ["--max-length", str(max_length)]
+
+            ok, s1_seconds = run_cmd(cmd_s1, "Training Stage-1", dry_run)
+            if not ok:
+                result["status"] = "stage1_train_failed"
+                result["total_seconds"] = round(time.time() - t_total)
+                append_results_csv(result)
+                return result
 
     # ------------------------------------------------------------------
     # Stage: Train
@@ -228,17 +282,17 @@ def run_one(
     train_seconds = 0.0
     if skip_train or should_skip_train(exp_dir):
         if should_skip_train(exp_dir):
-            log("⏭  Train: skipping — outputs already exist")
+            log("⏭ Train: skipping — outputs already exist")
         else:
-            log("⏭  Train: skipping (--skip-train)")
+            log("⏭ Train: skipping (--skip-train)")
     else:
         cmd = [
             "uv", "run", "python", "scripts/train.py",
-            "--experiment",  experiment,
-            "--mode",        "hierarchical",
-            "--stage",       "2",
+            "--experiment", experiment,
+            "--mode", "hierarchical",
+            "--stage", "2",
             "--code-filter", code_filter,
-            "--epochs",      str(epochs),
+            "--epochs", str(epochs),
         ]
         if model:
             cmd += ["--model", model]
@@ -250,55 +304,79 @@ def run_one(
             cmd += ["--chapters"] + chapters
         if max_length:
             cmd += ["--max-length", str(max_length)]
+        if use_presplit:
+            cmd += ["--use-presplit"]
 
+        exp_logger.log_start("train_stage2", params={
+            "model": model or "—",
+            "epochs": epochs,
+            "gold_path": gold_path or "—",
+            "stage2_init": stage2_init or "—",
+            "chapters": ",".join(chapters) if chapters else "all",
+            "use_presplit": use_presplit,
+        })
         ok, train_seconds = run_cmd(cmd, "Training", dry_run)
         result["train_seconds"] = round(train_seconds)
 
         if not ok:
+            exp_logger.log_failed("train_stage2", reason="non-zero exit code")
             result["status"] = "train_failed"
             result["total_seconds"] = round(time.time() - t_total)
             append_results_csv(result)
             return result
+        exp_logger.log_complete("train_stage2", artifacts={
+            "stage2_dir": str(exp_dir / "stage2"),
+        })
 
     # ------------------------------------------------------------------
     # Stage: Calibrate
     # ------------------------------------------------------------------
     if skip_calibrate or should_skip_calibrate(exp_dir):
         if should_skip_calibrate(exp_dir):
-            log("⏭  Calibrate: skipping — calibration_report.json exists")
+            log("⏭ Calibrate: skipping — calibration_report.json exists")
         else:
-            log("⏭  Calibrate: skipping (--skip-calibrate)")
+            log("⏭ Calibrate: skipping (--skip-calibrate)")
     else:
         cmd = [
             "uv", "run", "python", "scripts/calibrate.py",
-            "--experiment",       experiment,
+            "--experiment", experiment,
             "--stage1-experiment", stage1_experiment,
         ]
+        exp_logger.log_start("calibrate", params={"stage1_experiment": stage1_experiment})
         ok, _ = run_cmd(cmd, "Calibration", dry_run)
         if not ok:
+            exp_logger.log_failed("calibrate", reason="non-zero exit code")
             result["status"] = "calibrate_failed"
             result["total_seconds"] = round(time.time() - t_total)
             append_results_csv(result)
             return result
+        exp_logger.log_complete("calibrate", artifacts={
+            "calibration_report": str(exp_dir / "calibration_report.json"),
+        })
 
     # ------------------------------------------------------------------
     # Stage: Evaluate
     # ------------------------------------------------------------------
     if should_skip_evaluate(exp_dir) and not dry_run:
-        log("⏭  Evaluate: skipping — eval/ already exists")
+        log("⏭ Evaluate: skipping — eval/ already exists")
     else:
         cmd = [
             "uv", "run", "python", "scripts/evaluate.py",
-            "--experiment",        experiment,
-            "--mode",              "hierarchical",
+            "--experiment", experiment,
+            "--mode", "hierarchical",
             "--stage1-experiment", stage1_experiment,
         ]
+        exp_logger.log_start("evaluate")
         ok, _ = run_cmd(cmd, "Evaluation", dry_run)
         if not ok:
+            exp_logger.log_failed("evaluate", reason="non-zero exit code")
             result["status"] = "evaluate_failed"
             result["total_seconds"] = round(time.time() - t_total)
             append_results_csv(result)
             return result
+        exp_logger.log_complete("evaluate", artifacts={
+            "eval_dir": str(exp_dir / "eval"),
+        })
 
     # ------------------------------------------------------------------
     # Read results
@@ -306,27 +384,33 @@ def run_one(
     if not dry_run:
         metrics = read_eval_results(exp_dir)
         result.update({
-            "e2e_accuracy":        metrics.get("e2e_accuracy"),
-            "macro_f1":            metrics.get("macro_f1"),
-            "ece":                 metrics.get("ece"),
-            "coverage_07":         metrics.get("coverage_at_threshold"),
+            "e2e_accuracy": metrics.get("e2e_accuracy"),
+            "macro_f1": metrics.get("macro_f1"),
+            "ece": metrics.get("ece"),
+            "coverage_07": metrics.get("coverage_at_threshold"),
             "accuracy_on_covered": metrics.get("accuracy_on_covered") or metrics.get("accuracy_at_threshold"),
-            "stage1_accuracy":     metrics.get("stage1_accuracy"),
-            "stage2_accuracy":     metrics.get("within_chapter_accuracy"),
+            "stage1_accuracy": metrics.get("stage1_accuracy"),
+            "stage2_accuracy": metrics.get("within_chapter_accuracy"),
         })
 
-    result["status"]        = "ok" if not dry_run else "dry_run"
+    result["status"] = "ok" if not dry_run else "dry_run"
     result["total_seconds"] = round(time.time() - t_total)
     append_results_csv(result)
 
-    log(f"\n  ✅ {experiment} complete in {result['total_seconds']}s")
+    # Write results to experiment registry
+    if not dry_run and result.get("e2e_accuracy"):
+        exp_logger.log_results({k: float(v) for k, v in result.items()
+                                 if k in ("e2e_accuracy","macro_f1","ece",
+                                          "coverage_07","stage1_accuracy",
+                                          "stage2_accuracy") and v})
+
+    log(f"\n ✅ {experiment} complete in {result['total_seconds']}s")
     if result.get("e2e_accuracy"):
-        log(f"     E2E: {float(result['e2e_accuracy']):.3f}  "
-            f"F1: {float(result['macro_f1']):.3f}  "
+        log(f" E2E: {float(result['e2e_accuracy']):.3f} "
+            f"F1: {float(result['macro_f1']):.3f} "
             f"ECE: {float(result['ece']):.4f}")
 
     return result
-
 
 # ---------------------------------------------------------------------------
 # Main
@@ -359,8 +443,14 @@ def parse_args() -> argparse.Namespace:
                    default="data/gold/medsynth_gold_augmented.parquet",
                    help="Gold layer parquet path.")
     p.add_argument("--stage1-experiment",
-                   default="E-003_Hierarchical_ICD10",
-                   help="Stage-1 router experiment name.")
+                   default=None,
+                   help="Stage-1 router experiment name. Defaults to same as --experiment for clean rebuilds.")
+    p.add_argument("--stage1-model",
+                   default="roberta-base",
+                   help="Model for Stage-1 router training (used with --train-stage1).")
+    p.add_argument("--train-stage1",
+                   action="store_true",
+                   help="Train Stage-1 router as part of this run (required for clean rebuilds like E-006).")
     p.add_argument("--code-filter",
                    default="billable",
                    choices=["all", "billable"])
@@ -371,22 +461,23 @@ def parse_args() -> argparse.Namespace:
                    help="Limit training to specific chapters.")
 
     # Control flags
-    p.add_argument("--skip-train",      action="store_true",
+    p.add_argument("--use-presplit", action="store_true",
+                   help="Pass --use-presplit to train.py to use pre-written splits.")
+    p.add_argument("--skip-train", action="store_true",
                    help="Skip training — calibrate + evaluate only.")
-    p.add_argument("--skip-calibrate",  action="store_true",
+    p.add_argument("--skip-calibrate", action="store_true",
                    help="Skip calibration.")
-    p.add_argument("--dry-run",         action="store_true",
+    p.add_argument("--dry-run", action="store_true",
                    help="Show what would run without executing.")
 
     return p.parse_args()
-
 
 def main() -> None:
     args = parse_args()
 
     # Build experiment list
     if args.experiments and args.models:
-        if len(args.experiments) != len(args.models):
+        if len(args.experiments)!= len(args.models):
             print("Error: --experiments and --models must have the same number of items.",
                   file=sys.stderr)
             sys.exit(1)
@@ -401,10 +492,10 @@ def main() -> None:
         sys.exit(1)
 
     print(f"\n{BANNER}")
-    print(f"  run_experiment.py — Experiment Orchestration")
-    print(f"  Experiments: {len(pairs)}")
-    print(f"  Dry-run:     {args.dry_run}")
-    print(f"  Started:     {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f" run_experiment.py — Experiment Orchestration")
+    print(f" Experiments: {len(pairs)}")
+    print(f" Dry-run: {args.dry_run}")
+    print(f" Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(BANNER)
 
     all_results = []
@@ -412,32 +503,34 @@ def main() -> None:
 
     for experiment, model in pairs:
         result = run_one(
-            experiment       = experiment,
-            model            = model,
-            stage2_init      = args.stage2_init,
-            gold_path        = args.gold_path,
+            experiment = experiment,
+            model = model,
+            stage2_init = args.stage2_init,
+            gold_path = args.gold_path,
             stage1_experiment= args.stage1_experiment,
-            code_filter      = args.code_filter,
-            epochs           = args.epochs,
-            chapters         = args.chapters,
-            max_length       = args.max_length,
-            skip_train       = args.skip_train,
-            skip_calibrate   = args.skip_calibrate,
-            dry_run          = args.dry_run,
+            code_filter = args.code_filter,
+            epochs = args.epochs,
+            chapters = args.chapters,
+            max_length = args.max_length,
+            use_presplit     = args.use_presplit,
+            skip_train = args.skip_train,
+            skip_calibrate = args.skip_calibrate,
+            dry_run = args.dry_run,
+            stage1_model = args.stage1_model,
+            train_stage1 = args.train_stage1,
         )
         all_results.append(result)
 
         if result["status"] not in ("ok", "dry_run"):
-            log(f"\n⚠️  {experiment} failed with status: {result['status']}")
-            log("   Continuing with remaining experiments...")
+            log(f"\n⚠️ {experiment} failed with status: {result['status']}")
+            log(" Continuing with remaining experiments...")
 
     total = time.time() - t0
     print(f"\n{BANNER}")
-    print(f"  All experiments complete in {total/60:.1f} min")
+    print(f" All experiments complete in {total/60:.1f} min")
     print(BANNER)
 
     print_comparison_table(all_results)
-
 
 if __name__ == "__main__":
     main()

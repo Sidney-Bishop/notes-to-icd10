@@ -57,8 +57,11 @@ class ZPhraseMatcher:
                 code = meta["code"]
                 norm_phrase = phrase.lower().strip()
                 self.phrases[norm_phrase] = code
-                # Compile word-boundary pattern for robust matching
-                pattern = re.compile(r'\b' + re.escape(norm_phrase) + r'\b')
+                # Compile pattern with flexible whitespace and word boundaries
+                # Allows matching "well-child", "well_child", "well child"
+                escaped = re.escape(norm_phrase)
+                pattern_str = r'\b' + escaped.replace(r'\ ', r'[\s\-_]+') + r'\b'
+                pattern = re.compile(pattern_str)
                 self._patterns.append((pattern, norm_phrase, code))
             logger.info(f"Z-dictionary loaded: {len(self.phrases)} phrases")
         except Exception as e:
@@ -68,9 +71,13 @@ class ZPhraseMatcher:
 
     def match(self, text: str) -> Tuple[str, str] | None:
         """Return (phrase, code) for first match, or None."""
-        text_lower = text.lower()
+        # Normalize hyphens and underscores to spaces
+        text_norm = re.sub(r'[-_]', ' ', text.lower())
+        # Collapse multiple spaces
+        text_norm = re.sub(r'\s+', ' ', text_norm)
+
         for pattern, phrase, code in self._patterns:
-            if pattern.search(text_lower):
+            if pattern.search(text_norm):
                 return phrase, code
         return None
 
@@ -102,7 +109,7 @@ class GraphReranker:
         min_encoder_score: float = 0.7,
         min_concepts: int = 2,
         graph_dir: Path = GRAPH_DIR,
-        z_boost: float = 0.18,
+        z_boost: float = 0.20,
         enable_z_injection: bool = True,
     ):
         self.graph_weight = graph_weight

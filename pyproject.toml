@@ -10,7 +10,7 @@ dependencies = [
     "duckdb>=1.1.0",
     "pyarrow>=15.0.0",
     # --- Core Data & Math ---
-    "numpy>=1.26.0",
+    "numpy>=1.26,<2.0",
     "pandas>=2.2.0",
     "scipy>=1.11.0",
     # --- ML / Deep Learning (M4 Max Optimized) ---
@@ -47,10 +47,19 @@ dependencies = [
     "fastapi>=0.135.1",
     "uvicorn>=0.42.0",
     "pydantic-ai>=1.84.1",
+    "scispacy>=0.5.5",
+    "en-core-sci-md",
+    "en-ner-bc5cdr-md",
+    "hdbscan>=0.8.42",
+    "umap-learn>=0.5.12",
 ]
 
-[tool.uv]
-dev-dependencies = [
+[dependency-groups]
+dev = [
     "pytest>=8.0.0",
     "black>=24.0.0",
 ]
+
+[tool.uv.sources]
+en-core-sci-md = { url = "https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.4/en_core_sci_md-0.5.4.tar.gz" }
+en-ner-bc5cdr-md = { url = "https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.4/en_ner_bc5cdr_md-0.5.4.tar.gz" }

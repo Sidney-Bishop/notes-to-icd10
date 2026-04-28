@@ -15,7 +15,7 @@ Preprocessing mirrors the training pipeline exactly:
     APSO-Flip and ICD-10 redaction before tokenisation.
 
 Public API
-----------
+
     predict(note, top_k=5, experiment_name="E-005a_...")
         Single-note end-to-end prediction. Returns codes + scores.
 
@@ -33,6 +33,7 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 from src.config import config
 from src.preprocessing import prepare_inference_input
+from src.graph_reranker import GraphReranker
 
 # ---------------------------------------------------------------------------
 # Registry path helpers — mirrors the path logic from the notebooks
@@ -41,20 +42,29 @@ from src.preprocessing import prepare_inference_input
 def _registry_base() -> Path:
     return config.resolve_path("outputs", "evaluations") / "registry"
 
-
 def _stage1_model_path(stage1_experiment: str = "E-003_Hierarchical_ICD10") -> Path:
     """
-    Stage-1 router lives under the E-003 experiment directory (not registry),
-    at: outputs/evaluations/{E003_name}/stage1/model/model/
+    Stage-1 router lives under the experiment directory.
+    Supports three layouts (auto-detected):
+      1. outputs/evaluations/{exp}/stage1/ ← clean
+      2. outputs/evaluations/{exp}/stage1/model/ ← single nest
+      3. outputs/evaluations/{exp}/stage1/model/model/ ← legacy double nest
     """
-    return (
+    base = (
         config.resolve_path("outputs", "evaluations")
         / stage1_experiment
         / "stage1"
-        / "model"
-        / "model"
     )
-
+    candidates = [
+        base,
+        base / "model",
+        base / "model" / "model",
+    ]
+    for p in candidates:
+        if p.is_dir() and (p / "model.safetensors").exists():
+            return p
+    # fallback to legacy path to raise a clear error downstream
+    return candidates[-1]
 
 def _stage2_dir(experiment_name: str) -> Path:
     """
@@ -67,7 +77,6 @@ def _stage2_dir(experiment_name: str) -> Path:
         / "stage2"
     )
 
-
 # ---------------------------------------------------------------------------
 # Chapters that have no trained resolver — use fallback prediction
 # (mirrors SKIP_CHAPTERS from notebooks 04 and 05)
@@ -77,7 +86,6 @@ _SKIP_CHAPTERS = {"U", "P", "Q"}
 # Default fallback codes for skip chapters, populated lazily from registry
 _SKIP_CHAPTER_DEFAULTS_FILE = "skip_chapter_defaults.json"
 
-
 class HierarchicalPredictor:
     """
     End-to-end two-stage ICD-10 predictor.
@@ -86,9 +94,9 @@ class HierarchicalPredictor:
     ``predict()`` calls — suitable for batch inference or interactive demos.
 
     Registry layout expected on disk
-    ---------------------------------
+
     Stage-1 (router):
-        outputs/evaluations/{stage1_experiment}/stage1/model/
+        outputs/evaluations/{stage1_experiment}/stage1/
 
     Stage-2 (resolvers, one per chapter):
         outputs/evaluations/{experiment_name}/stage2/{chapter}/model/
@@ -97,7 +105,7 @@ class HierarchicalPredictor:
             → contains ``skip_chapters`` key with fallback predictions
 
     Parameters
-    ----------
+
     experiment_name : str
         Name of the hierarchical experiment whose Stage-2 resolvers to load.
         Defaults to the best model (E-005a).
@@ -107,6 +115,7 @@ class HierarchicalPredictor:
     device : str or None
         Torch device string. Auto-detects MPS → CUDA → CPU if None.
     """
+
 
     def __init__(
         self,
@@ -147,7 +156,7 @@ class HierarchicalPredictor:
         if s1_temp_path.exists():
             with open(s1_temp_path) as f:
                 self.stage1_temperature = json.load(f).get("temperature", 1.0)
-            print(f"   🌡  Stage-1 temperature: {self.stage1_temperature:.4f}")
+            print(f" 🌡 Stage-1 temperature: {self.stage1_temperature:.4f}")
 
         # Build chapter id→label maps from Stage-1 model config
         self.id2chapter: dict[int, str] = {
@@ -157,7 +166,7 @@ class HierarchicalPredictor:
         self.chapter2id: dict[str, int] = {
             v: int(k) for k, v in self.id2chapter.items()
         }
-        print(f"   ✅ Stage-1: {len(self.id2chapter)} chapters")
+        print(f" ✅ Stage-1: {len(self.id2chapter)} chapters")
 
         # --- Stage-2 ---
         stage2_base = _stage2_dir(experiment_name)
@@ -173,16 +182,48 @@ class HierarchicalPredictor:
         self.stage2_id2label: dict[str, dict[int, str]] = {}
         self.stage2_temperatures: dict[str, float] = {}
 
+        def _find_ch_model_dir(ch_dir):
+            """Auto-detect model weights in chapter dir across all conventions."""
+            candidates = [
+                ch_dir,                          # FLAT   E-008+
+                ch_dir / "model",                # SINGLE E-006
+                ch_dir / "model" / "model",      # NESTED E-002
+            ]
+            for c in candidates:
+                if c.is_dir() and (c / "model.safetensors").exists():
+                    return c
+            return None
+
+        def _find_ch_label_map(ch_dir):
+            candidates = [
+                ch_dir / "label_map.json",
+                ch_dir / "model" / "label_map.json",
+            ]
+            for c in candidates:
+                if c.exists():
+                    return c
+            return None
+
+        def _find_ch_temperature(ch_dir):
+            candidates = [
+                ch_dir / "temperature.json",
+                ch_dir / "model" / "temperature.json",
+                ch_dir / "model" / "model" / "temperature.json",
+            ]
+            for c in candidates:
+                if c.exists():
+                    return c
+            return None
+
         chapters_found = 0
         for ch_dir in sorted(stage2_base.iterdir()):
             if not ch_dir.is_dir():
                 continue
             ch = ch_dir.name
-            model_dir = ch_dir / "model"
-            hf_dir = model_dir / "model"   # weights live one level deeper
-            label_map_path = model_dir / "label_map.json"
+            hf_dir = _find_ch_model_dir(ch_dir)
+            label_map_path = _find_ch_label_map(ch_dir)
 
-            if not hf_dir.exists() or not label_map_path.exists():
+            if hf_dir is None or label_map_path is None:
                 continue
 
             with open(label_map_path) as f:
@@ -201,15 +242,15 @@ class HierarchicalPredictor:
                 int(k): v for k, v in lmap["id2label"].items()
             }
             # Load temperature (defaults to 1.0 if not calibrated yet)
-            temp_path = hf_dir / "temperature.json"
-            if temp_path.exists():
+            temp_path = _find_ch_temperature(ch_dir)
+            if temp_path and temp_path.exists():
                 with open(temp_path) as f:
                     self.stage2_temperatures[ch] = json.load(f).get("temperature", 1.0)
             else:
                 self.stage2_temperatures[ch] = 1.0
             chapters_found += 1
 
-        print(f"   ✅ Stage-2: {chapters_found} resolvers loaded")
+        print(f" ✅ Stage-2: {chapters_found} resolvers loaded")
 
         # --- Skip-chapter fallbacks ---
         # Loaded from stage2_results.json saved during training
@@ -224,6 +265,10 @@ class HierarchicalPredictor:
             for ch in _SKIP_CHAPTERS:
                 self.skip_chapter_defaults[ch] = None
 
+        # --- Graph reranker ---
+        print("📥 Loading graph reranker...")
+        self.reranker = GraphReranker(graph_dir=Path("data/graph"))
+        self.reranker.load()
         print(f"⚡ Predictor ready")
 
     # -----------------------------------------------------------------------
@@ -236,7 +281,7 @@ class HierarchicalPredictor:
         Stage-1, then resolves via the appropriate Stage-2 chapter resolver.
 
         Parameters
-        ----------
+
         note : str
             Raw clinical note in SOAP format.
         top_k : int
@@ -244,11 +289,11 @@ class HierarchicalPredictor:
             resolver output. Stage-1 always returns the single top chapter.
 
         Returns
-        -------
+
         dict with keys:
-            codes  : list[str]  — ICD-10 codes, highest confidence first
+            codes : list[str] — ICD-10 codes, highest confidence first
             scores : list[float] — Corresponding softmax probabilities
-            chapter : str       — Predicted ICD-10 chapter (Stage-1 output)
+            chapter : str — Predicted ICD-10 chapter (Stage-1 output)
             stage2_source : str — "resolver", "fallback", or "fallback_no_model"
         """
         # Preprocessing — mirrors training pipeline exactly.
@@ -277,6 +322,7 @@ class HierarchicalPredictor:
         with torch.no_grad():
             s1_logits = self.stage1_model(**s1_inputs).logits
         s1_logits = s1_logits / self.stage1_temperature
+
         pred_chapter_id = int(torch.argmax(s1_logits, dim=-1).item())
         pred_chapter = self.id2chapter.get(pred_chapter_id, "UNKNOWN")
 
@@ -284,23 +330,23 @@ class HierarchicalPredictor:
         if pred_chapter in _SKIP_CHAPTERS:
             fallback_code = self.skip_chapter_defaults.get(pred_chapter, "UNKNOWN")
             return {
-                "codes":        [fallback_code or "UNKNOWN"],
-                "scores":       [1.0],
-                "chapter":      pred_chapter,
+                "codes": [fallback_code or "UNKNOWN"],
+                "scores": [1.0],
+                "chapter": pred_chapter,
                 "stage2_source": "fallback",
             }
 
         if pred_chapter not in self.stage2_models:
             return {
-                "codes":        ["UNKNOWN"],
-                "scores":       [1.0],
-                "chapter":      pred_chapter,
+                "codes": ["UNKNOWN"],
+                "scores": [1.0],
+                "chapter": pred_chapter,
                 "stage2_source": "fallback_no_model",
             }
 
-        ch_model     = self.stage2_models[pred_chapter]
+        ch_model = self.stage2_models[pred_chapter]
         ch_tokenizer = self.stage2_tokenizers[pred_chapter]
-        ch_id2label  = self.stage2_id2label[pred_chapter]
+        ch_id2label = self.stage2_id2label[pred_chapter]
 
         s2_inputs = ch_tokenizer(
             text,
@@ -318,18 +364,39 @@ class HierarchicalPredictor:
         with torch.no_grad():
             s2_logits = ch_model(**s2_inputs).logits
             T = self.stage2_temperatures.get(pred_chapter, 1.0)
-            s2_probs  = torch.softmax(s2_logits / T, dim=-1).cpu().numpy()[0]
+            s2_probs = torch.softmax(s2_logits / T, dim=-1).cpu().numpy()[0]
 
         top_k_actual = min(top_k, len(ch_id2label))
-        top_indices  = np.argsort(s2_probs)[::-1][:top_k_actual]
+        top_indices = np.argsort(s2_probs)[::-1][:top_k_actual]
+
+        codes = [ch_id2label.get(int(i), "UNKNOWN") for i in top_indices]
+        scores = [float(s2_probs[i]) for i in top_indices]
+
+        # --- Graph-augmented reranking for low-confidence predictions ---
+        top_confidence = scores[0] if scores else 0.0
+        should_rerank = (top_confidence < 0.7) or (pred_chapter == "Z")
+        if should_rerank:
+            candidates = list(zip(codes, scores))
+            reranked = self.reranker.rerank(text, candidates)
+
+            # FIXED: use pred_chapter (was 'chapter' causing NameError)
+            threshold = 0.05 if pred_chapter == "Z" else 0.35
+            if reranked and reranked[0].combined_score >= threshold:
+                codes = [r.code for r in reranked]
+                scores = [r.combined_score for r in reranked]
+                return {
+                    "codes": codes,
+                    "scores": scores,
+                    "chapter": pred_chapter,
+                    "stage2_source": "graph_reranked",
+                }
 
         return {
-            "codes":         [ch_id2label.get(int(i), "UNKNOWN") for i in top_indices],
-            "scores":        [float(s2_probs[i]) for i in top_indices],
-            "chapter":       pred_chapter,
+            "codes": codes,
+            "scores": scores,
+            "chapter": pred_chapter,
             "stage2_source": "resolver",
         }
-
 
 # ---------------------------------------------------------------------------
 # Convenience function — matches the README's documented API exactly
@@ -349,7 +416,7 @@ def predict(
     to avoid reloading all models on every call.
 
     Parameters
-    ----------
+
     note : str
         Raw clinical note in SOAP format.
     top_k : int
@@ -360,11 +427,11 @@ def predict(
         Experiment providing the Stage-1 router.
 
     Returns
-    -------
+
     dict with keys: codes, scores, chapter, stage2_source
 
     Example
-    -------
+
     >>> from src.inference import predict
     >>> result = predict(note, top_k=5)
     >>> print(f"Top prediction: {result['codes'][0]} ({result['scores'][0]:.1%})")
@@ -375,7 +442,6 @@ def predict(
         stage1_experiment=stage1_experiment,
     )
     return predictor.predict(note, top_k=top_k)
-
 
 # ---------------------------------------------------------------------------
 # Legacy single-model API — kept for backward compatibility with any
@@ -430,10 +496,9 @@ class ClinicalPredictor:
 
         top_idx = np.argsort(probs)[::-1][:top_k]
         return {
-            "codes":  [self.model.config.id2label[int(i)] for i in top_idx],
+            "codes": [self.model.config.id2label[int(i)] for i in top_idx],
             "scores": [float(probs[i]) for i in top_idx],
         }
-
 
 def predict_icd3(
     text: str,

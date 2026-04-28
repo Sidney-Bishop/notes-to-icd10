@@ -328,6 +328,8 @@ class EncoderAdapter(ModelAdapter):
         Human-readable model identifier for logging/metadata.
     """
 
+    
+
     def __init__(
         self,
         model,
@@ -351,9 +353,10 @@ class EncoderAdapter(ModelAdapter):
     def from_pretrained(
         cls,
         model_name_or_path: str,
-        label2id:           dict[str, int],
-        id2label:           dict[int, str],
-        device:             Optional[str] = None,
+        label2id: dict[str, int],
+        id2label: dict[int, str],
+        device: Optional[str] = None,
+        tokenizer_name_or_path: str | None = None,
     ) -> "EncoderAdapter":
         """
         Initialise from a HuggingFace model name or local path.
@@ -368,10 +371,14 @@ class EncoderAdapter(ModelAdapter):
         device : str or None
             Auto-detects MPS → CUDA → CPU if None.
         """
+
         resolved_device = cls._resolve_device(device)
 
         num_labels = len(label2id)
-        tokenizer  = AutoTokenizer.from_pretrained(model_name_or_path)
+        tokenizer_source = tokenizer_name_or_path or model_name_or_path
+        tokenizer = AutoTokenizer.from_pretrained(tokenizer_source)
+
+
         model      = AutoModelForSequenceClassification.from_pretrained(
             model_name_or_path,
             num_labels=num_labels,
@@ -414,15 +421,14 @@ class EncoderAdapter(ModelAdapter):
         Restore a saved EncoderAdapter from a directory produced by save().
 
         Expects:
-            model_dir/model/          — HuggingFace model + tokenizer
-            model_dir/label_map.json  — {label2id: {...}, id2label: {...}}
+            model_dir/               — HuggingFace model + tokenizer
+            model_dir/label_map.json — {label2id: {...}, id2label: {...}}
         """
         model_dir   = Path(model_dir)
-        hf_dir      = model_dir / "model"
         lmap_path   = model_dir / "label_map.json"
 
-        if not hf_dir.exists():
-            raise FileNotFoundError(f"Model directory not found: {hf_dir}")
+        if not (model_dir / "config.json").exists():
+            raise FileNotFoundError(f"Model directory not found or incomplete: {model_dir}")
         if not lmap_path.exists():
             raise FileNotFoundError(f"Label map not found: {lmap_path}")
 
@@ -433,9 +439,9 @@ class EncoderAdapter(ModelAdapter):
         id2label = {int(k): v for k, v in lmap["id2label"].items()}
 
         resolved_device = cls._resolve_device(device)
-        tokenizer = AutoTokenizer.from_pretrained(str(hf_dir))
+        tokenizer = AutoTokenizer.from_pretrained(str(model_dir))
         model     = AutoModelForSequenceClassification.from_pretrained(
-            str(hf_dir)
+            str(model_dir)
         ).to(resolved_device)
 
         return cls(
@@ -444,7 +450,7 @@ class EncoderAdapter(ModelAdapter):
             label2id=label2id,
             id2label=id2label,
             device=resolved_device,
-            model_name=str(hf_dir),
+            model_name=str(model_dir),
         )
 
     # ── ModelAdapter interface ───────────────────────────────────────────────
@@ -678,16 +684,15 @@ class EncoderAdapter(ModelAdapter):
         """
         Save model weights, tokenizer, and label maps to output_dir.
 
-        Layout produced:
-            output_dir/model/          — HuggingFace save_pretrained artifacts
-            output_dir/label_map.json  — {label2id, id2label}
+        Layout produced (FLAT — no nested 'model/' folder):
+            output_dir/               — HuggingFace save_pretrained artifacts
+            output_dir/label_map.json — {label2id, id2label}
         """
         output_dir = Path(output_dir)
-        hf_dir     = output_dir / "model"
-        hf_dir.mkdir(parents=True, exist_ok=True)
+        output_dir.mkdir(parents=True, exist_ok=True)
 
-        self.model.save_pretrained(str(hf_dir))
-        self.tokenizer.save_pretrained(str(hf_dir))
+        self.model.save_pretrained(str(output_dir))
+        self.tokenizer.save_pretrained(str(output_dir))
 
         label_map = {
             "label2id": self.label2id,
@@ -696,7 +701,7 @@ class EncoderAdapter(ModelAdapter):
         with open(output_dir / "label_map.json", "w") as f:
             json.dump(label_map, f, indent=2)
 
-        print(f"   ✅ EncoderAdapter saved: {hf_dir} ({len(self.label2id)} labels)")
+        print(f"   ✅ EncoderAdapter saved: {output_dir} ({len(self.label2id)} labels)")
 
     # ── Internal helpers ────────────────────────────────────────────────────
 

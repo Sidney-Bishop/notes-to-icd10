@@ -1,23 +1,86 @@
 {
-  "general adult medical examination without abnormal findings": {"code": "Z00.00", "title": "Encounter for general adult medical examination without abnormal findings"},
-  "general adult medical examination with abnormal findings": {"code": "Z00.01", "title": "Encounter for general adult medical examination with abnormal findings"},
-  "encounter for general adult medical examination": {"code": "Z00.00", "title": "Encounter for general adult medical examination without abnormal findings"},
-  "annual wellness exam": {"code": "Z00.00", "title": "Encounter for general adult medical examination without abnormal findings"},
-  "annual wellness": {"code": "Z00.00", "title": "Encounter for general adult medical examination without abnormal findings"},
-  "routine physical exam": {"code": "Z00.00", "title": "Encounter for general adult medical examination without abnormal findings"},
-  "routine physical": {"code": "Z00.00", "title": "Encounter for general adult medical examination without abnormal findings"},
-  "wellness visit": {"code": "Z00.00", "title": "Encounter for general adult medical examination without abnormal findings"},
-  "health check": {"code": "Z00.00", "title": "Encounter for general adult medical examination without abnormal findings"},
-  "preventive visit": {"code": "Z00.00", "title": "Encounter for general adult medical examination without abnormal findings"},
-  "well child visit": {"code": "Z00.129", "title": "Encounter for routine child health examination without abnormal findings"},
-  "health supervision of infant": {"code": "Z00.129", "title": "Encounter for routine child health examination without abnormal findings"},
-  "preoperative examination": {"code": "Z01.818", "title": "Encounter for other preprocedural examination"},
-  "pre-op clearance": {"code": "Z01.818", "title": "Encounter for other preprocedural examination"},
-  "gastrostomy status": {"code": "Z93.1", "title": "Gastrostomy status"},
-  "gastrostomy tube check": {"code": "Z43.1", "title": "Encounter for attention to gastrostomy"},
-  "g-tube check": {"code": "Z43.1", "title": "Encounter for attention to gastrostomy"},
-  "encounter for attention to gastrostomy": {"code": "Z43.1", "title": "Encounter for attention to gastrostomy"},
-  "personal history of": {"code": "Z87.891", "title": "Personal history of other specified conditions"},
-  "family history of": {"code": "Z83.49", "title": "Family history of other endocrine nutritional and metabolic diseases"},
-  "screening for": {"code": "Z13.9", "title": "Encounter for screening for other specified diseases and disorders"}
+  "annual wellness exam": {
+    "code": "Z00.00",
+    "precision": 0.98
+  },
+  "annual physical": {
+    "code": "Z00.00",
+    "precision": 0.97
+  },
+  "wellness exam": {
+    "code": "Z00.00",
+    "precision": 0.96
+  },
+  "health check": {
+    "code": "Z00.00",
+    "precision": 0.95
+  },
+  "routine physical": {
+    "code": "Z00.00",
+    "precision": 0.95
+  },
+  "well child": {
+    "code": "Z00.129",
+    "precision": 0.99
+  },
+  "well child check": {
+    "code": "Z00.129",
+    "precision": 0.99
+  },
+  "well baby": {
+    "code": "Z00.129",
+    "precision": 0.98
+  },
+  "pediatric well visit": {
+    "code": "Z00.129",
+    "precision": 0.98
+  },
+  "child health exam": {
+    "code": "Z00.129",
+    "precision": 0.97
+  },
+  "encounter for immunization": {
+    "code": "Z23",
+    "precision": 0.99
+  },
+  "vaccination": {
+    "code": "Z23",
+    "precision": 0.96
+  },
+  "pre-op": {
+    "code": "Z01.818",
+    "precision": 0.94
+  },
+  "preoperative": {
+    "code": "Z01.818",
+    "precision": 0.94
+  },
+  "pre op clearance": {
+    "code": "Z01.818",
+    "precision": 0.93
+  },
+  "screening mammogram": {
+    "code": "Z12.31",
+    "precision": 0.98
+  },
+  "colonoscopy screening": {
+    "code": "Z12.11",
+    "precision": 0.97
+  },
+  "pap smear": {
+    "code": "Z12.4",
+    "precision": 0.96
+  },
+  "encounter for screening": {
+    "code": "Z13.9",
+    "precision": 0.9
+  },
+  "employment physical": {
+    "code": "Z02.1",
+    "precision": 0.95
+  },
+  "school physical": {
+    "code": "Z02.0",
+    "precision": 0.95
+  }
 }
