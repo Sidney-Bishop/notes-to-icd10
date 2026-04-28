@@ -53,39 +53,98 @@ initialisation** substantially outperforms flat ICD-10 classification —
 ---
 
 ## 🏗️ Architecture
-```
-Clinical Note (APSO format)
-        │
-        ▼
-┌─────────────────────────┐
-│     Stage-1 Router      │  Bio_ClinicalBERT (E-001 init)
-│  22-way ICD-10 chapter  │  95.4% routing accuracy
-│     classification      │
-└─────────────────────────┘
-        │
-        ▼  routes to correct chapter resolver
-┌─────────────────────────┐
-│    Stage-2 Resolver     │  Bio_ClinicalBERT (E-002 init)
-│  Within-chapter ICD-10  │  70.1% within-chapter accuracy
-│      prediction         │
-└─────────────────────────┘
-        │
-        ▼
-    ICD-10 Code
+
+The codebase comprises **5 distinct communities** that together form a
+complete ML pipeline — from data preparation through inference and
+experiment tracking:
+
+```mermaid
+flowchart TB
+    %% --- Silver Vault (red community in graphify) ---
+    subgraph SV["📦 Silver Vault (DuckDB + Parquet)"]
+        direction TB
+        RAW["raw/ MedSynth CSV"]
+        SIL["silver/ Parquet"]
+        GOLD["gold/ Parquet"]
+        RAW -->|register_dataframe| SIL -->|APSO-Flip + redaction| GOLD
+    end
+
+    %% --- Training (blue) ---
+    subgraph TR["🏋️ Training Pipeline"]
+        direction LR
+        TRAIN["scripts/train.py"]
+        CAL["scripts/calibrate.py"]
+        S1["Stage-1 model<br/>(22-way chapter router)"]
+        S2["Stage-2 models<br/>(chapter resolvers)"]
+        TRAIN --> S1
+        CAL -->|temperature.json| S2
+    end
+
+    %% --- Inference (teal + yellow) ---
+    subgraph INF["🔍 Inference Pipeline"]
+        direction LR
+        NOTE["Clinical Note (SOAP)"] --> HP["HierarchicalPredictor"]
+        HP -->|Stage-1 routing| CHAP["predicted chapter"]
+        CHAP -->|Stage-2 lookup| ENC["encoder scores (top-k)"]
+        ENC -->|conf ≥0.7| OUT["Calibrated ICD-10 codes"]
+        ENC -->|conf <0.7 or Z-chapter| GR["GraphReranker"]
+        GR -->|graph affinity + Z-boost| OUT
+    end
+
+    %% --- ExperimentLogger (orange hub) ---
+    subgraph LOG["📋 ExperimentLogger (Central Orchestrator)"]
+        direction LR
+        CFG["artifacts.yaml"] --> LOGN["log_start / log_complete"] --> REG["experiments.json<br/>run.log"]
+    end
+
+    %% --- Data flow ---
+    GOLD --> TRAIN
+    GOLD -.->|test_split.parquet| CAL
+    S1 -->|model weights| HP
+    S2 -->|model weights + T| HP
+    TRAIN -.->|ExperimentLogger| LOG
+    CAL -.->|ExperimentLogger| LOG
+
+    %% --- Colors matching graphify ---
+    style SV fill:#ffebee,stroke:#c62828,stroke-width:2px
+    style TR fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    style INF fill:#e0f7fa,stroke:#00838f,stroke-width:2px
+    style LOG fill:#fff3e0,stroke:#ef6c00,stroke-width:2px
+    style HP fill:#b2ebf2,stroke:#0097a7,stroke-width:2px
+    style GR fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+    style S1 fill:#bbdefb,stroke:#1565c0
+    style S2 fill:#bbdefb,stroke:#1565c0
 ```
 
-**Stage-1** routes each note to one of 22 ICD-10 chapters (A–Z),
-initialised from E-001 (ICD-3 classifier) which is already chapter-aware.
+### The 5 Communities
 
-**Stage-2** resolves the specific ICD-10 code within the routed chapter.
-19 dedicated resolvers fine-tuned from E-002 weights reduce the effective
-label space from 1,926 to an average of ~100 classes per resolver.
+**1. Silver Vault (DuckDB + Parquet)** — Declarative data management via
+`src/config.py`'s `ArtifactConfig` singleton. Manages the Medallion
+architecture: raw CSV → silver Parquet → gold Parquet (APSO-processed),
+with full JSONL audit trails and DuckDB queryable metadata.
 
-**Transfer learning chain:**
-```
-Bio_ClinicalBERT → E-001 (ICD-3) → Stage-1 init
-Bio_ClinicalBERT → E-002 (ICD-10 flat) → Stage-2 init
-```
+**2. Training Pipeline** — `scripts/train.py` produces a Stage-1 router
+(22-way chapter classification) and per-chapter Stage-2 resolvers. Both
+stages initialise from transfer-learned Bio_ClinicalBERT weights.
+
+**3. Calibration System** — `scripts/calibrate.py` applies temperature
+scaling (Guo et al. 2017) to every model, optimising a scalar T via LBFGS
+to minimise cross-entropy on held-out test data. Outputs `temperature.json`
+per model, read by the predictor at runtime.
+
+**4. Inference Pipeline** — `src/inference.py`'s `HierarchicalPredictor`
+loads Stage-1 + all Stage-2 models with calibration temperatures. Routes
+each note through the two-stage pipeline, applying `T`-scaled softmax.
+
+**5. GraphReranker** — `src/graph_reranker.py` activates when Stage-2
+top confidence < 0.7 or the predicted chapter is "Z". Uses a knowledge
+graph (ICD-10 ↔ UMLS concept associations) plus a Z-code phrase dictionary
+to compute affinity scores and re-rank candidates.
+
+**ExperimentLogger** (`src/experiment_logger.py`) serves as the central
+orchestrator across all communities: it tracks experiment state, logs
+stage completions with artifacts and parameters, and maintains a machine-readable
+registry at `outputs/experiments.json`.
 
 ---
 
@@ -265,3 +324,4 @@ via [GitHub Issues](https://github.com/Sidney-Bishop/notes-to-icd10/issues).
 MIT License — see [LICENSE](LICENSE) for details.
 
 Copyright (c) 2026 Jason Roche
+
