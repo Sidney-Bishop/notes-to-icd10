@@ -265,3 +265,5 @@ data/graph/
 notebooks/OLD_*.ipynb
 notebooks/*\ 1.ipynb
 
+CLAUDE.md
+.claude/
