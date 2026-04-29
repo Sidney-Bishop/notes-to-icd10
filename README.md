@@ -10,7 +10,7 @@
 [![Dataset](https://img.shields.io/badge/dataset-MedSynth-orange.svg)](https://huggingface.co/datasets/Ahmad0067/MedSynth)
 
 Two-stage hierarchical ICD-10 coding from clinical notes using Bio_ClinicalBERT —
-**66.9% accuracy across 1,926 ICD-10 codes** from ~4 training examples per code.
+**79.8% accuracy across 1,926 ICD-10 codes** from ~4 training examples per code.
 
 ---
 
@@ -18,14 +18,13 @@ Two-stage hierarchical ICD-10 coding from clinical notes using Bio_ClinicalBERT 
 
 | Experiment | Architecture | Accuracy | Macro F1 |
 |---|---|---|---|
-| E-001 | ICD-3 flat, 675 classes | 82.7% | 0.760 |
-| E-002 | ICD-10 flat, 1,926 classes | 46.9% | 0.352 |
-| E-003 | Hierarchical, Stage-2 from scratch | 10.6% | 0.070 |
-| E-004a | Hierarchical, E-002 init | 66.7% | 0.551 |
-| **E-005a** | **E-004a + extended epochs** | **66.9%** | **0.553** |
+| E-001 | ICD-3 flat, 675 classes | 87.2% | 0.841 |
+| E-002 | ICD-10 flat, 1,926 classes | 73.3% | 0.634 |
+| E-003 | Hierarchical, cold start Stage-2 | 11.1% | 0.075 |
+| **E-009** | **Hierarchical, E-002 init Stage-2** | **79.8%** | **0.711** |
 
-**Best model (E-005a):** 66.9% top-1 accuracy, 0.553 Macro F1;
-95.4% chapter routing accuracy, 70.1% within-chapter accuracy.
+**Best model (E-009):** 79.8% top-1 accuracy, 0.711 Macro F1;
+96.4% chapter routing accuracy, 82.8% within-chapter accuracy.
 
 ---
 
@@ -33,22 +32,22 @@ Two-stage hierarchical ICD-10 coding from clinical notes using Bio_ClinicalBERT 
 
 This project builds an end-to-end pipeline that predicts specific ICD-10
 diagnostic codes from APSO-structured clinical notes. The core finding is
-that a **two-stage hierarchical architecture with transfer-learned
-initialisation** substantially outperforms flat ICD-10 classification —
-+20pp accuracy over the flat baseline on an extremely low-resource task.
+that a **two-stage hierarchical architecture with E-002 initialisation**
+substantially outperforms flat ICD-10 classification —
++6.5pp accuracy over the flat baseline on an extremely low-resource task.
 
 ### Key Findings
 
-- **Flat ICD-10 classification** (E-002) achieves 46.9% — a strong baseline
+- **Flat ICD-10 classification** (E-002) achieves 73.3% — a strong baseline
   given ~4 training examples per code across 1,926 classes
 - **Hierarchical architecture fails without correct initialisation** (E-003,
-  10.6%) — training Stage-2 resolvers from scratch on chapter-filtered
-  subsets is insufficient
-- **E-002 initialisation fixes Stage-2** (E-004a, 66.7%) — fine-tuning
+  11.1%) — training Stage-2 resolvers from scratch on chapter-filtered
+  subsets is insufficient despite an accurate Stage-1 router (96.4%)
+- **E-002 initialisation fixes Stage-2** (E-009, 79.8%) — fine-tuning
   existing ICD-10 representations rather than learning from scratch produces
-  a 6.3x within-chapter accuracy improvement (11.1% → 69.8%)
-- **Extended training yields marginal gains** (E-005a, +0.2pp) — the
-  architecture reaches its ceiling on MedSynth at 20 epochs
+  a 7.2× within-chapter accuracy improvement (11.5% → 82.8%)
+- **Within-chapter accuracy of 82.8% exceeds the 80.4% target** needed to
+  outperform the flat baseline end-to-end
 
 ---
 
@@ -124,8 +123,9 @@ architecture: raw CSV → silver Parquet → gold Parquet (APSO-processed),
 with full JSONL audit trails and DuckDB queryable metadata.
 
 **2. Training Pipeline** — `scripts/train.py` produces a Stage-1 router
-(22-way chapter classification) and per-chapter Stage-2 resolvers. Both
-stages initialise from transfer-learned Bio_ClinicalBERT weights.
+(22-way chapter classification) and per-chapter Stage-2 resolvers. Stage-1
+uses a general-purpose encoder; Stage-2 resolvers initialise from the E-002
+flat ICD-10 model weights for maximum representation transfer.
 
 **3. Calibration System** — `scripts/calibrate.py` applies temperature
 scaling (Guo et al. 2017) to every model, optimising a scalar T via LBFGS
@@ -181,16 +181,23 @@ uv run jupyter notebook
 |---|---|---|
 | `01-EDA_SOAP.ipynb` | Gold layer generation | ~15 min |
 | `02-Model_ClinicalBERT_Baseline_ICD3.ipynb` | E-001 ICD-3 baseline | ~2.5 hrs |
-| `03-Model_ClinicalBERT_Surgical_ICD10.ipynb` | E-002 flat ICD-10 | ~2.5 hrs |
-| `04-Model_Hierarchical_ICD10.ipynb` | E-003 hierarchical | ~3.5 hrs |
-| `05-Model_Hierarchical_ICD10_E002Init.ipynb` | E-004a best model | ~3.5 hrs |
-| `05_a-Model_Hierarchical_ICD10_E002Init.ipynb` | E-005a extended | ~1 hr |
+| `03-Model_ClinicalBERT_Surgical_ICD10.ipynb` | E-002 flat ICD-10 | ~4 hrs |
+| `04-Model_Hierarchical_ICD10.ipynb` | E-003 hierarchical cold start | ~2 hrs |
+| `05-Model_Hierarchical_ICD10_E002Init.ipynb` | E-009 best model | ~2 hrs |
 
-Total training time: approximately 13–15 hours on Apple M4 Max.
+Total training time: approximately 11–12 hours on Apple M5 Max.
+
+Or run end-to-end via scripts — see `Run notes.md` for the complete
+step-by-step guide including verification commands at each stage.
 
 ### Inference
 ```python
-from src.inference import predict
+from src.inference import HierarchicalPredictor
+
+predictor = HierarchicalPredictor(
+    experiment_name='E-009_Balanced_E002Init',
+    stage1_experiment='E-003_Stage1_Router',
+)
 
 note = """
 Assessment: Type 2 diabetes mellitus with hyperglycaemia.
@@ -199,7 +206,7 @@ Subjective: Patient reports increased thirst and frequent urination.
 Objective: Fasting glucose 14.2 mmol/L, BMI 31.
 """
 
-result = predict(note, top_k=5)
+result = predictor.predict(note, top_k=5)
 print(f"Top prediction: {result['codes'][0]} ({result['scores'][0]:.1%})")
 # Top prediction: E11.65 (84.2%)
 ```
@@ -217,6 +224,7 @@ notes-to-icd10/
 ├── data/
 │   ├── cache/              # HuggingFace model cache (gitignored)
 │   ├── gold/               # Gold layer Parquet — APSO-processed
+│   ├── ontology/           # ICD-10 ↔ UMLS knowledge graph data
 │   └── raw/                # Original MedSynth CSV (gitignored)
 ├── notebooks/
 │   ├── 01-EDA_SOAP.ipynb
@@ -224,21 +232,29 @@ notes-to-icd10/
 │   ├── 03-Model_ClinicalBERT_Surgical_ICD10.ipynb
 │   ├── 04-Model_Hierarchical_ICD10.ipynb
 │   ├── 05-Model_Hierarchical_ICD10_E002Init.ipynb
-│   └── 05_a-Model_Hierarchical_ICD10_E002Init.ipynb
+│   └── Notebook_pipline_Overview.md
 ├── outputs/
 │   └── evaluations/
 │       ├── registry/       # Promoted model artifacts (gitignored)
 │       └── E-00*/          # Per-experiment training artifacts (gitignored)
+├── scripts/
+│   ├── train.py            # Flat and hierarchical training
+│   ├── calibrate.py        # Temperature scaling
+│   ├── evaluate.py         # Full evaluation suite
+│   ├── predict.py          # Single-note inference
+│   └── prepare_splits.py   # Deterministic train/val/test splits
 ├── src/
 │   ├── config.py           # Centralised configuration + audit trail
-│   ├── data_loader.py      # Gold layer ingestion utilities
-│   ├── dataset.py          # HuggingFace Dataset helpers
-│   ├── evaluation.py       # Metrics: Macro F1, Accuracy, Top-5
-│   ├── gatekeeper.py       # Pydantic validation schemas
+│   ├── experiment_logger.py # Structured experiment registry
+│   ├── graph_reranker.py   # ICD-10 knowledge graph reranker
 │   ├── inference.py        # End-to-end pipeline inference
-│   └── preprocessing.py    # APSO note construction
+│   ├── paths.py            # Canonical path resolution
+│   ├── plot_utils.py       # Figure persistence (R-003)
+│   └── evaluation.py       # Metrics: Macro F1, Accuracy, Top-5
+├── Run notes.md            # Step-by-step script pipeline guide
+├── REFACTORING_PLAN.md     # Development roadmap and status
+├── verify_scripts.py       # Pre-flight health checks
 ├── artifacts.yaml          # Centralised experiment configuration
-├── mlflow.db               # MLflow SQLite experiment tracker (gitignored)
 ├── pyproject.toml          # uv-managed dependencies
 └── uv.lock
 ```
@@ -264,9 +280,10 @@ a 22-way chapter routing problem followed by within-chapter resolution,
 reducing the effective label space per resolver from 1,926 to ~100.
 
 ### Transfer Learning Chain
-Rather than training from raw Bio_ClinicalBERT weights, each stage
-initialises from the best available prior model — creating a progressive
-transfer learning chain that accumulates ICD knowledge across experiments.
+Each stage initialises from the best available prior model — creating a
+progressive transfer learning chain: base Bio_ClinicalBERT → E-002 flat
+ICD-10 → E-009 per-chapter resolvers. This accumulates ICD-10 knowledge
+across experiments rather than relearning from scratch at each stage.
 
 ---
 
@@ -279,10 +296,10 @@ transfer learning chain that accumulates ICD knowledge across experiments.
   an extremely challenging regime. Results reflect the limits of this
   constraint rather than the architecture ceiling.
 - **Z-chapter difficulty:** Administrative codes (Z-chapter, 263 classes)
-  achieve only 32.6% E2E accuracy due to highly similar clinical language
-  across codes.
-- **Apple Silicon only tested:** Training was conducted exclusively on
-  Apple M4 Max with MPS. CUDA compatibility is expected but untested.
+  achieve only 52.9% E2E accuracy due to highly similar clinical language
+  across codes. This is the primary remaining improvement target.
+- **Apple Silicon tested:** Training was conducted on Apple M5 Max with
+  MPS. CUDA compatibility is expected but untested.
 
 ---
 
@@ -324,6 +341,3 @@ via [GitHub Issues](https://github.com/Sidney-Bishop/notes-to-icd10/issues).
 MIT License — see [LICENSE](LICENSE) for details.
 
 Copyright (c) 2026 Jason Roche
-
-
-# Tiny test text ( ignore )
