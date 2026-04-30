@@ -1,0 +1,47 @@
+=======================================================
+  E-002_FullICD10_ClinicalBERT — OFFICIAL PERFORMANCE RECORD
+=======================================================
+  Experiment:      E-002_FullICD10_ClinicalBERT
+  Model:           emilyalsentzer/Bio_ClinicalBERT
+  Label scheme:    Full ICD-10 (1926 classes)
+  Epochs:          40
+  Best epoch:      40
+  Max length:      512 tokens
+-------------------------------------------------------
+  VALIDATION SET (Best Epoch):
+    Macro F1:      0.6609
+    Accuracy:      76.2%
+    Top-5 Acc:     90.0%
+    Loss:          2.0677
+-------------------------------------------------------
+  TEST SET:
+    Macro F1:      0.6344
+    Accuracy:      73.3%
+    Top-5 Acc:     87.6%
+    Loss:          2.1606
+-------------------------------------------------------
+  CHAPTER-LEVEL (from Phase 11b):
+    Chapter acc:   91.2%
+    Within-chapter errors: 173 (17.9%)
+    Cross-chapter errors:  85 (8.8%)
+    Errors in correct chapter: 67.1%
+-------------------------------------------------------
+  STATUS: FLAT ICD-10 CEILING LOCKED
+  REGISTRY: outputs/evaluations/registry/E-002_FullICD10_ClinicalBERT/
+=======================================================
+
+Date locked: 2026-04-27
+Hardware:    Apple M5 Max (MPS)
+Runtime:     ~193 min (40 epochs)
+
+Notes:
+- Val/test F1 gap of 0.027
+  reflects ~1 test record per class variance, not overfitting
+- Best checkpoint selected by peak eval_macro_f1 (load_best_model_at_end=True)
+- 848 of 1926 ICD-10 classes absent from test set — reported F1
+  is a conservative lower bound on discriminative performance
+- Chapter-level accuracy (91.2%) vs code-level (73.3%) gap of 17.9pp
+  defines the Stage-2 resolver target for hierarchical experiments
+- Within-chapter baseline for hierarchical Stage-2: 73.3% / 91.2% = 80.4%
+- MLflow logging error: id2label/label2id dicts passed to log_params —
+  cosmetic only, training unaffected. Fix in Phase 1 for future runs.

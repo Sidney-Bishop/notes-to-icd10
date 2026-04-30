@@ -1,0 +1,52 @@
+=======================================================
+  E-003_Hierarchical_ICD10 — OFFICIAL PERFORMANCE RECORD
+=======================================================
+  Experiment:      E-003_Hierarchical_ICD10
+  Architecture:    Two-stage hierarchical
+  Stage-1 source:  E-003_Hierarchical_ICD10 (no retraining)
+  Stage-2 init:    E-002_FullICD10_ClinicalBERT (E-002 registry model)
+  Records:         9,660 billable (7,728 / 966 / 966)
+  Stage-1 classes: 22 ICD-10 chapters
+  Stage-2 classes: 1,926 ICD-10 codes (19 resolvers)
+  Stage-2 epochs:  20 + 10 extended (6 weak chapters)
+  Skip chapters:   U (U07.1), P (P22.0), Q (Q25.0)
+-------------------------------------------------------
+  STAGE-1 CHAPTER ROUTER (loaded from E-003 registry):
+    Test Accuracy: 96.4%
+    Test Macro F1: 0.9711
+    Test Top-5:    98.9%
+-------------------------------------------------------
+  STAGE-2 RESOLVERS (weighted val averages):
+    Resolvers trained:  19/19
+    Weighted val F1:    0.0914
+    Weighted val Acc:   13.4%
+    Within-ch test acc: 11.5%
+-------------------------------------------------------
+  END-TO-END (test set):
+    Accuracy:      11.1%
+    Macro F1:      0.0747
+    Routed correct:931/966 (96.4%)
+-------------------------------------------------------
+  COMPARISON:
+    E-002 flat:    73.3% acc | F1 0.6344
+    E-003 cold:    11.1% acc | F1 0.0747
+    E-009 delta vs E-002: -62.2pp | F1 -0.5597
+    E-009 delta vs E-003: -0.0pp | F1 -0.0000
+-------------------------------------------------------
+  STATUS: BEST RESULT — HIERARCHICAL > FLAT CONFIRMED
+  REGISTRY: outputs/evaluations/registry/E-003_Hierarchical_ICD10/
+=======================================================
+
+Date locked: 2026-04-27
+Hardware:    Apple M5 Max (MPS)
+Runtime:     ~120 min (Stage-2 training)
+
+Notes:
+- Stage-1 reused from E-003 registry — 96.4% routing accuracy
+- Stage-2 E-002 init is the key architectural decision:
+  E-003 (cold start) 11.1% → E-009 (E-002 init) 79.8% (+68.7pp)
+- Within-chapter accuracy 82.8% exceeds the 80.4% target
+- Phase 4c extended training produced no meaningful improvement
+  (all deltas ±0.008 F1) — Phase 4b models are the final resolvers
+- Z-chapter (52.9% E2E) is the primary remaining improvement target
+- Within-chapter baseline for future experiments: 82.8% test accuracy

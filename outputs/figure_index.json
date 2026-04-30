@@ -1,0 +1,119 @@
+[
+  {
+    "saved": "2026-04-26T09:24:10.222796",
+    "path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/visualizations/01-EDA_SOAP/token_pressure_kde_20260426_092410.png",
+    "notebook": "01-EDA_SOAP",
+    "description": "token_pressure_kde",
+    "experiment": "",
+    "dpi": 150,
+    "fmt": "png"
+  },
+  {
+    "saved": "2026-04-26T12:40:07.464289",
+    "path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/visualizations/01-EDA_SOAP/icd10_frequency_histogram_20260426_124007.png",
+    "notebook": "01-EDA_SOAP",
+    "description": "icd10_frequency_histogram",
+    "experiment": "",
+    "dpi": 150,
+    "fmt": "png"
+  },
+  {
+    "saved": "2026-04-26T12:40:41.227160",
+    "path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/visualizations/01-EDA_SOAP/token_pressure_kde_20260426_124041.png",
+    "notebook": "01-EDA_SOAP",
+    "description": "token_pressure_kde",
+    "experiment": "",
+    "dpi": 150,
+    "fmt": "png"
+  },
+  {
+    "saved": "2026-04-26T12:48:20.507306",
+    "path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/visualizations/01-EDA_SOAP/icd10_frequency_histogram_20260426_124820.png",
+    "notebook": "01-EDA_SOAP",
+    "description": "icd10_frequency_histogram",
+    "experiment": "",
+    "dpi": 150,
+    "fmt": "png"
+  },
+  {
+    "saved": "2026-04-26T12:48:21.689379",
+    "path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/visualizations/01-EDA_SOAP/token_pressure_kde_20260426_124821.png",
+    "notebook": "01-EDA_SOAP",
+    "description": "token_pressure_kde",
+    "experiment": "",
+    "dpi": 150,
+    "fmt": "png"
+  },
+  {
+    "saved": "2026-04-26T13:10:02.985808",
+    "path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/visualizations/01-EDA_SOAP/icd10_frequency_histogram_20260426_131002.png",
+    "notebook": "01-EDA_SOAP",
+    "description": "icd10_frequency_histogram",
+    "experiment": "",
+    "dpi": 150,
+    "fmt": "png"
+  },
+  {
+    "saved": "2026-04-26T13:10:13.942985",
+    "path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/visualizations/01-EDA_SOAP/token_pressure_kde_20260426_131013.png",
+    "notebook": "01-EDA_SOAP",
+    "description": "token_pressure_kde",
+    "experiment": "",
+    "dpi": 150,
+    "fmt": "png"
+  },
+  {
+    "saved": "2026-04-26T18:23:43.087104",
+    "path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/visualizations/02-Model_ClinicalBERT_Baseline_ICD3/training_dashboard_20260426_182342.png",
+    "notebook": "02-Model_ClinicalBERT_Baseline_ICD3",
+    "description": "training_dashboard",
+    "experiment": "E-001_Baseline_ICD3",
+    "dpi": 200,
+    "fmt": "png"
+  },
+  {
+    "saved": "2026-04-26T18:29:23.979720",
+    "path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/visualizations/02-Model_ClinicalBERT_Baseline_ICD3/confusion_matrix_top10_20260426_182923.png",
+    "notebook": "02-Model_ClinicalBERT_Baseline_ICD3",
+    "description": "confusion_matrix_top10",
+    "experiment": "E-001_Baseline_ICD3",
+    "dpi": 150,
+    "fmt": "png"
+  },
+  {
+    "saved": "2026-04-27T07:27:03.695536",
+    "path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/visualizations/03-Model_ClinicalBERT_Surgical_ICD10/confusion_matrix_top10_20260427_072703.png",
+    "notebook": "03-Model_ClinicalBERT_Surgical_ICD10",
+    "description": "confusion_matrix_top10",
+    "experiment": "E-002_FullICD10_ClinicalBERT",
+    "dpi": 150,
+    "fmt": "png"
+  },
+  {
+    "saved": "2026-04-27T07:31:03.375769",
+    "path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/visualizations/03-Model_ClinicalBERT_Surgical_ICD10/chapter_confusion_matrix_20260427_073103.png",
+    "notebook": "03-Model_ClinicalBERT_Surgical_ICD10",
+    "description": "chapter_confusion_matrix",
+    "experiment": "E-002_FullICD10_ClinicalBERT",
+    "dpi": 150,
+    "fmt": "png"
+  },
+  {
+    "saved": "2026-04-27T08:30:21.205746",
+    "path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/visualizations/04-Model_Hierarchical_ICD10/stage1_router_dashboard_20260427_083021.png",
+    "notebook": "04-Model_Hierarchical_ICD10",
+    "description": "stage1_router_dashboard",
+    "experiment": "E-003_Hierarchical_ICD10",
+    "dpi": 200,
+    "fmt": "png"
+  },
+  {
+    "saved": "2026-04-27T09:06:13.617880",
+    "path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/visualizations/04-Model_Hierarchical_ICD10/stage1_router_dashboard_20260427_090613.png",
+    "notebook": "04-Model_Hierarchical_ICD10",
+    "description": "stage1_router_dashboard",
+    "experiment": "E-003_Hierarchical_ICD10",
+    "dpi": 200,
+    "fmt": "png"
+  }
+]

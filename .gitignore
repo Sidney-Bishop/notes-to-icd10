@@ -256,7 +256,6 @@ Claude_Code_Local_Setup_Guide_v2.md
 start-claude-local-v2.sh
 
 # Large outputs
-outputs/
 graphify-out/
 data/graph/
 *.zip
