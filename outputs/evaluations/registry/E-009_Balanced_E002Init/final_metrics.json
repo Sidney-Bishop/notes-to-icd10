@@ -1,0 +1,52 @@
+{
+    "experiment_id": "E-009",
+    "experiment_name": "E-009_Balanced_E002Init",
+    "timestamp": "2026-04-27T15:39:23.765477",
+    "stage1": {
+        "source": "E-003_Hierarchical_ICD10",
+        "test_accuracy": 0.9637681159420289,
+        "test_macro_f1": 0.0,
+        "test_top5": 0.0
+    },
+    "stage2": {
+        "init_model": "E-002_FullICD10_ClinicalBERT",
+        "num_epochs": 20,
+        "extended_chapters": [
+            "Z",
+            "E",
+            "H",
+            "T",
+            "K",
+            "S"
+        ],
+        "extended_epochs": 10,
+        "extended_lr": 5e-06,
+        "num_resolvers": 19,
+        "skip_chapters": [
+            "U",
+            "Q",
+            "P"
+        ],
+        "weighted_val_f1": 0.7613720374807175,
+        "weighted_val_acc": 0.8348405962578512
+    },
+    "end_to_end": {
+        "test_accuracy": 0.7981366459627329,
+        "test_macro_f1": 0.7104805145667801,
+        "stage1_routing": 0.9637681159420289,
+        "within_chapter": 0.8281417830290011
+    },
+    "baselines": {
+        "e002_accuracy": 0.7329,
+        "e002_macro_f1": 0.6344,
+        "e003_accuracy": 0.111,
+        "e003_macro_f1": 0.0747
+    },
+    "deltas": {
+        "vs_e002_accuracy": 0.06523664596273293,
+        "vs_e002_macro_f1": 0.07608051456678011,
+        "vs_e003_accuracy": 0.6871366459627329,
+        "vs_e003_macro_f1": 0.6357805145667801
+    },
+    "key_finding": "E-009 hierarchical pipeline (E-002 init Stage-2) achieves 79.8% E2E accuracy \u2014 +6.5% vs E-002 flat baseline (73.3%). First hierarchical result to definitively exceed the flat ICD-10 classifier. Within-chapter accuracy 82.8% exceeds the 80.4% target."
+}

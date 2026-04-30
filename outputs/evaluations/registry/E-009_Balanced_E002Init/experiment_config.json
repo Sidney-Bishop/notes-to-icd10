@@ -1,0 +1,19 @@
+{
+    "experiment_id": "E-009",
+    "experiment_name": "E-009_Balanced_E002Init",
+    "description": "Two-stage hierarchical ICD-10 | Stage-1 from E-003 registry | Stage-2 initialised from E-002 registry model",
+    "model_name": "emilyalsentzer/Bio_ClinicalBERT",
+    "payload_type": "note_only",
+    "label_scheme": "hierarchical",
+    "code_status_filter": "billable",
+    "stage1_source": "E-003_Hierarchical_ICD10",
+    "stage2_init_model": "E-002_FullICD10_ClinicalBERT",
+    "stage2_num_epochs": 20,
+    "stage2_learning_rate": 2e-05,
+    "stage2_batch_size": 16,
+    "max_length": 512,
+    "weight_decay": 0.01,
+    "warmup_ratio": 0.1,
+    "use_special_tokens": false,
+    "seed": 42
+}
