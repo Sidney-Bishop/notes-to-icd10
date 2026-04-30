@@ -1,0 +1,467 @@
+{
+  "E-008_Balanced": {
+    "experiment": "E-008_Balanced",
+    "created": "2026-04-25T08:18:05.962075",
+    "stages": {
+      "train_stage2": {
+        "status": "complete",
+        "completed": "2026-04-25T08:18:05.962316",
+        "artifacts": {
+          "stage2_dir": "outputs/evaluations/E-008_Balanced/stage2"
+        }
+      },
+      "calibrate": {
+        "status": "complete",
+        "completed": "2026-04-25T08:18:05.962486",
+        "artifacts": {
+          "calibration_report": "outputs/evaluations/E-008_Balanced/calibration_report.json"
+        }
+      },
+      "evaluate": {
+        "status": "complete",
+        "completed": "2026-04-25T08:18:05.962685",
+        "artifacts": {
+          "eval_dir": "outputs/evaluations/E-008_Balanced/eval"
+        }
+      }
+    },
+    "results": {
+      "e2e_accuracy": 0.342,
+      "macro_f1": 0.249,
+      "ece": 0.064,
+      "coverage_07": 0.187,
+      "stage1_accuracy": 0.974,
+      "recorded": "2026-04-25T08:18:05.962836"
+    }
+  },
+  "E-006_Hierarchical_Clean": {
+    "experiment": "E-006_Hierarchical_Clean",
+    "created": "2026-04-25T08:18:05.962972",
+    "stages": {
+      "train_stage2": {
+        "status": "complete",
+        "completed": "2026-04-25T08:18:05.963161",
+        "artifacts": {
+          "stage2_dir": "outputs/evaluations/E-006_Hierarchical_Clean/stage2"
+        }
+      },
+      "calibrate": {
+        "status": "complete",
+        "completed": "2026-04-25T08:18:05.963305",
+        "artifacts": {
+          "calibration_report": "outputs/evaluations/E-006_Hierarchical_Clean/calibration_report.json"
+        }
+      },
+      "evaluate": {
+        "status": "complete",
+        "completed": "2026-04-25T08:18:05.963442",
+        "artifacts": {
+          "eval_dir": "outputs/evaluations/E-006_Hierarchical_Clean/eval"
+        }
+      }
+    },
+    "results": {
+      "e2e_accuracy": 0.238,
+      "macro_f1": 0.16,
+      "ece": 0.103,
+      "coverage_07": 0.14,
+      "stage1_accuracy": 0.984,
+      "recorded": "2026-04-25T08:18:05.963582"
+    }
+  },
+  "E-004a_Hierarchical_E002Init": {
+    "experiment": "E-004a_Hierarchical_E002Init",
+    "created": "2026-04-25T09:30:33.115482",
+    "stages": {
+      "prepare_splits": {
+        "status": "complete",
+        "completed": "2026-04-25T09:30:33.115844",
+        "artifacts": {
+          "stage2_dir": "outputs/evaluations/E-004a_Hierarchical_E002Init/stage2",
+          "gold": "medsynth_gold_augmented.parquet",
+          "total_records": 11214,
+          "test_records": 1127,
+          "seed": 42
+        }
+      },
+      "train_stage2": {
+        "status": "complete",
+        "started": "2026-04-25T15:27:27.227786",
+        "params": {
+          "model": "emilyalsentzer/Bio_ClinicalBERT",
+          "mode": "hierarchical",
+          "stage": 2,
+          "epochs": 20,
+          "batch_size": 16,
+          "learning_rate": 2e-05,
+          "weight_decay": 0.01,
+          "warmup_ratio": 0.1,
+          "max_length": 512,
+          "code_filter": "billable",
+          "label_scheme": "icd10",
+          "use_presplit": true,
+          "stage2_init": "outputs/evaluations/E-002_FullICD10_ClinicalBERT",
+          "chapters": "all",
+          "gold_path": "auto",
+          "seed": 42
+        },
+        "completed": "2026-04-25T17:26:52.504815",
+        "artifacts": {
+          "stage2_dir": "outputs/evaluations/E-004a_Hierarchical_E002Init/stage2",
+          "chapters_trained": "A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,R,S,T,Z",
+          "chapters_skipped": "P,Q,U",
+          "stage2_init": "E-002_FullICD10_ClinicalBERT",
+          "train_seconds": 4593
+        }
+      },
+      "calibrate": {
+        "status": "complete",
+        "started": "2026-04-25T17:29:33.795200",
+        "params": {
+          "stage1_experiment": "E-003_Stage1_Router",
+          "threshold": 0.7,
+          "dry_run": false
+        },
+        "completed": "2026-04-25T17:30:01.871632",
+        "artifacts": {
+          "calibration_report": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/evaluations/E-004a_Hierarchical_E002Init/calibration_report.json",
+          "resolvers_calibrated": 19
+        }
+      },
+      "evaluate": {
+        "status": "complete",
+        "started": "2026-04-25T17:38:56.597146",
+        "params": {
+          "mode": "hierarchical",
+          "stage1_experiment": "E-003_Stage1_Router",
+          "threshold": 0.7,
+          "sample": "all"
+        },
+        "completed": "2026-04-25T17:40:24.188501",
+        "artifacts": {
+          "eval_dir": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/evaluations/E-004a_Hierarchical_E002Init/eval"
+        }
+      }
+    },
+    "results": {
+      "stage1_accuracy": 0.965,
+      "stage2_accuracy": 0.216,
+      "e2e_accuracy": 0.209,
+      "macro_f1": 0.141,
+      "ece": 0.2094,
+      "coverage_07": 0.34,
+      "recorded": "2026-04-25T17:50:34.126051"
+    }
+  },
+  "E-002_FullICD10_ClinicalBERT": {
+    "experiment": "E-002_FullICD10_ClinicalBERT",
+    "created": "2026-04-25T11:59:38.719312",
+    "stages": {
+      "train_flat": {
+        "status": "complete",
+        "started": "2026-04-25T11:59:38.719610",
+        "params": {
+          "model": "emilyalsentzer/Bio_ClinicalBERT",
+          "mode": "flat",
+          "stage": 12,
+          "epochs": 20,
+          "batch_size": 16,
+          "learning_rate": 2e-05,
+          "weight_decay": 0.01,
+          "warmup_ratio": 0.1,
+          "max_length": 512,
+          "code_filter": "billable",
+          "label_scheme": "icd10",
+          "use_presplit": false,
+          "stage2_init": "none",
+          "chapters": "all",
+          "gold_path": "auto",
+          "seed": 42
+        },
+        "failed": "2026-04-25T13:35:34.021868",
+        "reason": "'TrainingResult' object has no attribute 'get'",
+        "completed": "2026-04-25T14:27:21.897170",
+        "artifacts": {
+          "model_dir": "outputs/evaluations/E-002_FullICD10_ClinicalBERT",
+          "best_epoch": 19,
+          "best_val_accuracy": 0.5745,
+          "best_val_f1": 0.456,
+          "num_classes": 1926,
+          "train_seconds": 5751
+        }
+      }
+    },
+    "results": {
+      "e2e_accuracy": 0.7619,
+      "macro_f1": 0.6609,
+      "recorded": "2026-04-27T07:20:11.771899"
+    }
+  },
+  "E-003_Stage1_Router": {
+    "experiment": "E-003_Stage1_Router",
+    "created": "2026-04-25T14:30:29.616977",
+    "stages": {
+      "train_stage1": {
+        "status": "complete",
+        "started": "2026-04-25T14:30:29.617310",
+        "params": {
+          "model": "emilyalsentzer/Bio_ClinicalBERT",
+          "mode": "hierarchical",
+          "stage": 1,
+          "epochs": 10,
+          "batch_size": 16,
+          "learning_rate": 2e-05,
+          "weight_decay": 0.01,
+          "warmup_ratio": 0.1,
+          "max_length": 512,
+          "code_filter": "billable",
+          "label_scheme": "icd10",
+          "use_presplit": false,
+          "stage2_init": "none",
+          "chapters": "all",
+          "gold_path": "auto",
+          "seed": 42
+        },
+        "failed": "2026-04-25T15:13:55.238608",
+        "reason": "'TrainingResult' object has no attribute 'get'",
+        "completed": "2026-04-25T15:27:20.353965",
+        "artifacts": {
+          "stage1_dir": "outputs/evaluations/E-003_Stage1_Router/stage1",
+          "best_epoch": 6,
+          "best_val_accuracy": 0.939,
+          "best_val_f1": 0.951,
+          "train_seconds": 2600
+        }
+      }
+    },
+    "results": {
+      "stage1_accuracy": 0.9648,
+      "macro_f1": 0.9722,
+      "recorded": "2026-04-27T08:32:00.932860"
+    }
+  },
+  "E-002_FullICD10_ClinicalBERT_Aug": {
+    "experiment": "E-002_FullICD10_ClinicalBERT_Aug",
+    "created": "2026-04-25T17:55:10.678372",
+    "stages": {
+      "train_flat": {
+        "status": "complete",
+        "started": "2026-04-25T17:55:10.678704",
+        "params": {
+          "model": "emilyalsentzer/Bio_ClinicalBERT",
+          "mode": "flat",
+          "stage": 12,
+          "epochs": 20,
+          "batch_size": 16,
+          "learning_rate": 2e-05,
+          "weight_decay": 0.01,
+          "warmup_ratio": 0.1,
+          "max_length": 512,
+          "code_filter": "billable",
+          "label_scheme": "icd10",
+          "use_presplit": false,
+          "stage2_init": "none",
+          "chapters": "all",
+          "gold_path": "auto",
+          "seed": 42
+        },
+        "completed": "2026-04-25T20:12:53.215160",
+        "artifacts": {
+          "model_dir": "outputs/evaluations/E-002_FullICD10_ClinicalBERT_Aug",
+          "best_epoch": 20,
+          "best_val_accuracy": 0.5714,
+          "best_val_f1": 0.4532,
+          "gold": "medsynth_gold_augmented.parquet"
+        }
+      }
+    }
+  },
+  "E-009_Balanced_E002Init": {
+    "experiment": "E-009_Balanced_E002Init",
+    "created": "2026-04-25T20:13:04.010560",
+    "stages": {
+      "train_stage2": {
+        "status": "complete",
+        "started": "2026-04-25T21:46:33.451783",
+        "params": {
+          "model": "emilyalsentzer/Bio_ClinicalBERT",
+          "mode": "hierarchical",
+          "stage": 2,
+          "epochs": 20,
+          "batch_size": 16,
+          "learning_rate": 2e-05,
+          "weight_decay": 0.01,
+          "warmup_ratio": 0.1,
+          "max_length": 512,
+          "code_filter": "billable",
+          "label_scheme": "icd10",
+          "use_presplit": true,
+          "stage2_init": "outputs/evaluations/E-002_FullICD10_ClinicalBERT_Aug",
+          "chapters": "all",
+          "gold_path": "data/gold/medsynth_gold_augmented.parquet",
+          "seed": 42
+        },
+        "completed": "2026-04-25T23:18:20.888339",
+        "artifacts": {
+          "stage2_dir": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/evaluations/E-009_Balanced_E002Init/stage2",
+          "chapters_trained": "",
+          "stage2_init": "outputs/evaluations/E-002_FullICD10_ClinicalBERT_Aug"
+        }
+      },
+      "calibrate": {
+        "status": "complete",
+        "started": "2026-04-26T02:59:02.491110",
+        "params": {
+          "stage1_experiment": "E-003_Stage1_Router",
+          "threshold": 0.7,
+          "dry_run": false
+        },
+        "completed": "2026-04-26T02:59:31.374818",
+        "artifacts": {
+          "calibration_report": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/evaluations/E-009_Balanced_E002Init/calibration_report.json",
+          "resolvers_calibrated": 19
+        }
+      },
+      "evaluate": {
+        "status": "complete",
+        "started": "2026-04-26T02:59:34.274753",
+        "params": {
+          "mode": "hierarchical",
+          "stage1_experiment": "E-003_Stage1_Router",
+          "threshold": 0.7,
+          "sample": "all"
+        },
+        "completed": "2026-04-26T03:00:47.096416",
+        "artifacts": {
+          "eval_dir": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/evaluations/E-009_Balanced_E002Init/eval"
+        }
+      }
+    },
+    "results": {
+      "e2e_accuracy": 0.798,
+      "macro_f1": 0.7105,
+      "stage1_accuracy": 0.964,
+      "recorded": "2026-04-27T15:39:58.896712"
+    }
+  },
+  "EDA": {
+    "experiment": "EDA",
+    "created": "2026-04-26T13:09:35.900804",
+    "stages": {
+      "nb_ingestion": {
+        "status": "complete",
+        "started": "2026-04-26T13:09:44.483883",
+        "params": {
+          "note": "raw parquet anchor"
+        },
+        "completed": "2026-04-26T13:10:57.400898",
+        "artifacts": {}
+      },
+      "nb_apso_flip": {
+        "status": "running",
+        "started": "2026-04-26T13:10:58.796443",
+        "params": {
+          "note": "APSO signal prioritisation + redaction"
+        }
+      },
+      "nb_gold_export": {
+        "status": "complete",
+        "started": "2026-04-26T13:11:30.561668",
+        "params": {
+          "note": "Gold layer Parquet export"
+        },
+        "completed": "2026-04-26T13:11:37.088208",
+        "artifacts": {}
+      }
+    }
+  },
+  "E-001_Baseline_ICD3": {
+    "experiment": "E-001_Baseline_ICD3",
+    "created": "2026-04-26T17:06:41.257206",
+    "stages": {},
+    "results": {
+      "e2e_accuracy": 0.8691,
+      "macro_f1": 0.8434,
+      "recorded": "2026-04-26T17:06:41.257742"
+    }
+  },
+  "E-003_Hierarchical_ICD10": {
+    "experiment": "E-003_Hierarchical_ICD10",
+    "created": "2026-04-27T12:18:48.665960",
+    "stages": {},
+    "results": {
+      "e2e_accuracy": 0.111,
+      "macro_f1": 0.0747,
+      "stage1_accuracy": 0.964,
+      "recorded": "2026-04-27T12:18:48.667191"
+    }
+  },
+  "E-010_40ep_E002Init": {
+    "experiment": "E-010_40ep_E002Init",
+    "created": "2026-04-30T10:59:04.800749",
+    "stages": {
+      "train_stage2": {
+        "status": "complete",
+        "started": "2026-04-30T10:59:04.801582",
+        "params": {
+          "model": "emilyalsentzer/Bio_ClinicalBERT",
+          "mode": "hierarchical",
+          "stage": 2,
+          "epochs": 20,
+          "batch_size": 8,
+          "learning_rate": 2e-05,
+          "weight_decay": 0.01,
+          "warmup_ratio": 0.1,
+          "max_length": 512,
+          "code_filter": "billable",
+          "label_scheme": "icd10",
+          "use_presplit": false,
+          "stage2_init": "outputs/evaluations/registry/E-002_FullICD10_ClinicalBERT",
+          "chapters": "all",
+          "gold_path": "auto",
+          "seed": 42
+        },
+        "completed": "2026-04-30T11:49:57.526174",
+        "artifacts": {
+          "stage2_dir": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/evaluations/E-010_40ep_E002Init/stage2",
+          "chapters_trained": "",
+          "stage2_init": "outputs/evaluations/registry/E-002_FullICD10_ClinicalBERT"
+        }
+      },
+      "calibrate": {
+        "status": "complete",
+        "started": "2026-04-30T12:38:30.751159",
+        "params": {
+          "stage1_experiment": "E-003_Hierarchical_ICD10",
+          "threshold": 0.7,
+          "dry_run": false
+        },
+        "completed": "2026-04-30T12:38:58.775051",
+        "artifacts": {
+          "calibration_report": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/evaluations/E-010_40ep_E002Init/calibration_report.json",
+          "resolvers_calibrated": 19
+        }
+      },
+      "evaluate": {
+        "status": "complete",
+        "started": "2026-04-30T12:39:33.621657",
+        "params": {
+          "mode": "hierarchical",
+          "stage1_experiment": "E-003_Hierarchical_ICD10",
+          "threshold": 0.7,
+          "sample": "all"
+        },
+        "completed": "2026-04-30T12:40:36.999076",
+        "artifacts": {
+          "eval_dir": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/evaluations/E-010_40ep_E002Init/eval"
+        }
+      }
+    },
+    "results": {
+      "e2e_accuracy": 0.839,
+      "macro_f1": 0.762,
+      "stage1_accuracy": 0.987,
+      "recorded": "2026-04-30T12:45:17.894452"
+    }
+  }
+}
