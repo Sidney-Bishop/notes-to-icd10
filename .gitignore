@@ -144,13 +144,17 @@ db/
 # -----------------------------------------------------------------------------
 # Outputs — selective exclusion
 #
-# We TRACK:   label mappings, final metrics, e2e results (small JSON)
+# We TRACK:   label mappings, final metrics, e2e results, run log, registry
 # We EXCLUDE: model weights (above), Parquet eval artifacts, visualisations,
-#             raw prediction files
+#             raw prediction files, large generated directories
 # -----------------------------------------------------------------------------
 outputs/predictions/
 outputs/visualizations/
 outputs/reports/
+outputs/clustering/
+outputs/embeddings/
+outputs/models/
+outputs/evaluations_archive*/
 
 # Per-experiment large artifacts (training curves, confusion matrix PNGs etc.)
 # Note: git doesn't support ** globbing — use explicit depth patterns instead
@@ -162,6 +166,11 @@ outputs/evaluations/registry/*/*.png
 outputs/evaluations/registry/*/*.jpg
 outputs/evaluations/registry/*/stage1/*.png
 
+# Large Parquet files in eval directories
+outputs/evaluations/*/*.parquet
+outputs/evaluations/*/*/*.parquet
+outputs/evaluations/*/*/*/*.parquet
+
 # training_args.bin — binary, not needed in git (caught by *.bin above,
 # but listed explicitly for clarity since it appears in many subdirectories)
 training_args.bin
@@ -169,13 +178,22 @@ training_args.bin
 # Processing log (append-only JSONL, grows unboundedly — regenerable)
 outputs/evaluations/processing_log.jsonl
 
+# CSV result summaries (regenerable from experiments.json)
+outputs/experiment_results.csv
+
 # TRACK these (small, essential for inference and reproducibility):
+# outputs/experiments.json
+# outputs/run.log
+# outputs/figure_index.json
+# outputs/evaluations/registry/*/OFFICIAL_PERFORMANCE_RECORD.txt
 # outputs/evaluations/registry/*/label_mapping.json
 # outputs/evaluations/registry/*/final_metrics.json
 # outputs/evaluations/registry/*/experiment_config.json
 # outputs/evaluations/registry/*/e2e_results.json
 # outputs/evaluations/*/stage2/*/model/label_map.json
 # outputs/evaluations/*/stage2/stage2_results.json
+# outputs/evaluations/E-003_Hierarchical_ICD10/stage1/label_map.json
+# outputs/evaluations/E-003_Hierarchical_ICD10/stage1/temperature.json
 # (No exclude rules needed for these — they are not matched by patterns above)
 
 
@@ -247,22 +265,30 @@ $RECYCLE.BIN/
 # Miscellaneous
 # -----------------------------------------------------------------------------
 *.log
-*.pidoutputs/
+*.pid
 gold.jsonl
 project_handoff.zip
 
-# Local Claude setup
-Claude_Code_Local_Setup_Guide_v2.md
-start-claude-local-v2.sh
-
-# Large outputs
+# Knowledge graph (large generated output — rebuild with: python -m graphify update .)
 graphify-out/
 data/graph/
+
+# Archives and uploads
 *.zip
+medsynth_src_*.txt
+
+# LLM wiki experiment files
+sources/
+CLAUDE_WIKI.md
+
+# Local Claude Code setup (machine-specific)
+Claude_Code_Local_Setup_Guide_v2.md
+start-claude-local-v2.sh
 
 # Notebook backups
 notebooks/OLD_*.ipynb
 notebooks/*\ 1.ipynb
 
+# Claude session files
 CLAUDE.md
 .claude/
