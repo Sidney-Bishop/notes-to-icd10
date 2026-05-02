@@ -1643,3 +1643,408 @@ Z chapter at 38.1% is the single biggest remaining lever — 218 test records, 2
 
 ## Document Maintenance Note — Updated 26 April 2026
 E-009 breakthrough result documented. 71.7% E2E, 0.637 F1, 0.030 ECE — new definitive best. Key architectural constraint confirmed and documented. Next session should focus on chapter Z improvement or MIMIC-IV validation.
+
+
+
+---
+
+## Session — 30 April 2026: E-010 — New Project Best
+
+### Context
+
+Following the April 2026 notebook re-run (E-009 at 79.8% on original gold,
+20-epoch E-002 init), the question was whether the 40-epoch E-002 trained
+during the notebook session would produce meaningfully better Stage-2
+resolvers. E-010 tests this directly: same architecture as E-009, same
+original gold dataset, same Stage-2 epoch count (20), but Stage-2 initialised
+from the 40-epoch E-002 instead of the 20-epoch version.
+
+### Hypothesis
+
+The 40-epoch E-002 encoder contains richer ICD-10 representations than the
+20-epoch version — we know from E-001's training curve that performance was
+still improving significantly at epoch 20. If those richer encoder weights
+transfer to Stage-2, within-chapter accuracy should improve.
+
+### Training
+
+- **Stage-2 init:** `outputs/evaluations/registry/E-002_FullICD10_ClinicalBERT/model/`
+  (40-epoch, original gold, 1,926 codes)
+- **Gold:** Original gold layer (9,660 billable records, 80/10/10 split)
+- **Stage-2 epochs:** 20 per resolver
+- **Stage-1:** Reused from E-003 (no retraining needed)
+- **Runtime:** ~51 minutes (19 resolvers)
+
+All 19 resolvers trained without errors. Notable val accuracies at best epoch:
+N=98.1% (ep 6), T=100% (ep 3), L=100% (ep 5), S=95.4% (ep 5), Z=65.2% (ep 6).
+
+**Two missing Stage-1 calibration artefacts were generated this session:**
+- `outputs/evaluations/E-003_Hierarchical_ICD10/stage1/label_map.json`
+  (derived from `chapter_mapping.json`)
+- `outputs/evaluations/E-003_Hierarchical_ICD10/stage1/test_split.parquet`
+  (regenerated from gold layer with seed=42 split)
+
+### Results
+
+| Metric | E-009 (20-ep E-002) | **E-010 (40-ep E-002)** | Delta |
+|---|---|---|---|
+| E2E Accuracy | 79.8% | **83.9%** | +4.1pp |
+| Macro F1 | 0.711 | **0.762** | +0.051 |
+| Stage-1 routing | 96.4% | **98.7%** | +2.3pp |
+| Within-chapter | 82.8% | **84.8%** | +2.0pp |
+| Z-chapter | 52.9% | **62.1%** | +9.2pp |
+| ECE | — | **0.034** | — |
+| Coverage@0.7 | — | **82.1%** | — |
+| Accuracy on covered | — | **95.2%** | — |
+
+### Calibration Results (19 resolvers)
+
+| Resolver | T | ECE before→after | Coverage@0.7 | Acc on covered |
+|---|---|---|---|---|
+| A | 0.050 | 0.250→0.628 | 50.0% | 0.0% (unstable — 6 test records) |
+| B | 0.266 | 0.727→0.175 | 75.0% | 91.7% |
+| C | 0.263 | 0.801→0.080 | 90.2% | 93.5% |
+| D | 0.200 | 0.790→0.049 | 92.1% | 100% |
+| E | 0.270 | 0.669→0.121 | 71.8% | 89.3% |
+| F | 0.313 | 0.670→0.138 | 77.1% | 100% |
+| G | 0.257 | 0.640→0.086 | 79.4% | 96.3% |
+| H | 0.327 | 0.611→0.048 | 88.1% | 91.9% |
+| I | 0.378 | 0.626→0.042 | 97.0% | 98.4% |
+| J | 0.276 | 0.757→0.065 | 88.0% | 97.7% |
+| K | 0.472 | 0.607→0.056 | 89.7% | 92.3% |
+| L | 0.292 | 0.719→0.043 | 86.8% | 97.0% |
+| M | 0.342 | 0.727→0.045 | 86.5% | 96.9% |
+| N | 0.247 | 0.774→0.034 | 94.3% | 98.0% |
+| O | 0.272 | 0.616→0.100 | 71.9% | 95.7% |
+| R | 0.278 | 0.733→0.064 | 85.0% | 95.3% |
+| S | 0.214 | 0.764→0.094 | 84.1% | 100% |
+| T | 0.280 | 0.602→0.236 | 75.0% | 100% |
+| Z | 0.323 | 0.558→0.076 | 47.0% | 88.7% |
+
+**Avg ECE: 0.665 → 0.115. Avg Coverage@0.7: 80.5% at 90.7% accuracy.**
+
+### vs All Experiments — Updated Leaderboard
+
+| Rank | Experiment | E2E | F1 | ECE | Cov@0.7 | Cov Acc |
+|---|---|---|---|---|---|---|
+| 🥇 | **E-010_40ep_E002Init** | **83.9%** | **0.762** | **0.034** | **82.1%** | **95.2%** |
+| 🥈 | E-009_Balanced_E002Init | 79.8% | 0.711 | — | — | — |
+| 🥉 | E-005c + Graph + Override | 77.4% | 0.679 | 0.027 | 68.5% | 93.6% |
+| 4th | E-002 flat | 73.3% | 0.634 | — | — | — |
+| 5th | E-008_Balanced | 34.2% | 0.249 | — | — | — |
+| 6th | E-006_Hierarchical_Clean | 23.8% | 0.160 | — | — | — |
+| 7th | E-004a_Hierarchical_E002Init | 20.9% | 0.141 | — | — | — |
+| 8th | E-003_Hierarchical_ICD10 | 11.1% | 0.075 | — | — | — |
+
+### Key Finding
+
+**E-010 beats the previous production pipeline (E-005c + Graph + Override)
+by +6.5pp accuracy and +0.083 F1 without requiring augmented gold, graph
+reranking, or Z-threshold overrides.** The improvement comes entirely from
+the 40-epoch E-002 initialiser providing richer encoder representations.
+
+The Z-chapter result is particularly significant: 62.1% E2E (+9.2pp over
+E-009) with 47% auto-coded at 88.7% precision. The 40-epoch encoder has
+substantially better Z-code discrimination than the 20-epoch version.
+
+### Updated Architectural Constraint
+
+> Train E-002 on the **same gold dataset** as Stage-2, and train it for
+> **sufficient epochs** (40, not 20). Both conditions matter. The 20-epoch
+> vs 40-epoch difference alone accounts for +4.1pp E2E accuracy.
+
+### Remaining Opportunities
+
+1. **Chapter Z** — 62.1% E2E, 47% auto-coded. Still the primary gap.
+   The 40-epoch init helped significantly (+9.2pp). Contrastive fine-tuning
+   or lower confidence threshold for Z may push further.
+2. **E-010 + GraphReranker** — E-010 without graph already beats E-005c+graph.
+   Adding the graph to E-010 is an obvious next experiment (E-011).
+3. **MIMIC-IV validation** — Blocked on PhysioNet access.
+4. **Coverage@0.7 on Z** — 47% at 88.7% precision. Lowering Z threshold
+   to 0.5 may rescue more notes at acceptable precision.
+
+---
+
+## Document Maintenance Note — Updated 30 April 2026
+
+E-010 result documented. 83.9% E2E, 0.762 F1, 0.034 ECE, 82.1% Coverage@0.7
+at 95.2% accuracy — new definitive best. Supersedes E-009 (79.8%) and
+E-005c+Graph (77.4%) as current production baseline.
+
+
+
+---
+
+## Project Conventions — Established 2 May 2026
+
+This section documents conventions that have emerged during the project
+and must be followed by anyone working on it going forward. It is written
+as a handoff document — a new contributor should be able to read this
+section and understand how the project is organised without needing the
+full session history above.
+
+---
+
+### Package Management
+
+This project uses **uv** exclusively for Python dependency management.
+Never use `pip install`, `pip3`, or `python3` directly.
+
+```bash
+uv sync                          # install all dependencies from pyproject.toml
+uv add <package>                 # add a new runtime dependency
+uv add --dev <package>           # add a development-only dependency
+uv run python <script.py>        # run a script using the project venv
+uv run pytest tests/ -v          # run the unit test suite
+uv run python verify_scripts.py  # pre-flight check (always run before training)
+```
+
+The virtual environment lives at `.venv/` in the project root. The Python
+binary path is:
+```
+/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/.venv/bin/python
+```
+
+This path is referenced in the Quarto publication config (see below).
+
+---
+
+### Notebook Conventions
+
+All training notebooks (02–05) use shared setup utilities from
+`notebooks/utils/nb_setup.py`. This module eliminates ~80 lines of
+duplicated MLflow, device, and HuggingFace setup code from every notebook.
+
+Every notebook Phase 1 follows this pattern:
+
+```python
+import sys
+from pathlib import Path
+
+# Bootstrap — must happen before importing from notebooks.utils
+_root = next(
+    p for p in [Path.cwd(), *Path.cwd().parents]
+    if (p / "artifacts.yaml").exists()
+)
+if str(_root) not in sys.path:
+    sys.path.insert(0, str(_root))
+
+from notebooks.utils.nb_setup import setup_experiment
+
+cfg = { ... }  # experiment-specific config dict
+ctx = setup_experiment(cfg)
+```
+
+`setup_experiment()` returns an `ExperimentContext` with `.PROJECT_ROOT`,
+`.GOLD_PARQUET_PATH`, `.EXP_DIR`, `.device`, `.HF_CACHE_DIR`, `.DB_PATH`,
+and `.mlflow_run` — all resolved and ready to use.
+
+Key functions in `nb_setup.py`:
+
+| Function | Purpose |
+|---|---|
+| `setup_experiment(cfg)` | Full Phase 1 in one call |
+| `make_training_args(output_dir, cfg)` | Consistent `TrainingArguments` factory |
+| `promote_to_registry(cfg, trainer, ...)` | Flat model registry promotion |
+| `check_mlflow_run()` | Assert MLflow run is active |
+| `end_mlflow_run(final_metrics)` | Log final metrics and close run |
+| `print_monitoring_urls(project_root, tb_dir)` | Print TensorBoard/MLflow commands |
+| `_mlflow_safe_params(cfg)` | Filter cfg for safe MLflow logging |
+
+**MLflow note:** `warmup_ratio` is excluded from MLflow param logging via
+`_MLFLOW_EXCLUDE_KEYS` — it is converted to `warmup_steps` inside
+`make_training_args()` and re-logging it causes a MLflow conflict error.
+Internal cfg keys prefixed with `_` (e.g. `_notebook`, `_train_size`) are
+also excluded.
+
+---
+
+### Experiment Registry
+
+Every experiment is logged to two files:
+
+- **`outputs/experiments.json`** — machine-readable registry indexed by
+  experiment name. Updated by `ExperimentLogger.log_results()`.
+- **`outputs/run.log`** — append-only human-readable audit trail.
+
+Both files are tracked in git (force-added with `git add -f`). Model weights
+and large binary artifacts in `outputs/evaluations/` are gitignored.
+
+Check the current registry state:
+```bash
+uv run python -c "from src.experiment_logger import status; status()"
+```
+
+---
+
+### Image and Asset Management
+
+The project uses a two-location convention for images:
+
+**1. Master copies — `resources/images/`**
+
+This is the canonical source for all project images, organised as:
+
+```
+resources/images/
+├── notes-to-icd10-logo.png      # project logo
+├── training_curves/             # per-experiment training curve exports
+└── publication/                 # master copies of publication figures
+    └── icd10_hierarchy.png      # ICD-10 code hierarchy diagram
+```
+
+Images here are the originals. Never delete or overwrite without keeping
+a backup.
+
+**2. Publication working copies — `publications/notes_to_icd10/sections/images/`**
+
+Quarto's preview server resolves image paths relative to the `.qmd` file's
+location. Since all `.qmd` section files live in `sections/`, images must
+be co-located in `sections/images/` for the preview server to find them.
+
+```bash
+# Workflow: copy from master to publication working copy
+cp resources/images/publication/my_figure.png \
+   publications/notes_to_icd10/sections/images/
+```
+
+In `.qmd` files, always reference images with a simple relative path:
+```markdown
+![Caption text.](images/my_figure.png){#fig-label}
+```
+
+**Never use absolute paths or `../../` prefixes in `.qmd` image references** —
+these work for PDF rendering but break the live preview server.
+
+---
+
+### Publication System
+
+The project documentation is written as a multi-format publication using:
+
+- **[Quarto](https://quarto.org/)** (v1.9+) — the authoring and rendering
+  system. Quarto processes `.qmd` files (Quarto Markdown — a superset of
+  standard Markdown that supports executable Python code cells, callout
+  boxes, cross-references, and figure/table captions).
+
+- **[Typst](https://typst.app/)** — the PDF renderer. Typst is bundled
+  with Quarto 1.4+ and produces high-quality PDF output without requiring
+  a LaTeX installation. It is faster and has cleaner error messages than
+  LaTeX.
+
+The publication lives at:
+```
+publications/
+└── notes_to_icd10/
+    ├── _quarto.yml              # project config — formats, TOC, Python path
+    ├── index.qmd                # preface and reader guide
+    ├── references.bib           # BibTeX references
+    ├── sections/                # one .qmd file per chapter
+    │   ├── images/              # working copies of figures (see above)
+    │   ├── 01_executive_summary.qmd
+    │   ├── 02_introduction.qmd
+    │   ├── 03_dataset.qmd
+    │   ├── 04_methodology.qmd
+    │   ├── 05_experiments.qmd
+    │   ├── 06_results.qmd
+    │   ├── 07_pipeline.qmd
+    │   ├── 08_limitations.qmd
+    │   └── 09_conclusions.qmd
+    ├── figures/                 # generated figures (from code cells)
+    └── _output/                 # rendered output (gitignored)
+```
+
+**Key Quarto commands:**
+
+```bash
+cd publications/notes_to_icd10
+
+quarto preview                   # live browser preview (hot-reloads on save)
+quarto render --to html          # render full HTML book to _output/
+quarto render --to typst         # render PDF via Typst to _output/
+quarto render                    # render all configured formats
+```
+
+**Python execution:** Quarto runs Python code cells using the project venv.
+This is configured in `_quarto.yml`:
+
+```yaml
+jupyter:
+  python: /Users/jroche/Workspace/Python/Notes_to_ICD10_prj/.venv/bin/python
+```
+
+Code cells in `.qmd` files use standard Jupyter cell syntax:
+
+````
+```{python}
+#| label: tbl-my-table
+#| tbl-cap: "My table caption"
+
+import pandas as pd
+from IPython.display import Markdown
+df = pd.DataFrame(...)
+display(Markdown(df.to_markdown(index=False)))
+```
+````
+
+**Important:** Use `display(Markdown(df.to_markdown(...)))` for tables —
+not `print(df.to_markdown(...))` or `display(df.to_markdown(...))`. The
+`Markdown()` wrapper is required for Quarto to render the output as a
+formatted table rather than raw text.
+
+**Required Python packages for publication rendering:**
+
+```bash
+uv add tabulate    # required by pandas .to_markdown()
+```
+
+**Gitignore:** The following publication directories are gitignored:
+```
+publications/notes_to_icd10/_output/
+publications/notes_to_icd10/_freeze/
+```
+
+The `.qmd` source files and `_quarto.yml` are tracked in git.
+The rendered outputs (`_output/`) are not — share the PDF directly,
+not the build artefacts.
+
+---
+
+### Unit Tests
+
+The test suite lives in `tests/` and covers core infrastructure without
+requiring GPU access (heavy imports are mocked):
+
+```bash
+uv run pytest tests/ -v          # run all 94 tests
+uv run pytest tests/test_paths.py -v          # path resolution tests
+uv run pytest tests/test_experiment_logger.py -v  # logger tests
+uv run pytest tests/test_inference_validation.py -v  # Pydantic validation
+uv run pytest tests/test_preprocessing.py -v  # APSO flip and redaction
+```
+
+Tests must pass before committing any changes to `src/` or `scripts/`.
+
+---
+
+### Git Conventions
+
+The blanket `outputs/` gitignore rule was removed — specific exclusions
+are used instead (see `.gitignore` for the full list). Key tracked files
+that require `git add -f`:
+
+```bash
+git add -f outputs/experiments.json
+git add -f outputs/run.log
+```
+
+Commit message conventions:
+- `E-NNN: <result> — <description>` for experiment commits
+- `R-NNN: <description>` for refactoring commits
+- `fix: <description>` for bug fixes
+- `docs: <description>` for documentation updates
+
+---
+
+*Section added: 2 May 2026*
