@@ -25,15 +25,92 @@ Public API
 """
 
 import json
+import warnings
 import torch
 import numpy as np
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
+from pydantic import BaseModel, field_validator, model_validator
 from src.config import config
 from src.preprocessing import prepare_inference_input
 from src.graph_reranker import GraphReranker
+
+
+# ---------------------------------------------------------------------------
+# R-005: Input validation
+# ---------------------------------------------------------------------------
+
+_MIN_WORDS_WARNING = 20    # fewer than this → warn, still run
+_MAX_WORDS_WARNING = 400   # more than this → warn about truncation, still run
+
+
+class ClinicalNoteInput(BaseModel):
+    """
+    Validates and normalises a clinical note before inference.
+
+    Accepts either a raw string or a pre-validated instance.
+    Backward compatible — HierarchicalPredictor.predict() accepts
+    both plain str and ClinicalNoteInput.
+
+    Validation rules
+    ----------------
+    - Note must be a non-empty string after stripping whitespace
+    - Note must be valid UTF-8 (non-UTF-8 bytes are sanitised with a warning)
+    - Notes shorter than 20 words produce a reliability warning
+    - Notes longer than 400 words produce a truncation warning
+      (Bio_ClinicalBERT silently truncates to 512 tokens)
+    """
+
+    note: str
+    preprocessed: bool = False
+
+    @field_validator("note", mode="before")
+    @classmethod
+    def sanitise_encoding(cls, v: str) -> str:
+        """Sanitise non-UTF-8 characters with a warning."""
+        if isinstance(v, bytes):
+            v = v.decode("utf-8", errors="replace")
+            warnings.warn(
+                "ClinicalNoteInput: note was bytes, decoded with UTF-8 "
+                "(replacement characters used for invalid bytes).",
+                UserWarning,
+                stacklevel=4,
+            )
+        return v
+
+    @field_validator("note")
+    @classmethod
+    def note_must_be_non_empty(cls, v: str) -> str:
+        if not v or not v.strip():
+            raise ValueError(
+                "Clinical note cannot be empty. "
+                "Provide a non-empty APSO-structured clinical note."
+            )
+        return v.strip()
+
+    @model_validator(mode="after")
+    def check_length(self) -> "ClinicalNoteInput":
+        n_words = len(self.note.split())
+        if n_words < _MIN_WORDS_WARNING:
+            warnings.warn(
+                f"ClinicalNoteInput: note is very short ({n_words} words). "
+                f"Predictions may be unreliable. "
+                f"A typical APSO note has at least {_MIN_WORDS_WARNING} words.",
+                UserWarning,
+                stacklevel=4,
+            )
+        elif n_words > _MAX_WORDS_WARNING:
+            warnings.warn(
+                f"ClinicalNoteInput: note is long ({n_words} words). "
+                f"Bio_ClinicalBERT will silently truncate to 512 tokens — "
+                f"content beyond ~400 words may be lost. "
+                f"Consider using APSO ordering to ensure Assessment appears first.",
+                UserWarning,
+                stacklevel=4,
+            )
+        return self
 
 # ---------------------------------------------------------------------------
 # Registry path helpers — mirrors the path logic from the notebooks
@@ -273,7 +350,12 @@ class HierarchicalPredictor:
 
     # -----------------------------------------------------------------------
 
-    def predict(self, note: str, top_k: int = 5, preprocessed: bool = False) -> dict:
+    def predict(
+        self,
+        note: Union[str, ClinicalNoteInput],
+        top_k: int = 5,
+        preprocessed: bool = False,
+    ) -> dict:
         """
         Predict ICD-10 codes for a single clinical note.
 
@@ -282,11 +364,16 @@ class HierarchicalPredictor:
 
         Parameters
 
-        note : str
-            Raw clinical note in SOAP format.
+        note : str or ClinicalNoteInput
+            Raw clinical note in SOAP format, or a pre-validated
+            ClinicalNoteInput instance. Plain strings are accepted for
+            backward compatibility and are validated automatically.
         top_k : int
             Number of top predictions to return. Applies only to the Stage-2
             resolver output. Stage-1 always returns the single top chapter.
+        preprocessed : bool
+            Set True if the note has already been APSO-flipped and redacted
+            (e.g. evaluation directly on gold layer apso_note column).
 
         Returns
 
@@ -295,12 +382,21 @@ class HierarchicalPredictor:
             scores : list[float] — Corresponding softmax probabilities
             chapter : str — Predicted ICD-10 chapter (Stage-1 output)
             stage2_source : str — "resolver", "fallback", or "fallback_no_model"
+
+        Raises
+
+        pydantic.ValidationError
+            If note is empty or not a string.
         """
+        # Validate and normalise input — accepts both str and ClinicalNoteInput
+        if not isinstance(note, ClinicalNoteInput):
+            note = ClinicalNoteInput(note=note, preprocessed=preprocessed)
+
         # Preprocessing — mirrors training pipeline exactly.
         # If the caller has already preprocessed the text (e.g. evaluation on
         # Gold layer apso_note which is already APSO-flipped and redacted),
         # pass preprocessed=True to skip this step and avoid double-processing.
-        text = note if preprocessed else prepare_inference_input(note)
+        text = note.note if note.preprocessed else prepare_inference_input(note.note)
 
         # --- Stage-1: chapter routing ---
         s1_inputs = self.stage1_tokenizer(
