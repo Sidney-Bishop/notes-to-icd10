@@ -4,8 +4,8 @@
 Written as a handoff document — a new conversation with Claude should be
 able to pick this up and proceed without needing the full project history.
 
-**Date:** 1 May 2026
-**Current best result:** E-010_40ep_E002Init — 83.9% E2E | 0.762 F1 | 0.034 ECE | 82.1% Coverage@0.7 (95.2% acc)
+**Date:** 2 May 2026
+**Current best result:** E-010_40ep_E002Init — 83.9% E2E | 0.763 F1 | 0.033 ECE | 82.1% Coverage@0.7 (95.2% acc)
 
 ---
 
@@ -54,7 +54,7 @@ Always use 40 epochs for E-002 training.
 | E-002_FullICD10_ClinicalBERT | 76.2% | 0.661 | — | — |
 | E-003_Hierarchical_ICD10 | 11.1% | 0.075 | — | — |
 | E-009_Balanced_E002Init | 79.8% | 0.711 | — | — |
-| **E-010_40ep_E002Init** | **83.9%** | **0.762** | **0.034** | **82.1%** |
+| **E-010_40ep_E002Init** | **83.9%** | **0.763** | **0.033** | **82.1%** |
 
 ---
 
@@ -105,14 +105,7 @@ All four training notebooks (02-05) updated and re-run to verify reproducibility
 
 **Note on cost:** Full notebook re-runs required ~12 hours of GPU compute.
 For future refactoring verification, use a single smoke test rather than
-full training runs. The re-runs confirmed reproducibility across all
-experiments but were not strictly necessary to verify the utility module.
-
-**Acceptance criteria met:**
-- Phase 1 boilerplate reduced from ~80 lines to ~15 lines across all notebooks ✅
-- Consistent MLflow experiment naming and param logging ✅
-- `warmup_ratio` deprecation warning eliminated ✅
-- All notebooks reproduce previous results within normal variance ✅
+full training runs.
 
 ---
 
@@ -127,33 +120,34 @@ and confusion matrix cells in notebooks 02-05 updated to use `save_figure()`.
 ---
 
 ### R-004 — MLflow as Active Query Source
-**Priority: Medium**
+**Priority: Low**
 **Status: ⏳ PENDING**
 
-MLflow is being written to but never read from. The experiment registry
-(`outputs/experiments.json`) was built manually because MLflow wasn't
-being queried.
+MLflow is being written to but never read from. Low priority — `status()`
+already covers the primary use case.
 
 **What to build:**
 - `scripts/mlflow_query.py` with `best_run()`, `compare_runs()`,
   `get_artifacts()`, `leaderboard()` functions
-- `ExperimentLogger.status()` optionally pulling from MLflow
-
-**Decision:** MLflow is source of truth for training metrics. `experiments.json`
-is lightweight index. `run.log` is append-only audit trail. All three maintained.
 
 ---
 
 ### R-005 — Pydantic Input Validation for Inference
 **Priority: Medium**
-**Status: ⏳ PENDING**
+**Status: ✅ COMPLETE**
 
-`HierarchicalPredictor.predict()` accepts any string with no validation.
+Already implemented in `src/inference.py` during script layer work.
+Verified 2 May 2026 with mock-isolated unit tests.
 
-**What to build:**
-- `ClinicalNoteInput` Pydantic model in `src/inference.py`
-- Validators for empty notes, short notes (<20 words warning), long notes (>400 words warning)
-- Backward compatible — plain string still works
+`ClinicalNoteInput` Pydantic model with:
+- Empty/whitespace-only note → raises `ValidationError`
+- Note < 20 words → `UserWarning` (still runs)
+- Note > 400 words → `UserWarning` about truncation (still runs)
+- Bytes input → decoded with warning
+- Backward compatible — plain str still accepted
+
+Note: `evaluate.py` suppresses these warnings when running on pre-processed
+gold layer notes (`preprocessed=True`) to avoid noisy output.
 
 ---
 
@@ -179,36 +173,37 @@ Official comparison table (all results on same original gold test set):
 | Flat ICD-10 (E-002) | 73.3% | 0.634 | 1,926 classes, 40 epochs |
 | Hierarchical cold start (E-003) | 11.1% | 0.075 | Fresh Stage-2 init |
 | Hierarchical E-002 init 20ep (E-009) | 79.8% | 0.711 | Original gold |
-| **Hierarchical E-002 init 40ep (E-010)** | **83.9%** | **0.762** | **Current best** |
+| **Hierarchical E-002 init 40ep (E-010)** | **83.9%** | **0.763** | **Current best** |
 
 ---
 
 ### R-008 — Unit Tests for Core Modules
 **Priority: Low**
-**Status: ⏳ PENDING**
+**Status: ✅ COMPLETE**
 
-No unit tests exist. The Z override bug and `TrainingResult.get()` bug
-would both have been caught immediately by tests.
+94 tests across 4 files, all passing. No GPU required — heavy imports mocked.
 
-**What to build:**
-- `tests/test_paths.py` — verify `ExperimentPaths` resolves all conventions correctly
-- `tests/test_experiment_logger.py` — verify logging writes to correct files
-- `tests/test_inference_validation.py` — verify Pydantic validation (after R-005)
-- `tests/test_preprocessing.py` — verify APSO flip and ICD-10 redaction
+| File | Tests | Coverage |
+|---|---|---|
+| `tests/test_paths.py` | 32 | `ExperimentPaths`, 3 layout conventions, all path helpers |
+| `tests/test_experiment_logger.py` | 14 | `log_start`, `log_complete`, `log_results`, `log_failed`, multi-experiment |
+| `tests/test_inference_validation.py` | 20 | `ClinicalNoteInput` — all validators, edge cases, backward compat |
+| `tests/test_preprocessing.py` | 28 | APSO-flip, ICD-10 redaction pattern, `build_apso_note`, `redact_icd10_sections` |
+
+Run with: `uv run pytest tests/ -v`
 
 ---
 
 ### R-009 — Dependency Version Audit
 **Priority: Low**
-**Status: 🔶 PARTIALLY COMPLETE**
+**Status: ✅ COMPLETE**
 
-sklearn version mismatch (1.1.2 vs 1.8.0) — graph reranker pickled against
-old version. `pyproject.toml` `[dependency-groups] dev` format fixed.
+Knowledge graph rebuilt with sklearn 1.8.0 (was 1.1.2).
 
-**Remaining:**
-- Rebuild graph reranker with current sklearn version or pin sklearn
-- Audit remaining unpinned dependencies
-- Ensure `uv.lock` is committed
+Residual sklearn version warning during graph loading is from **scispacy's
+internal UMLS linker** — a third-party component that bundles its own
+TF-IDF vectorizer. Not fixable without a scispacy upgrade. Our own graph
+pickle (`data/graph/icd10_knowledge_graph.pkl`) is clean.
 
 ---
 
@@ -221,10 +216,10 @@ old version. `pyproject.toml` `[dependency-groups] dev` format fixed.
 | 3 | R-006 (EDA frequency analysis) | ✅ Complete |
 | 4 | R-007 (baseline comparison) | ✅ Complete |
 | 5 | R-002 (shared notebook utils) | ✅ Complete |
-| 6 | R-004 (MLflow querying) | ⏳ Pending |
-| 7 | R-005 (Pydantic validation) | ⏳ Pending |
-| 8 | R-008 (unit tests) | ⏳ Pending |
-| 9 | R-009 (dependency audit) | 🔶 Partial |
+| 6 | R-005 (Pydantic validation) | ✅ Complete |
+| 7 | R-008 (unit tests) | ✅ Complete |
+| 8 | R-009 (dependency audit) | ✅ Complete |
+| 9 | R-004 (MLflow querying) | ⏳ Pending (low priority) |
 
 ---
 
@@ -232,10 +227,14 @@ old version. `pyproject.toml` `[dependency-groups] dev` format fixed.
 
 | Priority | Experiment | Expected gain | Effort |
 |---|---|---|---|
-| 1 | **E-011: E-010 + GraphReranker** | +1-2pp Z-chapter | Low — graph already built |
-| 2 | **Z-chapter contrastive fine-tuning** | +5-10pp Z | Medium — 2 weeks |
-| 3 | **Lower Z threshold to 0.5** | More Z coverage at ~85% precision | Low |
-| 4 | **MIMIC-IV validation** | Reveals synthetic→real gap | Blocked on PhysioNet |
+| 1 | **Z-chapter contrastive fine-tuning** | +5-10pp Z | Medium — 2 weeks |
+| 2 | **Lower Z threshold to 0.5** | More Z coverage at ~85% precision | Low |
+| 3 | **MIMIC-IV validation** | Reveals synthetic→real gap | Blocked on PhysioNet |
+
+**E-011 finding:** E-010 + GraphReranker = 83.9% / F1 0.763 — identical to
+E-010 alone. The graph reranker has minimal impact on E-010's well-calibrated
+resolvers (most predictions already exceed the 0.7 confidence threshold).
+Z-chapter improved marginally from 62.1% → 62.9%.
 
 ---
 
@@ -268,21 +267,13 @@ If starting fresh, give Claude this context:
 
 > "I am working on the Notes-to-ICD10 project. Please read REFACTORING_PLAN.md
 > in the project root. The current best model is E-010_40ep_E002Init at 83.9%
-> E2E, 0.762 F1, 0.034 ECE, 82.1% Coverage@0.7. All scripts pass
-> `uv run python verify_scripts.py`. Before touching any code, read
-> src/paths.py, src/experiment_logger.py, and src/inference.py to understand
-> the existing architecture. The shared notebook utilities are in
-> notebooks/utils/nb_setup.py. The next refactoring priorities are R-004
-> (MLflow query script) and R-005 (Pydantic validation for inference)."
+> E2E, 0.763 F1, 0.033 ECE, 82.1% Coverage@0.7. All scripts pass
+> `uv run python verify_scripts.py`. All refactoring requirements are complete
+> except R-004 (low priority). The unit test suite is at `tests/` — run with
+> `uv run pytest tests/ -v`. The next research priority is Z-chapter
+> contrastive fine-tuning or MIMIC-IV validation (blocked on PhysioNet access)."
 
 ---
 
-*Last updated: 1 May 2026*
+*Last updated: 2 May 2026*
 *Author: Refactoring session with Claude Sonnet 4.6*
-
-
-
-# Mark R-005 complete in REFACTORING_PLAN.md
-# Change: "Status: ⏳ PENDING" → "Status: ✅ COMPLETE"
-# Add note: "Already implemented in src/inference.py during script layer work.
-#            Verified 1 May 2026 with mock-isolated unit tests."
