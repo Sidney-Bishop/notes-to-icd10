@@ -444,14 +444,14 @@
       },
       "evaluate": {
         "status": "complete",
-        "started": "2026-05-02T12:44:31.577655",
+        "started": "2026-05-04T12:42:40.896538",
         "params": {
           "mode": "hierarchical",
           "stage1_experiment": "E-003_Hierarchical_ICD10",
           "threshold": 0.7,
           "sample": "all"
         },
-        "completed": "2026-05-02T12:45:35.912493",
+        "completed": "2026-05-04T12:43:49.617502",
         "artifacts": {
           "eval_dir": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/evaluations/E-010_40ep_E002Init/eval"
         }
@@ -464,7 +464,7 @@
       "macro_f1": 0.7628,
       "ece": 0.0329,
       "coverage_07": 0.8209,
-      "recorded": "2026-05-02T12:45:35.913052"
+      "recorded": "2026-05-04T12:43:49.618142"
     }
   }
 }
