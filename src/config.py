@@ -60,8 +60,19 @@ class ArtifactConfig:
             FileNotFoundError: If artifacts.yaml cannot be located.
             yaml.YAMLError: If the config file contains invalid YAML.
         """
-        # Prevent re-initialization of singleton
+        # Prevent re-initialization of singleton.
+        # If a config_path is supplied but differs from what was used at first
+        # init, raise immediately — silently ignoring it causes subtle bugs in
+        # tests and scripts that pass an explicit path.
         if self._initialized:
+            if config_path is not None:
+                given = Path(config_path).resolve()
+                if given != self.config_path.resolve():
+                    raise ValueError(
+                        f"ArtifactConfig already initialised with "
+                        f"'{self.config_path}'; cannot reinitialise with '{given}'. "
+                        f"Pass config_path=None to reuse the existing singleton."
+                    )
             return
 
         # Resolve config file location

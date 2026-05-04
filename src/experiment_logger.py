@@ -61,23 +61,17 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
 
-# ---------------------------------------------------------------------------
-# Paths
-# ---------------------------------------------------------------------------
+from src.config import config
 
-def _project_root() -> Path:
-    current = Path.cwd()
-    while current != current.parent:
-        if (current / "artifacts.yaml").exists():
-            return current.resolve()
-        current = current.parent
-    raise FileNotFoundError("Could not find artifacts.yaml — run from within project tree.")
+# ---------------------------------------------------------------------------
+# Paths — delegate to config singleton rather than re-walking the filesystem
+# ---------------------------------------------------------------------------
 
 def _run_log_path() -> Path:
-    return _project_root() / "outputs" / "run.log"
+    return config.project_root / "outputs" / "run.log"
 
 def _registry_path() -> Path:
-    return _project_root() / "outputs" / "experiments.json"
+    return config.project_root / "outputs" / "experiments.json"
 
 
 # ---------------------------------------------------------------------------

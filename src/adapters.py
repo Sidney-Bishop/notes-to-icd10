@@ -455,15 +455,26 @@ class EncoderAdapter(ModelAdapter):
 
     # ── ModelAdapter interface ───────────────────────────────────────────────
 
-    def predict(self, note: str, top_k: int = 5) -> PredictionResult:
+    def predict(self, note: str, top_k: int = 5, preprocessed: bool = False) -> PredictionResult:
         """
-        Single-note prediction with APSO-Flip + redaction preprocessing.
+        Single-note prediction with optional APSO-Flip + redaction preprocessing.
 
         Confidence = top-1 softmax probability. Used by HybridRouter to
         decide whether to escalate to a generative model or human review.
+
+        Parameters
+        ----------
+        note : str
+            Raw clinical note, or pre-processed APSO note if preprocessed=True.
+        top_k : int
+            Number of top predictions to return.
+        preprocessed : bool
+            Set True when the note has already been APSO-flipped and redacted
+            (e.g. evaluation directly on gold layer apso_note column) to avoid
+            double-processing. Mirrors the flag on HierarchicalPredictor.predict().
         """
         t0   = time.perf_counter()
-        text = prepare_inference_input(note)
+        text = note if preprocessed else prepare_inference_input(note)
 
         inputs = self.tokenizer(
             text,
@@ -508,6 +519,7 @@ class EncoderAdapter(ModelAdapter):
         notes:  list[str],
         top_k:  int = 5,
         batch_size: int = 32,
+        preprocessed: bool = False,
     ) -> list[PredictionResult]:
         """
         Efficient batched prediction.
@@ -518,17 +530,21 @@ class EncoderAdapter(ModelAdapter):
         Parameters
         ----------
         notes : list[str]
-            Raw clinical notes in SOAP format.
+            Raw clinical notes in SOAP format, or pre-processed APSO notes
+            if preprocessed=True.
         top_k : int
             Number of top predictions per note.
         batch_size : int
             Number of notes per forward pass.
+        preprocessed : bool
+            Set True when notes have already been APSO-flipped and redacted
+            (e.g. evaluation on the gold layer apso_note column).
         """
-        preprocessed = [prepare_inference_input(n) for n in notes]
+        texts = notes if preprocessed else [prepare_inference_input(n) for n in notes]
         all_results: list[PredictionResult] = []
 
-        for i in range(0, len(preprocessed), batch_size):
-            batch_texts = preprocessed[i : i + batch_size]
+        for i in range(0, len(texts), batch_size):
+            batch_texts = texts[i : i + batch_size]
 
             inputs = self.tokenizer(
                 batch_texts,

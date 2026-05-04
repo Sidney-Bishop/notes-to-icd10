@@ -23,6 +23,7 @@ This module provides two interfaces:
 """
 
 import re
+import warnings
 import polars as pl
 from typing import Optional
 
@@ -212,6 +213,15 @@ def prepare_inference_input(note: str) -> str:
 
     # Fall back to original note if section extraction fails entirely
     if not apso_note:
+        warnings.warn(
+            "prepare_inference_input: no SOAP section headers detected in the "
+            "provided note — falling back to the raw text without APSO reordering. "
+            "Assessment-first ordering cannot be applied, which may reduce prediction "
+            "quality. Ensure the note contains 'Assessment:', 'Plan:', 'Subjective:', "
+            "and 'Objective:' headers.",
+            UserWarning,
+            stacklevel=2,
+        )
         apso_note = note.strip()
 
     # Redact ICD-10 code strings — same pattern as Phase 3c

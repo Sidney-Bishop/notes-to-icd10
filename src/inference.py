@@ -34,6 +34,7 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 from pydantic import BaseModel, field_validator, model_validator
 from src.config import config
+from src.paths import ExperimentPaths
 from src.preprocessing import prepare_inference_input
 from src.graph_reranker import GraphReranker
 
@@ -113,46 +114,11 @@ class ClinicalNoteInput(BaseModel):
         return self
 
 # ---------------------------------------------------------------------------
-# Registry path helpers — mirrors the path logic from the notebooks
+# Registry path helper — kept for ClinicalPredictor (legacy flat models)
 # ---------------------------------------------------------------------------
 
 def _registry_base() -> Path:
     return config.resolve_path("outputs", "evaluations") / "registry"
-
-def _stage1_model_path(stage1_experiment: str = "E-003_Hierarchical_ICD10") -> Path:
-    """
-    Stage-1 router lives under the experiment directory.
-    Supports three layouts (auto-detected):
-      1. outputs/evaluations/{exp}/stage1/ ← clean
-      2. outputs/evaluations/{exp}/stage1/model/ ← single nest
-      3. outputs/evaluations/{exp}/stage1/model/model/ ← legacy double nest
-    """
-    base = (
-        config.resolve_path("outputs", "evaluations")
-        / stage1_experiment
-        / "stage1"
-    )
-    candidates = [
-        base,
-        base / "model",
-        base / "model" / "model",
-    ]
-    for p in candidates:
-        if p.is_dir() and (p / "model.safetensors").exists():
-            return p
-    # fallback to legacy path to raise a clear error downstream
-    return candidates[-1]
-
-def _stage2_dir(experiment_name: str) -> Path:
-    """
-    Stage-2 resolvers live under the experiment's own eval directory:
-    outputs/evaluations/{experiment_name}/stage2/
-    """
-    return (
-        config.resolve_path("outputs", "evaluations")
-        / experiment_name
-        / "stage2"
-    )
 
 # ---------------------------------------------------------------------------
 # Chapters that have no trained resolver — use fallback prediction
@@ -160,8 +126,6 @@ def _stage2_dir(experiment_name: str) -> Path:
 # ---------------------------------------------------------------------------
 _SKIP_CHAPTERS = {"U", "P", "Q"}
 
-# Default fallback codes for skip chapters, populated lazily from registry
-_SKIP_CHAPTER_DEFAULTS_FILE = "skip_chapter_defaults.json"
 
 class HierarchicalPredictor:
     """
@@ -170,35 +134,32 @@ class HierarchicalPredictor:
     Loads all models once on construction and reuses them across
     ``predict()`` calls — suitable for batch inference or interactive demos.
 
-    Registry layout expected on disk
-
-    Stage-1 (router):
-        outputs/evaluations/{stage1_experiment}/stage1/
-
-    Stage-2 (resolvers, one per chapter):
-        outputs/evaluations/{experiment_name}/stage2/{chapter}/model/
-        outputs/evaluations/{experiment_name}/stage2/{chapter}/model/label_map.json
-        outputs/evaluations/{experiment_name}/stage2/stage2_results.json
-            → contains ``skip_chapters`` key with fallback predictions
+    Path resolution is delegated to ``ExperimentPaths`` (src/paths.py),
+    which handles all three historical layout conventions automatically
+    (FLAT / SINGLE / NESTED).
 
     Parameters
 
     experiment_name : str
         Name of the hierarchical experiment whose Stage-2 resolvers to load.
-        Defaults to the best model (E-005a).
+        Defaults to the best model (E-010).
     stage1_experiment : str
         Name of the experiment providing the Stage-1 router.
         Defaults to E-003 (Stage-1 is shared across E-003/E-004a/E-005a).
     device : str or None
         Torch device string. Auto-detects MPS → CUDA → CPU if None.
+    use_reranker : bool
+        Load and apply the graph reranker. Set False to skip graph loading
+        for faster startup when reranking is not needed (e.g. evaluation
+        runs on E-010, where E-011 showed minimal reranker impact).
     """
-
 
     def __init__(
         self,
         experiment_name: str = "E-005a_Hierarchical_ICD10_Extended",
         stage1_experiment: str = "E-003_Hierarchical_ICD10",
         device: Optional[str] = None,
+        use_reranker: bool = True,
     ) -> None:
 
         # --- Device ---
@@ -213,11 +174,14 @@ class HierarchicalPredictor:
 
         print(f"🔧 Device: {self.device}")
 
+        # --- Path resolution ---
+        paths = ExperimentPaths(experiment_name, stage1_experiment)
+
         # --- Stage-1 ---
-        stage1_path = _stage1_model_path(stage1_experiment)
-        if not stage1_path.exists():
+        stage1_path = paths.stage1_model_dir()
+        if stage1_path is None or not stage1_path.exists():
             raise FileNotFoundError(
-                f"Stage-1 model not found at {stage1_path}\n"
+                f"Stage-1 model not found under {paths._s1_base}\n"
                 f"Run notebook 04 through Phase 6 first."
             )
         print(f"📥 Loading Stage-1 router from {stage1_experiment}...")
@@ -228,9 +192,9 @@ class HierarchicalPredictor:
         self.stage1_model.eval()
 
         # Load temperature (1.0 = uncalibrated)
-        s1_temp_path = stage1_path / "temperature.json"
         self.stage1_temperature = 1.0
-        if s1_temp_path.exists():
+        s1_temp_path = paths.stage1_temperature_existing()
+        if s1_temp_path is not None:
             with open(s1_temp_path) as f:
                 self.stage1_temperature = json.load(f).get("temperature", 1.0)
             print(f" 🌡 Stage-1 temperature: {self.stage1_temperature:.4f}")
@@ -246,7 +210,7 @@ class HierarchicalPredictor:
         print(f" ✅ Stage-1: {len(self.id2chapter)} chapters")
 
         # --- Stage-2 ---
-        stage2_base = _stage2_dir(experiment_name)
+        stage2_base = paths.stage2_base
         if not stage2_base.exists():
             raise FileNotFoundError(
                 f"Stage-2 directory not found at {stage2_base}\n"
@@ -259,46 +223,13 @@ class HierarchicalPredictor:
         self.stage2_id2label: dict[str, dict[int, str]] = {}
         self.stage2_temperatures: dict[str, float] = {}
 
-        def _find_ch_model_dir(ch_dir):
-            """Auto-detect model weights in chapter dir across all conventions."""
-            candidates = [
-                ch_dir,                          # FLAT   E-008+
-                ch_dir / "model",                # SINGLE E-006
-                ch_dir / "model" / "model",      # NESTED E-002
-            ]
-            for c in candidates:
-                if c.is_dir() and (c / "model.safetensors").exists():
-                    return c
-            return None
-
-        def _find_ch_label_map(ch_dir):
-            candidates = [
-                ch_dir / "label_map.json",
-                ch_dir / "model" / "label_map.json",
-            ]
-            for c in candidates:
-                if c.exists():
-                    return c
-            return None
-
-        def _find_ch_temperature(ch_dir):
-            candidates = [
-                ch_dir / "temperature.json",
-                ch_dir / "model" / "temperature.json",
-                ch_dir / "model" / "model" / "temperature.json",
-            ]
-            for c in candidates:
-                if c.exists():
-                    return c
-            return None
-
         chapters_found = 0
         for ch_dir in sorted(stage2_base.iterdir()):
             if not ch_dir.is_dir():
                 continue
             ch = ch_dir.name
-            hf_dir = _find_ch_model_dir(ch_dir)
-            label_map_path = _find_ch_label_map(ch_dir)
+            hf_dir = paths.stage2_model_dir(ch)
+            label_map_path = paths.stage2_label_map(ch)
 
             if hf_dir is None or label_map_path is None:
                 continue
@@ -312,15 +243,13 @@ class HierarchicalPredictor:
             ch_model.eval()
 
             self.stage2_models[ch] = ch_model
-            self.stage2_tokenizers[ch] = AutoTokenizer.from_pretrained(
-                str(hf_dir)
-            )
+            self.stage2_tokenizers[ch] = AutoTokenizer.from_pretrained(str(hf_dir))
             self.stage2_id2label[ch] = {
                 int(k): v for k, v in lmap["id2label"].items()
             }
             # Load temperature (defaults to 1.0 if not calibrated yet)
-            temp_path = _find_ch_temperature(ch_dir)
-            if temp_path and temp_path.exists():
+            temp_path = paths.stage2_temperature_existing(ch)
+            if temp_path is not None:
                 with open(temp_path) as f:
                     self.stage2_temperatures[ch] = json.load(f).get("temperature", 1.0)
             else:
@@ -332,7 +261,7 @@ class HierarchicalPredictor:
         # --- Skip-chapter fallbacks ---
         # Loaded from stage2_results.json saved during training
         self.skip_chapter_defaults: dict[str, Optional[str]] = {}
-        results_path = stage2_base / "stage2_results.json"
+        results_path = paths.stage2_results()
         if results_path.exists():
             with open(results_path) as f:
                 results = json.load(f)
@@ -342,10 +271,18 @@ class HierarchicalPredictor:
             for ch in _SKIP_CHAPTERS:
                 self.skip_chapter_defaults[ch] = None
 
-        # --- Graph reranker ---
-        print("📥 Loading graph reranker...")
-        self.reranker = GraphReranker(graph_dir=Path("data/graph"))
-        self.reranker.load()
+        # --- Graph reranker (optional) ---
+        # E-011 showed the reranker has minimal impact on E-010's well-calibrated
+        # resolvers. Set use_reranker=False to skip graph loading for faster startup.
+        self.use_reranker = use_reranker
+        if use_reranker:
+            print("📥 Loading graph reranker...")
+            self.reranker = GraphReranker(graph_dir=Path("data/graph"))
+            self.reranker.load()
+        else:
+            self.reranker = None
+            print("⏭  Graph reranker skipped (use_reranker=False)")
+
         print(f"⚡ Predictor ready")
 
     # -----------------------------------------------------------------------
@@ -406,13 +343,13 @@ class HierarchicalPredictor:
             max_length=512,
             return_tensors="pt",
         )
-        # Drop token_type_ids if model doesn't use them (RoBERTa-based variants)
+        # Drop token_type_ids if the tokenizer doesn't produce it (RoBERTa-based variants).
+        # Mirror the pattern in adapters.py: tokenizer.model_input_names is authoritative.
+        _s1_allowed = set(self.stage1_tokenizer.model_input_names)
         s1_inputs = {
             k: v.to(self.device)
             for k, v in s1_inputs.items()
-            if k in ["input_ids", "attention_mask", "token_type_ids"]
-            and k in self.stage1_model.config.to_dict().get("architectures", [""])[0].lower()
-            or k in ["input_ids", "attention_mask"]
+            if k in _s1_allowed
         }
 
         with torch.no_grad():
@@ -451,10 +388,11 @@ class HierarchicalPredictor:
             max_length=512,
             return_tensors="pt",
         )
+        _s2_allowed = set(ch_tokenizer.model_input_names)
         s2_inputs = {
             k: v.to(self.device)
             for k, v in s2_inputs.items()
-            if k in ["input_ids", "attention_mask", "token_type_ids"]
+            if k in _s2_allowed
         }
 
         with torch.no_grad():
@@ -470,12 +408,13 @@ class HierarchicalPredictor:
 
         # --- Graph-augmented reranking for low-confidence predictions ---
         top_confidence = scores[0] if scores else 0.0
-        should_rerank = (top_confidence < 0.7) or (pred_chapter == "Z")
+        should_rerank = self.use_reranker and (
+            (top_confidence < 0.7) or (pred_chapter == "Z")
+        )
         if should_rerank:
             candidates = list(zip(codes, scores))
             reranked = self.reranker.rerank(text, candidates)
 
-            # FIXED: use pred_chapter (was 'chapter' causing NameError)
             threshold = 0.05 if pred_chapter == "Z" else 0.35
             if reranked and reranked[0].combined_score >= threshold:
                 codes = [r.code for r in reranked]
@@ -498,6 +437,12 @@ class HierarchicalPredictor:
 # Convenience function — matches the README's documented API exactly
 # ---------------------------------------------------------------------------
 
+# Module-level cache so repeated predict() calls don't reload all models.
+# Keyed by (experiment_name, stage1_experiment) so different experiments
+# each get their own cached instance.
+_PREDICTOR_CACHE: dict[tuple[str, str], "HierarchicalPredictor"] = {}
+
+
 def predict(
     note: str,
     top_k: int = 5,
@@ -507,9 +452,10 @@ def predict(
     """
     End-to-end ICD-10 prediction for a single clinical note.
 
-    Instantiates a fresh ``HierarchicalPredictor`` on each call.
-    For repeated inference, instantiate ``HierarchicalPredictor`` directly
-    to avoid reloading all models on every call.
+    The underlying ``HierarchicalPredictor`` is cached after the first call
+    so subsequent calls with the same experiment arguments reuse loaded models
+    rather than reloading from disk. For a fresh load (e.g. after model
+    weights change), instantiate ``HierarchicalPredictor`` directly.
 
     Parameters
 
@@ -533,11 +479,13 @@ def predict(
     >>> print(f"Top prediction: {result['codes'][0]} ({result['scores'][0]:.1%})")
     Top prediction: E11.65 (84.2%)
     """
-    predictor = HierarchicalPredictor(
-        experiment_name=experiment_name,
-        stage1_experiment=stage1_experiment,
-    )
-    return predictor.predict(note, top_k=top_k)
+    cache_key = (experiment_name, stage1_experiment)
+    if cache_key not in _PREDICTOR_CACHE:
+        _PREDICTOR_CACHE[cache_key] = HierarchicalPredictor(
+            experiment_name=experiment_name,
+            stage1_experiment=stage1_experiment,
+        )
+    return _PREDICTOR_CACHE[cache_key].predict(note, top_k=top_k)
 
 # ---------------------------------------------------------------------------
 # Legacy single-model API — kept for backward compatibility with any

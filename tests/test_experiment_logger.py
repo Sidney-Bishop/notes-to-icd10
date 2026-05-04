@@ -26,11 +26,11 @@ from pathlib import Path
 @pytest.fixture
 def logger_tmp(tmp_path: Path, monkeypatch):
     """
-    Patches _project_root() to return tmp_path so all logger
+    Patches config.project_root to return tmp_path so all logger
     writes go to a temporary directory. Returns the tmp_path.
     """
-    import src.experiment_logger as el_module
-    monkeypatch.setattr(el_module, "_project_root", lambda: tmp_path)
+    import src.config as config_module
+    monkeypatch.setattr(config_module.config, "project_root", tmp_path)
     (tmp_path / "outputs").mkdir(parents=True, exist_ok=True)
     return tmp_path
 
