@@ -1,0 +1,221 @@
+{
+  "stage2": {
+    "A": {
+      "temperature": 6.082814,
+      "n_samples": 6,
+      "n_classes": 12,
+      "ece_before": 0.1027,
+      "ece_after": 0.0864,
+      "coverage_before": 0.0,
+      "coverage_after": 0.0,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.0
+    },
+    "B": {
+      "temperature": 0.05,
+      "n_samples": 16,
+      "n_classes": 31,
+      "ece_before": 0.0653,
+      "ece_after": 0.6508,
+      "coverage_before": 0.0,
+      "coverage_after": 0.75,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.1667
+    },
+    "C": {
+      "temperature": 0.356566,
+      "n_samples": 51,
+      "n_classes": 101,
+      "ece_before": 0.0204,
+      "ece_after": 0.0121,
+      "coverage_before": 0.0,
+      "coverage_after": 0.0,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.0
+    },
+    "D": {
+      "temperature": 6.744998,
+      "n_samples": 38,
+      "n_classes": 76,
+      "ece_before": 0.0223,
+      "ece_after": 0.0143,
+      "coverage_before": 0.0,
+      "coverage_after": 0.0,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.0
+    },
+    "E": {
+      "temperature": 3.8522,
+      "n_samples": 39,
+      "n_classes": 76,
+      "ece_before": 0.0257,
+      "ece_after": 0.0159,
+      "coverage_before": 0.0,
+      "coverage_after": 0.0,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.0
+    },
+    "F": {
+      "temperature": 0.350273,
+      "n_samples": 48,
+      "n_classes": 95,
+      "ece_before": 0.0585,
+      "ece_after": 0.0263,
+      "coverage_before": 0.0,
+      "coverage_after": 0.0,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.0
+    },
+    "G": {
+      "temperature": 0.05,
+      "n_samples": 34,
+      "n_classes": 68,
+      "ece_before": 0.0845,
+      "ece_after": 0.5898,
+      "coverage_before": 0.0,
+      "coverage_after": 0.5,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.1176
+    },
+    "H": {
+      "temperature": 0.05,
+      "n_samples": 42,
+      "n_classes": 83,
+      "ece_before": 0.0239,
+      "ece_after": 0.5957,
+      "coverage_before": 0.0,
+      "coverage_after": 0.381,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.125
+    },
+    "I": {
+      "temperature": 0.718981,
+      "n_samples": 66,
+      "n_classes": 131,
+      "ece_before": 0.013,
+      "ece_after": 0.0072,
+      "coverage_before": 0.0,
+      "coverage_after": 0.0,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.0
+    },
+    "J": {
+      "temperature": 4.563506,
+      "n_samples": 50,
+      "n_classes": 100,
+      "ece_before": 0.0002,
+      "ece_after": 0.0083,
+      "coverage_before": 0.0,
+      "coverage_after": 0.0,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.0
+    },
+    "K": {
+      "temperature": 5.164287,
+      "n_samples": 58,
+      "n_classes": 116,
+      "ece_before": 0.0151,
+      "ece_after": 0.0097,
+      "coverage_before": 0.0,
+      "coverage_after": 0.0,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.0
+    },
+    "L": {
+      "temperature": 0.334899,
+      "n_samples": 38,
+      "n_classes": 76,
+      "ece_before": 0.0785,
+      "ece_after": 0.0257,
+      "coverage_before": 0.0,
+      "coverage_after": 0.0,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.0
+    },
+    "M": {
+      "temperature": 0.311799,
+      "n_samples": 111,
+      "n_classes": 222,
+      "ece_before": 0.0416,
+      "ece_after": 0.0192,
+      "coverage_before": 0.0,
+      "coverage_after": 0.0,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.0
+    },
+    "N": {
+      "temperature": 0.259412,
+      "n_samples": 53,
+      "n_classes": 105,
+      "ece_before": 0.1433,
+      "ece_after": 0.0428,
+      "coverage_before": 0.0,
+      "coverage_after": 0.0189,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 1.0
+    },
+    "O": {
+      "temperature": 0.05,
+      "n_samples": 51,
+      "n_classes": 63,
+      "ece_before": 0.0261,
+      "ece_after": 0.6806,
+      "coverage_before": 0.0,
+      "coverage_after": 0.5882,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.0667
+    },
+    "R": {
+      "temperature": 0.305672,
+      "n_samples": 100,
+      "n_classes": 196,
+      "ece_before": 0.1055,
+      "ece_after": 0.0596,
+      "coverage_before": 0.0,
+      "coverage_after": 0.01,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.0
+    },
+    "S": {
+      "temperature": 0.05,
+      "n_samples": 44,
+      "n_classes": 87,
+      "ece_before": 0.0219,
+      "ece_after": 0.6525,
+      "coverage_before": 0.0,
+      "coverage_after": 0.5682,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.0
+    },
+    "T": {
+      "temperature": 0.782659,
+      "n_samples": 8,
+      "n_classes": 15,
+      "ece_before": 0.0394,
+      "ece_after": 0.0587,
+      "coverage_before": 0.0,
+      "coverage_after": 0.0,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.0
+    },
+    "Z": {
+      "temperature": 0.324034,
+      "n_samples": 211,
+      "n_classes": 263,
+      "ece_before": 0.2066,
+      "ece_after": 0.0679,
+      "coverage_before": 0.0,
+      "coverage_after": 0.0474,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.6
+    }
+  },
+  "meta": {
+    "experiment": "E-002_FullICD10_ClinicalBERT",
+    "stage1_experiment": "E-002_FullICD10_ClinicalBERT",
+    "threshold": 0.7,
+    "device": "mps",
+    "elapsed_s": 17.8,
+    "started": "2026-04-23 19:03:02"
+  }
+}

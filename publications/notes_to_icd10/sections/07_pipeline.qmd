@@ -1,0 +1,125 @@
+---
+title: "Inference Pipeline"
+---
+
+# Inference Pipeline
+
+::: {.callout-note icon=false}
+## Plain-Language Summary
+This section describes the production-ready inference system — how a clinical
+note goes from raw text to a predicted ICD-10 code with a confidence score.
+It covers input validation, preprocessing, the two-stage prediction, and
+how the system handles edge cases.
+:::
+
+---
+
+## Pipeline Architecture {#sec-pipeline-arch}
+
+The inference pipeline is implemented in `src/inference.py` and exposed
+through the `HierarchicalPredictor` class. A convenience function `predict()`
+wraps the class for single-note use.
+
+```python
+from src.inference import HierarchicalPredictor
+
+predictor = HierarchicalPredictor(
+    experiment_name="E-010_40ep_E002Init",
+    stage1_experiment="E-003_Hierarchical_ICD10",
+)
+
+result = predictor.predict(note, top_k=5)
+# Returns: {"codes": [...], "scores": [...], "chapter": "M",
+#           "stage2_source": "resolver"}
+```
+
+All models are loaded once at construction time and reused across calls —
+essential for batch inference performance. Loading all 19 Stage-2 resolvers
+plus Stage-1 takes approximately 30 seconds on the development machine.
+
+---
+
+## Input Validation {#sec-pipeline-validation}
+
+The `ClinicalNoteInput` Pydantic model validates every note before it enters
+the pipeline:
+
+| Condition | Behaviour |
+|---|---|
+| Empty string | Raises `ValidationError` — rejected |
+| Whitespace only | Raises `ValidationError` — rejected |
+| Non-string type | Raises `ValidationError` — rejected |
+| Bytes input | Decoded with `UserWarning` — proceeds |
+| < 20 words | `UserWarning` about reliability — proceeds |
+| > 400 words | `UserWarning` about truncation risk — proceeds |
+| Valid note | Proceeds to preprocessing |
+
+: Input validation behaviours. {#tbl-pipeline-validation}
+
+The validation is designed to be **informative but not blocking** for
+borderline cases — a short note produces a warning but still gets a
+prediction. Only genuinely invalid inputs (empty, non-string) are rejected.
+
+---
+
+## Preprocessing at Inference {#sec-pipeline-preprocessing}
+
+The inference preprocessing mirrors the training pipeline exactly —
+a critical requirement for valid model application:
+
+1. **APSO-Flip:** Sections are reordered to Assessment → Plan → Subjective
+   → Objective, ensuring the most diagnostically informative content falls
+   within the first 512 tokens.
+
+2. **ICD-10 redaction:** Any ICD-10 code patterns in the note text are
+   replaced with `[REDACTED]` before tokenisation.
+
+When `preprocessed=True` is passed to `predict()` (used during evaluation
+on the gold layer, where APSO-Flip and redaction have already been applied),
+these steps are skipped to avoid double-processing.
+
+---
+
+## Prediction and Output {#sec-pipeline-output}
+
+The pipeline produces a dictionary with the following fields:
+
+```python
+{
+    "codes":         ["M25.562", "M25.561", "M25.569", "M54.5", "M79.3"],
+    "scores":        [0.847, 0.063, 0.041, 0.029, 0.020],
+    "chapter":       "M",
+    "stage2_source": "resolver"  # or "fallback", "graph_reranked"
+}
+```
+
+- `codes` — top-k ICD-10 predictions, highest confidence first.
+- `scores` — calibrated softmax probabilities after temperature scaling.
+- `chapter` — the chapter predicted by Stage-1.
+- `stage2_source` — how the Stage-2 prediction was produced:
+  - `"resolver"` — standard Stage-2 model output
+  - `"fallback"` — skip chapter (P, Q, U) using majority-class default
+  - `"graph_reranked"` — low-confidence prediction reranked by the knowledge graph
+
+---
+
+## Confidence Gating in Practice {#sec-pipeline-gating}
+
+The caller is responsible for applying the confidence threshold. A typical
+integration pattern:
+
+```python
+result = predictor.predict(note, top_k=5)
+top_code = result["codes"][0]
+top_score = result["scores"][0]
+
+if top_score >= 0.7:
+    # Auto-code: accept the prediction
+    assign_code(top_code, source="automated", confidence=top_score)
+else:
+    # Route to human review: provide suggestions
+    route_to_coder(suggestions=list(zip(result["codes"], result["scores"])))
+```
+
+The threshold τ=0.7 is a deployment parameter, not hardcoded — it can be
+adjusted based on the operational requirements of the deployment environment.

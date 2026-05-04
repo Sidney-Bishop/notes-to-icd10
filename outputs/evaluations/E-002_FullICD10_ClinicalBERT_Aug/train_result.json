@@ -1,0 +1,153 @@
+{
+  "experiment_name": "E-002_FullICD10_ClinicalBERT_Aug",
+  "best_epoch": 20,
+  "best_val_accuracy": 0.5714285714285714,
+  "best_val_f1": 0.4532449446504952,
+  "elapsed_seconds": 5778.938034250008,
+  "training_history": [
+    {
+      "epoch": 1.0,
+      "eval_loss": 7.564517021179199,
+      "eval_macro_f1": 0.0,
+      "eval_accuracy": 0.0,
+      "train_loss": null
+    },
+    {
+      "epoch": 2.0,
+      "eval_loss": 7.554389953613281,
+      "eval_macro_f1": 0.0,
+      "eval_accuracy": 0.0,
+      "train_loss": null
+    },
+    {
+      "epoch": 3.0,
+      "eval_loss": 7.273435592651367,
+      "eval_macro_f1": 0.0036240214647584347,
+      "eval_accuracy": 0.011387163561076604,
+      "train_loss": null
+    },
+    {
+      "epoch": 4.0,
+      "eval_loss": 6.851446151733398,
+      "eval_macro_f1": 0.01532826165383245,
+      "eval_accuracy": 0.035196687370600416,
+      "train_loss": null
+    },
+    {
+      "epoch": 5.0,
+      "eval_loss": 6.484477996826172,
+      "eval_macro_f1": 0.06543632173946407,
+      "eval_accuracy": 0.10869565217391304,
+      "train_loss": null
+    },
+    {
+      "epoch": 6.0,
+      "eval_loss": 6.164196968078613,
+      "eval_macro_f1": 0.11491017183027734,
+      "eval_accuracy": 0.17598343685300208,
+      "train_loss": null
+    },
+    {
+      "epoch": 7.0,
+      "eval_loss": 5.897360801696777,
+      "eval_macro_f1": 0.17463717024708983,
+      "eval_accuracy": 0.2515527950310559,
+      "train_loss": null
+    },
+    {
+      "epoch": 8.0,
+      "eval_loss": 5.6474409103393555,
+      "eval_macro_f1": 0.22750240606750788,
+      "eval_accuracy": 0.3167701863354037,
+      "train_loss": null
+    },
+    {
+      "epoch": 9.0,
+      "eval_loss": 5.432002544403076,
+      "eval_macro_f1": 0.2639053062265772,
+      "eval_accuracy": 0.36438923395445133,
+      "train_loss": null
+    },
+    {
+      "epoch": 10.0,
+      "eval_loss": 5.230634689331055,
+      "eval_macro_f1": 0.3214897701504844,
+      "eval_accuracy": 0.42339544513457555,
+      "train_loss": null
+    },
+    {
+      "epoch": 11.0,
+      "eval_loss": 5.050357341766357,
+      "eval_macro_f1": 0.35723852040816323,
+      "eval_accuracy": 0.4658385093167702,
+      "train_loss": null
+    },
+    {
+      "epoch": 12.0,
+      "eval_loss": 4.903264999389648,
+      "eval_macro_f1": 0.3750438261628951,
+      "eval_accuracy": 0.4855072463768116,
+      "train_loss": null
+    },
+    {
+      "epoch": 13.0,
+      "eval_loss": 4.770861625671387,
+      "eval_macro_f1": 0.391086636674872,
+      "eval_accuracy": 0.5031055900621118,
+      "train_loss": null
+    },
+    {
+      "epoch": 14.0,
+      "eval_loss": 4.646200180053711,
+      "eval_macro_f1": 0.41887527128813995,
+      "eval_accuracy": 0.5351966873706004,
+      "train_loss": null
+    },
+    {
+      "epoch": 15.0,
+      "eval_loss": 4.552513599395752,
+      "eval_macro_f1": 0.4253103485661625,
+      "eval_accuracy": 0.5424430641821946,
+      "train_loss": null
+    },
+    {
+      "epoch": 16.0,
+      "eval_loss": 4.468197345733643,
+      "eval_macro_f1": 0.4388713804713804,
+      "eval_accuracy": 0.5590062111801242,
+      "train_loss": null
+    },
+    {
+      "epoch": 17.0,
+      "eval_loss": 4.408444881439209,
+      "eval_macro_f1": 0.438115769650114,
+      "eval_accuracy": 0.556935817805383,
+      "train_loss": null
+    },
+    {
+      "epoch": 18.0,
+      "eval_loss": 4.362044811248779,
+      "eval_macro_f1": 0.44602975435566705,
+      "eval_accuracy": 0.567287784679089,
+      "train_loss": null
+    },
+    {
+      "epoch": 19.0,
+      "eval_loss": 4.335823059082031,
+      "eval_macro_f1": 0.44998014099890776,
+      "eval_accuracy": 0.5693581780538303,
+      "train_loss": null
+    },
+    {
+      "epoch": 20.0,
+      "eval_loss": 4.327083110809326,
+      "eval_macro_f1": 0.4532449446504952,
+      "eval_accuracy": 0.5714285714285714,
+      "train_loss": null
+    }
+  ],
+  "num_classes": 1926,
+  "label_scheme": "icd10",
+  "model": "emilyalsentzer/Bio_ClinicalBERT",
+  "timestamp": "2026-04-25T19:31:33.562237"
+}

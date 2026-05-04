@@ -1,0 +1,100 @@
+{
+  "experiment_name": "E-008_Balanced",
+  "stage1_experiment": "E-008_Balanced",
+  "n_test": 1127,
+  "stage1_accuracy": 0.9743,
+  "within_chapter_accuracy": 0.3506,
+  "e2e_accuracy": 0.3416,
+  "macro_f1": 0.2486,
+  "ece": 0.0635,
+  "threshold": 0.7,
+  "coverage_at_threshold": 0.1872,
+  "accuracy_at_threshold": 0.7299,
+  "chapter_accuracy": {
+    "A": {
+      "accuracy": 0.2857,
+      "n": 7
+    },
+    "B": {
+      "accuracy": 0.625,
+      "n": 16
+    },
+    "C": {
+      "accuracy": 0.4615,
+      "n": 52
+    },
+    "D": {
+      "accuracy": 0.1026,
+      "n": 39
+    },
+    "E": {
+      "accuracy": 0.0732,
+      "n": 41
+    },
+    "F": {
+      "accuracy": 0.54,
+      "n": 50
+    },
+    "G": {
+      "accuracy": 0.4167,
+      "n": 36
+    },
+    "H": {
+      "accuracy": 0.3636,
+      "n": 44
+    },
+    "I": {
+      "accuracy": 0.3194,
+      "n": 72
+    },
+    "J": {
+      "accuracy": 0.1321,
+      "n": 53
+    },
+    "K": {
+      "accuracy": 0.0469,
+      "n": 64
+    },
+    "L": {
+      "accuracy": 0.7179,
+      "n": 39
+    },
+    "M": {
+      "accuracy": 0.2328,
+      "n": 116
+    },
+    "N": {
+      "accuracy": 0.5439,
+      "n": 57
+    },
+    "O": {
+      "accuracy": 0.3654,
+      "n": 52
+    },
+    "P": {
+      "accuracy": 0.3333,
+      "n": 3
+    },
+    "Q": {
+      "accuracy": 0.3333,
+      "n": 3
+    },
+    "R": {
+      "accuracy": 0.3784,
+      "n": 111
+    },
+    "S": {
+      "accuracy": 0.2273,
+      "n": 44
+    },
+    "T": {
+      "accuracy": 0.0,
+      "n": 10
+    },
+    "Z": {
+      "accuracy": 0.422,
+      "n": 218
+    }
+  },
+  "timestamp": "2026-04-24T20:38:36.898614"
+}

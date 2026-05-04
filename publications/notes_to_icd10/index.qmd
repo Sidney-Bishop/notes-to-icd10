@@ -1,0 +1,76 @@
+---
+title: "Preface"
+---
+
+<div style="text-align: center; margin: 2em 0;">
+![](sections/images/notes-to-icd10-logo.png){width=60% fig-alt="Notes to ICD-10 logo showing a clinical note feeding into a neural network producing code E11.65"}
+</div>
+
+
+# How to Read This Document {.unnumbered}
+
+This document serves as both a technical report and a complete project record
+for the Notes-to-ICD-10 system — a machine learning pipeline that automatically
+predicts ICD-10 diagnostic codes from free-text clinical notes.
+
+It is written for a wide audience. Use the guide below to find the sections
+most relevant to you.
+
+---
+
+## Reader Guide {.unnumbered}
+
+::: {.callout-note icon=false}
+## 📋 For Business and Clinical Stakeholders
+Read: **Executive Summary** → **Introduction** → **Results** → **Limitations**
+
+These sections explain what the system does, why it matters, what it achieves,
+and what its current boundaries are — without requiring a background in machine
+learning or software engineering.
+:::
+
+::: {.callout-note icon=false}
+## 🔬 For Data Scientists and ML Practitioners
+Read: **Methodology** → **Experiments** → **Results** → **Conclusions**
+
+These sections cover the model architecture, training strategy, ablation
+experiments, calibration analysis, and key research findings in full technical
+depth.
+:::
+
+::: {.callout-note icon=false}
+## ⚙️ For Software Engineers and Developers
+Read: **Dataset** → **Methodology** → **Inference Pipeline** → **Limitations**
+
+These sections document the data pipeline, preprocessing decisions, inference
+architecture, and known technical constraints relevant to production deployment.
+:::
+
+---
+
+## Document Conventions {.unnumbered}
+
+Throughout this document:
+
+- **Callout boxes** like the ones above highlight key findings, warnings, or
+  important constraints that readers should not skip.
+- **Code listings** show exact commands or implementation details — safely
+  skippable if you are not working with the codebase directly.
+- Each major section opens with a **plain-language summary** that communicates
+  the essential point before diving into technical detail.
+- Tables marked with a 🏆 symbol contain the headline results for the section.
+
+---
+
+## Reproducibility {.unnumbered}
+
+All experiments reported in this document are fully reproducible from the
+project repository. The experiment registry (`outputs/experiments.json`) and
+step-by-step reproduction guide (`Run notes.md`) are included in the
+repository alongside the source code.
+
+```
+git clone https://github.com/Sidney-Bishop/notes-to-icd10
+uv sync
+uv run python verify_scripts.py
+```

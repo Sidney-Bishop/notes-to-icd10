@@ -1,0 +1,232 @@
+{
+  "stage1": {
+    "temperature": 1.328407,
+    "n_samples": 966,
+    "n_classes": 22,
+    "ece_before": 0.0531,
+    "ece_after": 0.0138,
+    "coverage_before": 0.9731,
+    "coverage_after": 0.9596,
+    "accuracy_on_covered_before": 0.9383,
+    "accuracy_on_covered_after": 0.9461
+  },
+  "stage2": {
+    "A": {
+      "temperature": 0.291362,
+      "n_samples": 7,
+      "n_classes": 13,
+      "ece_before": 0.342,
+      "ece_after": 0.2821,
+      "coverage_before": 0.0,
+      "coverage_after": 0.5714,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.75
+    },
+    "B": {
+      "temperature": 0.05,
+      "n_samples": 16,
+      "n_classes": 32,
+      "ece_before": 0.6817,
+      "ece_after": 0.1168,
+      "coverage_before": 0.0,
+      "coverage_after": 1.0,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.875
+    },
+    "C": {
+      "temperature": 0.284429,
+      "n_samples": 52,
+      "n_classes": 103,
+      "ece_before": 0.7125,
+      "ece_after": 0.0648,
+      "coverage_before": 0.0,
+      "coverage_after": 0.8077,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.9048
+    },
+    "D": {
+      "temperature": 0.303827,
+      "n_samples": 39,
+      "n_classes": 77,
+      "ece_before": 0.7335,
+      "ece_after": 0.0936,
+      "coverage_before": 0.0,
+      "coverage_after": 0.8462,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.9394
+    },
+    "E": {
+      "temperature": 0.349566,
+      "n_samples": 41,
+      "n_classes": 79,
+      "ece_before": 0.5797,
+      "ece_after": 0.1573,
+      "coverage_before": 0.0,
+      "coverage_after": 0.5854,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.9167
+    },
+    "F": {
+      "temperature": 0.328885,
+      "n_samples": 50,
+      "n_classes": 100,
+      "ece_before": 0.7134,
+      "ece_after": 0.144,
+      "coverage_before": 0.0,
+      "coverage_after": 0.76,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.9211
+    },
+    "G": {
+      "temperature": 0.216905,
+      "n_samples": 36,
+      "n_classes": 71,
+      "ece_before": 0.7427,
+      "ece_after": 0.1266,
+      "coverage_before": 0.0,
+      "coverage_after": 0.6111,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 1.0
+    },
+    "H": {
+      "temperature": 0.255356,
+      "n_samples": 44,
+      "n_classes": 87,
+      "ece_before": 0.7251,
+      "ece_after": 0.0658,
+      "coverage_before": 0.0,
+      "coverage_after": 0.8636,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.9474
+    },
+    "I": {
+      "temperature": 0.312517,
+      "n_samples": 72,
+      "n_classes": 143,
+      "ece_before": 0.7465,
+      "ece_after": 0.0595,
+      "coverage_before": 0.0,
+      "coverage_after": 0.7778,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.9464
+    },
+    "J": {
+      "temperature": 0.369554,
+      "n_samples": 53,
+      "n_classes": 106,
+      "ece_before": 0.5152,
+      "ece_after": 0.1198,
+      "coverage_before": 0.0,
+      "coverage_after": 0.6981,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.9189
+    },
+    "K": {
+      "temperature": 0.374019,
+      "n_samples": 64,
+      "n_classes": 127,
+      "ece_before": 0.6964,
+      "ece_after": 0.0799,
+      "coverage_before": 0.0,
+      "coverage_after": 0.7969,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.9216
+    },
+    "L": {
+      "temperature": 0.213237,
+      "n_samples": 39,
+      "n_classes": 78,
+      "ece_before": 0.7747,
+      "ece_after": 0.0656,
+      "coverage_before": 0.0,
+      "coverage_after": 0.9487,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.9459
+    },
+    "M": {
+      "temperature": 0.358701,
+      "n_samples": 116,
+      "n_classes": 231,
+      "ece_before": 0.7335,
+      "ece_after": 0.0674,
+      "coverage_before": 0.0,
+      "coverage_after": 0.7155,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.9518
+    },
+    "N": {
+      "temperature": 0.228204,
+      "n_samples": 57,
+      "n_classes": 113,
+      "ece_before": 0.7583,
+      "ece_after": 0.0634,
+      "coverage_before": 0.0,
+      "coverage_after": 0.807,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.9783
+    },
+    "O": {
+      "temperature": 0.248293,
+      "n_samples": 52,
+      "n_classes": 65,
+      "ece_before": 0.5349,
+      "ece_after": 0.1868,
+      "coverage_before": 0.0,
+      "coverage_after": 0.4231,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.6818
+    },
+    "R": {
+      "temperature": 0.34746,
+      "n_samples": 111,
+      "n_classes": 216,
+      "ece_before": 0.6051,
+      "ece_after": 0.105,
+      "coverage_before": 0.0,
+      "coverage_after": 0.6937,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.8571
+    },
+    "S": {
+      "temperature": 0.271091,
+      "n_samples": 44,
+      "n_classes": 88,
+      "ece_before": 0.7427,
+      "ece_after": 0.0315,
+      "coverage_before": 0.0,
+      "coverage_after": 0.9318,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.9268
+    },
+    "T": {
+      "temperature": 0.05,
+      "n_samples": 10,
+      "n_classes": 19,
+      "ece_before": 0.7103,
+      "ece_after": 0.0063,
+      "coverage_before": 0.0,
+      "coverage_after": 1.0,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 1.0
+    },
+    "Z": {
+      "temperature": 0.53372,
+      "n_samples": 218,
+      "n_classes": 277,
+      "ece_before": 0.2884,
+      "ece_after": 0.0792,
+      "coverage_before": 0.0,
+      "coverage_after": 0.1743,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.7368
+    }
+  },
+  "meta": {
+    "experiment": "E-009_Balanced_E002Init",
+    "stage1_experiment": "E-003_Stage1_Router",
+    "threshold": 0.7,
+    "device": "mps",
+    "elapsed_s": 28.9,
+    "started": "2026-04-26 02:59:02"
+  }
+}

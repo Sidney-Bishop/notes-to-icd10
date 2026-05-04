@@ -1,0 +1,64 @@
+project:
+  type: book
+  output-dir: _output
+
+book:
+  title: "Notes to ICD-10"
+  subtitle: "Automated Clinical Code Prediction from Free-Text Notes Using Hierarchical Deep Learning"
+  author:
+    - name: "Jason Roche"
+  date: "May 2026"
+  date-format: "MMMM YYYY"
+  chapters:
+    - index.qmd
+    - sections/01_executive_summary.qmd
+    - sections/02_introduction.qmd
+    - sections/03_dataset.qmd
+    - sections/04_methodology.qmd
+    - sections/05_experiments.qmd
+    - sections/06_results.qmd
+    - sections/07_pipeline.qmd
+    - sections/08_limitations.qmd
+    - sections/09_conclusions.qmd
+
+format:
+  typst:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    papersize: a4
+    margin:
+      x: 1.25in
+      y: 1.25in
+    fontsize: 11pt
+    mainfont: "Linux Libertine"
+    sansfont: "Linux Biolinum"
+    monofont: "DejaVu Sans Mono"
+    fig-pos: "H"
+    fig-cap-location: bottom
+    tbl-cap-location: top
+    highlight-style: github
+
+  html:
+    toc: true
+    toc-depth: 3
+    toc-location: left
+    number-sections: true
+    theme: cosmo
+    code-fold: true
+    code-tools: true
+    smooth-scroll: true
+    fig-cap-location: bottom
+    tbl-cap-location: top
+
+execute:
+  freeze: auto
+  echo: false
+  warning: false
+  message: false
+
+bibliography: references.bib
+
+jupyter:
+  python: /Users/jroche/Workspace/Python/Notes_to_ICD10_prj/.venv/bin/python
+

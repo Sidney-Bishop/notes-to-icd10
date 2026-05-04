@@ -1,0 +1,18 @@
+{
+    "e2e_accuracy": 0.7919254658385093,
+    "e2e_macro_f1": 0.699175103112111,
+    "stage1_routing_acc": 0.9637681159420289,
+    "within_chapter_acc": 0.8216970998925887,
+    "n_correct": 765,
+    "n_routing_correct": 931,
+    "n_routing_errors": 35,
+    "n_stage2_correct": 765,
+    "e002_accuracy": 0.7329,
+    "e002_macro_f1": 0.6344,
+    "e003_accuracy": 0.111,
+    "e003_macro_f1": 0.0747,
+    "delta_e002_accuracy": 0.05902546583850932,
+    "delta_e002_macro_f1": 0.06477510311211099,
+    "delta_e003_accuracy": 0.6809254658385093,
+    "delta_e003_macro_f1": 0.624475103112111
+}

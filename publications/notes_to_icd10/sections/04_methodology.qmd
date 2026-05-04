@@ -1,0 +1,331 @@
+---
+title: "Methodology"
+---
+
+# Methodology
+
+::: {.callout-note icon=false}
+## Plain-Language Summary
+This section describes how the system works technically. We use a
+two-stage approach: a first model routes each note to the right category
+of ICD-10 codes, and a second set of specialised models picks the specific
+code within that category. Both stages are built on a language model
+pre-trained on clinical text. Key design decisions — including how we
+initialise the models and how we calibrate their confidence scores — are
+explained here.
+:::
+
+---
+
+## Model Architecture Overview {#sec-method-overview}
+
+The Notes-to-ICD-10 system uses a **two-stage hierarchical architecture**
+that decomposes the 1,926-way ICD-10 classification problem into two simpler
+sub-problems aligned with the natural hierarchy of the ICD-10 code structure.
+
+```
+Clinical Note (APSO-ordered, ICD-10 redacted)
+        │
+        ▼
+┌─────────────────────────┐
+│   Stage-1: Chapter      │  22-way classification
+│   Router                │  "Which ICD-10 chapter?"
+│   (Bio_ClinicalBERT)    │  E.g. M = musculoskeletal
+└─────────────┬───────────┘
+              │ Predicted chapter
+              ▼
+┌─────────────────────────┐
+│   Stage-2: Chapter      │  Chapter-specific classification
+│   Resolver              │  "Which specific code?"
+│   (Bio_ClinicalBERT ×19)│  E.g. M25.562 = Pain in left knee
+└─────────────────────────┘
+        │
+        ▼
+ICD-10 code + calibrated confidence score
+```
+
+This decomposition reduces the effective label space for Stage-2 from
+1,926 codes to an average of approximately 100 per chapter — a
+fundamentally more tractable classification problem with the same
+training data budget.
+
+---
+
+## Base Model: Bio_ClinicalBERT {#sec-method-bert}
+
+All models in this project are fine-tuned from
+`emilyalsentzer/Bio_ClinicalBERT` [@Alsentzer2019] — a BERT-base model
+further pre-trained on clinical notes from MIMIC-III using masked language
+modelling. The model has:
+
+- 110 million parameters
+- 12 transformer layers
+- 768-dimensional hidden states
+- 28,996 token vocabulary (WordPiece)
+- 512-token maximum sequence length
+
+Bio_ClinicalBERT was chosen over general-domain BERT variants because
+clinical text contains substantial domain-specific vocabulary (medication
+names, anatomical terms, clinical abbreviations) that general pre-training
+on Wikipedia and BookCorpus does not cover. Preliminary experiments
+confirmed that Bio_ClinicalBERT consistently outperforms `bert-base-uncased`
+on this task, consistent with findings in the clinical NLP literature.
+
+---
+
+## Stage-1: Chapter Router {#sec-method-stage1}
+
+The Stage-1 router is a 22-way sequence classifier that predicts the
+ICD-10 chapter (A through Z, excluding a small number of unused letters)
+for each clinical note.
+
+**Architecture:** Bio_ClinicalBERT encoder with a linear classification head
+mapping the `[CLS]` token representation to 22 logits, one per chapter.
+
+**Training data:** All 9,660 billable records, with chapter labels derived
+from the first character of each ICD-10 code.
+
+**Training hyperparameters:**
+
+| Parameter | Value |
+|---|---|
+| Epochs | 5 |
+| Learning rate | 2×10⁻⁵ |
+| Batch size | 16 |
+| Weight decay | 0.01 |
+| Warmup | 10% of total steps |
+| Optimiser | AdamW |
+| Evaluation strategy | Per epoch |
+| Best checkpoint | Highest validation Macro F1 |
+
+: Stage-1 training hyperparameters. {#tbl-method-stage1-hparams}
+
+**Initialisation:** The Stage-1 router is initialised from the E-001
+ICD-3 baseline model weights (see @sec-exp-e001) — a model pre-trained on
+a 675-way classification of ICD-3 stem codes. Because ICD-3 stems begin
+with the chapter letter, the E-001 encoder already has implicit chapter
+awareness, and fine-tuning for explicit chapter classification converges
+rapidly.
+
+**Result:** The Stage-1 router achieves **98.7% test accuracy** on
+22-way chapter classification — effectively solving the routing problem.
+Only 13 of 966 test records are misrouted to the wrong chapter, and
+misrouted records account for the majority of end-to-end failures.
+
+---
+
+## Stage-2: Chapter Resolvers {#sec-method-stage2}
+
+The Stage-2 layer consists of **19 per-chapter resolver models**, each a
+Bio_ClinicalBERT classifier trained to predict the specific ICD-10 code
+within its assigned chapter.
+
+Three chapters (P, Q, U) are excluded from training due to insufficient
+records (fewer than 15 training examples). These chapters use a
+majority-class fallback prediction.
+
+**Architecture:** Bio_ClinicalBERT encoder with a linear classification head
+sized to the number of billable codes in the chapter (ranging from 12 for
+chapter A to 263 for chapter Z).
+
+**Training hyperparameters:**
+
+| Parameter | Value |
+|---|---|
+| Epochs | 20 per resolver |
+| Learning rate | 2×10⁻⁵ |
+| Batch size | 16 |
+| Weight decay | 0.01 |
+| Warmup | 10% of total steps |
+| Optimiser | AdamW |
+
+: Stage-2 training hyperparameters. {#tbl-method-stage2-hparams}
+
+### The Initialisation Problem {#sec-method-init}
+
+The single most important design decision in Stage-2 is how to initialise
+the encoder weights before chapter-specific fine-tuning.
+
+**Cold start (E-003):** Initialise from base Bio_ClinicalBERT without any
+ICD-10 pre-training. Result: 11.1% E2E accuracy despite 98.7% Stage-1
+routing. The Stage-2 resolvers fail to learn useful representations from
+only ~4 training examples per code.
+
+**Warm start from E-002 (E-009, E-010):** Initialise from a flat ICD-10
+classifier pre-trained on all 1,926 codes. The encoder has already learned
+representations that distinguish between ICD-10 codes — the per-chapter
+head is then trained to specialise these representations for the narrower
+within-chapter classification problem.
+
+The warm start works because the Bio_ClinicalBERT encoder, after flat
+ICD-10 pre-training, has developed internal representations that encode
+clinically meaningful distinctions between conditions. When the classification
+head is swapped from 1,926-way to chapter-specific N-way, the encoder
+weights are already in a useful regime and fine-tuning converges to a much
+better solution.
+
+::: {.callout-important}
+## Critical Constraint: Code Space Must Match
+
+The E-002 flat classifier and the Stage-2 resolvers **must be trained on
+the same gold dataset**. If they use different record sets, the code space
+of the flat classifier differs from the code space of the resolvers, and the
+classifier head cannot transfer. In early experiments, this mismatch caused
+E2E accuracy to collapse from ~80% to ~20%. This constraint is now enforced
+programmatically in `scripts/train.py`.
+:::
+
+### The Epoch Count Effect {#sec-method-epochs}
+
+A secondary finding is that the number of pre-training epochs for E-002
+has a surprisingly large effect on downstream Stage-2 performance.
+
+Initialising Stage-2 from a 20-epoch E-002 (E-009) produces 79.8% E2E
+accuracy. Initialising from a 40-epoch E-002 (E-010) produces 83.9% — a
++4.1 percentage point improvement from simply training the initialiser longer.
+
+![E-002 training dashboard showing all six metrics across 40 epochs (~19,320 steps). The Macro F1 and Accuracy curves (top row, centre and right) are still rising steeply at the 10,000-step mark — epoch 20 — confirming the model had not converged. Stopping at epoch 20 would discard significant representational learning.](images/E-002_FullICD10_ClinicalBERT_dashboard.png){#fig-e002-dashboard fig-alt="Six-panel training dashboard for E-002 showing Eval Loss decreasing, Macro F1 and Accuracy still rising at epoch 20"}
+
+
+Inspection of E-002's validation curves confirms the model is still improving
+at epoch 20 and has not converged. The 40-epoch encoder provides richer,
+more stable representations that transfer more effectively to chapter-specific
+fine-tuning.
+
+**The practical implication:** When using flat pre-training as a warm-start
+strategy, train the flat model to full convergence rather than stopping
+early. The transfer benefit compounds.
+
+---
+
+## Temperature Scaling Calibration {#sec-method-calibration}
+
+A well-calibrated model is one where a predicted confidence of 70% actually
+corresponds to being correct 70% of the time. Uncalibrated models are
+typically overconfident — they assign high confidence scores even to
+incorrect predictions — which makes confidence thresholds unreliable.
+
+We apply **temperature scaling** [@Guo2017] to calibrate both Stage-1 and
+all Stage-2 resolvers after training.
+
+Temperature scaling is a single-parameter post-hoc calibration method. A
+scalar temperature $T$ is learned by minimising the negative log-likelihood
+of the validation set predictions:
+
+$$
+\hat{p}_{k} = \text{softmax}\left(\frac{\mathbf{z}}{T}\right)_k
+$$
+
+where $\mathbf{z}$ is the vector of logits output by the model and $T > 1$
+softens the distribution (reduces overconfidence).
+
+$T$ is optimised using L-BFGS on the validation set. The learned temperature
+is stored in a `temperature.json` file alongside each model and applied at
+inference time.
+
+**Calibration quality** is measured by **Expected Calibration Error (ECE)**
+— the weighted average of the gap between predicted confidence and actual
+accuracy across confidence bins. Lower ECE is better; ECE = 0 means perfect
+calibration.
+
+| | Before calibration | After calibration |
+|---|---|---|
+| Stage-1 ECE | 0.027 | 0.014 |
+| Stage-2 avg ECE | 0.665 | 0.115 |
+| E2E ECE | 0.640 | **0.034** |
+
+: Temperature scaling calibration results for E-010. {#tbl-method-calibration}
+
+The Stage-2 resolvers show dramatic ECE improvement — from 0.665 to 0.115
+on average — because the fine-tuned models are initially very overconfident.
+After calibration, the E2E ECE of 0.034 indicates excellent calibration
+quality across the full pipeline.
+
+---
+
+## Confidence-Gated Output {#sec-method-gating}
+
+The calibrated confidence scores enable a **selective automation** strategy:
+
+- Cases where Stage-2 top-1 confidence ≥ 0.7 are flagged for **automatic
+  coding** — the system's prediction is accepted without human review.
+- Cases where confidence < 0.7 are **routed to human review** — the system
+  provides its top-5 predictions as suggestions but defers the final
+  decision.
+
+The threshold τ = 0.7 is a design parameter that trades off automation rate
+against precision. At τ = 0.7 and with E-010 calibration:
+
+- **82.1% of cases** are auto-coded
+- **95.2% precision** on auto-coded cases
+- 17.9% of cases are routed to human review
+
+This is the **Use Case B** operating mode — high-confidence automation
+with a human safety net. A lower threshold increases automation rate at the
+cost of precision; a higher threshold increases precision at the cost of
+automation rate.
+
+---
+
+## The Knowledge Graph Reranker {#sec-method-graph}
+
+For low-confidence predictions (confidence < 0.7) and for all Z-chapter
+predictions (the most difficult chapter), a **graph-based reranker** provides
+a secondary signal to improve prediction quality.
+
+The knowledge graph is built from the clinical notes themselves using:
+
+1. **Named entity recognition** via `en_ner_bc5cdr_md` (a clinical NER model)
+   to extract disease and chemical mentions from each note.
+2. **UMLS concept linking** via scispacy to map extracted entities to UMLS
+   concept identifiers.
+3. **Graph construction** — ICD-10 codes are connected to UMLS concepts
+   that appear in their associated notes, and codes sharing concepts are
+   connected by confusability edges.
+
+The resulting graph contains **6,990 nodes** and **269,264 edges** across
+1,926 ICD-10 codes and 5,042 UMLS concepts.
+
+At inference, the reranker computes a **combined score** for each candidate
+code by combining the model's softmax probability with a graph affinity
+score derived from concept overlap between the query note and the candidate
+code's concept neighbourhood.
+
+**Finding:** With E-010's well-calibrated resolvers, the graph reranker has
+minimal impact on overall accuracy — most predictions already exceed the 0.7
+threshold without reranking. The Z-chapter shows a marginal improvement
+(62.1% → 62.9%) when reranking is applied.
+
+---
+
+## Training Infrastructure {#sec-method-infra}
+
+All training was conducted on an **Apple MacBook Pro (M5 Max)** using
+Metal Performance Shaders (MPS) acceleration via PyTorch's MPS backend.
+
+| Component | Specification |
+|---|---|
+| **Hardware** | Apple MacBook Pro |
+| **Chip** | Apple M5 Max |
+| **CPU cores** | 18 (6 performance + 12 efficiency) |
+| **Unified memory** | 128 GB |
+| **Acceleration** | MPS (Metal Performance Shaders) |
+| **Python version** | 3.12 |
+| **Package manager** | uv |
+| **Deep learning framework** | PyTorch + HuggingFace Transformers |
+| **Data processing** | Polars |
+| **Experiment tracking** | MLflow (SQLite backend) |
+| **Total experiment chain runtime** | ~12 hours |
+
+: Training infrastructure. {#tbl-method-infra}
+
+The 128 GB unified memory architecture is particularly relevant for this
+task — loading 19 Stage-2 resolver models simultaneously at inference time
+requires substantial memory, and the shared CPU/GPU memory pool means
+all models remain resident without paging.
+
+Key MPS compatibility constraints applied during training:
+
+- `fp16=False` — MPS does not support half-precision training
+- `dataloader_pin_memory=False` — MPS does not support pinned memory  
+- `PYTORCH_ENABLE_MPS_FALLBACK=1` — CPU fallback for unsupported operations

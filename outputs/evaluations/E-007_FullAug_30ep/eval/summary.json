@@ -1,0 +1,92 @@
+{
+  "experiment_name": "E-007_FullAug_30ep",
+  "stage1_experiment": "E-007_FullAug_30ep",
+  "n_test": 1064,
+  "stage1_accuracy": 0.2444,
+  "within_chapter_accuracy": 0.4385,
+  "e2e_accuracy": 0.1071,
+  "macro_f1": 0.0549,
+  "ece": 0.0934,
+  "threshold": 0.7,
+  "coverage_at_threshold": 0.0085,
+  "accuracy_at_threshold": 0.6667,
+  "chapter_accuracy": {
+    "A": {
+      "accuracy": 0.0,
+      "n": 6
+    },
+    "B": {
+      "accuracy": 0.0,
+      "n": 16
+    },
+    "C": {
+      "accuracy": 0.0,
+      "n": 51
+    },
+    "D": {
+      "accuracy": 0.0263,
+      "n": 38
+    },
+    "E": {
+      "accuracy": 0.0,
+      "n": 39
+    },
+    "F": {
+      "accuracy": 0.0625,
+      "n": 48
+    },
+    "G": {
+      "accuracy": 0.0588,
+      "n": 34
+    },
+    "H": {
+      "accuracy": 0.0238,
+      "n": 42
+    },
+    "I": {
+      "accuracy": 0.0152,
+      "n": 66
+    },
+    "J": {
+      "accuracy": 0.0,
+      "n": 50
+    },
+    "K": {
+      "accuracy": 0.0172,
+      "n": 58
+    },
+    "L": {
+      "accuracy": 0.0,
+      "n": 38
+    },
+    "M": {
+      "accuracy": 0.0,
+      "n": 111
+    },
+    "N": {
+      "accuracy": 0.0566,
+      "n": 53
+    },
+    "O": {
+      "accuracy": 0.1569,
+      "n": 51
+    },
+    "R": {
+      "accuracy": 0.0,
+      "n": 100
+    },
+    "S": {
+      "accuracy": 0.0,
+      "n": 44
+    },
+    "T": {
+      "accuracy": 0.0,
+      "n": 8
+    },
+    "Z": {
+      "accuracy": 0.4455,
+      "n": 211
+    }
+  },
+  "timestamp": "2026-04-24T12:29:53.165209"
+}

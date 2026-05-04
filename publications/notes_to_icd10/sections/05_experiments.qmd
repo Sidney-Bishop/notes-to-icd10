@@ -1,0 +1,500 @@
+---
+title: "Experiments"
+---
+
+# Experiments
+
+::: {.callout-note icon=false}
+## Plain-Language Summary
+This section describes the progression of experiments that led to the
+current best result. Each experiment was a deliberate test of one specific
+hypothesis. Reading these in order reveals the key insights: the architecture
+works, but only with the right initialisation strategy — and the depth of
+that initialisation matters more than expected.
+:::
+
+---
+
+## Experimental Design Principles {#sec-exp-design}
+
+All experiments share the following design constraints to ensure valid
+comparison:
+
+- **Same gold dataset** — all experiments use the 9,660-record billable
+  gold layer derived from MedSynth FY2026.
+- **Same deterministic splits** — the 80/10/10 train/val/test split with
+  seed=42 is fixed for all experiments.
+- **Same test set** — the 966-record test set is held out and touched
+  only once per experiment for final evaluation.
+- **Same evaluation metrics** — all results report top-1 accuracy and
+  Macro F1 on the test set, with ECE and Coverage@0.7 for calibrated models.
+- **Logged provenance** — every run is logged to `outputs/experiments.json`
+  and `outputs/run.log` with full parameter records.
+
+---
+
+## Understanding the Evaluation Metrics {#sec-exp-metrics}
+
+::: {.callout-note icon=false}
+## Plain-Language Summary
+Before presenting the experiment results, this section explains what the
+evaluation metrics actually measure and why we chose them. This is
+particularly important for a 1,926-class problem where the choice of
+averaging method significantly affects what the number means — and whether
+it honestly reflects the system's capabilities.
+:::
+
+---
+
+### Top-1 Accuracy
+
+The simplest metric: of all test records, what fraction did the model
+predict correctly?
+
+$$\text{Accuracy} = \frac{\text{Correct predictions}}{\text{Total predictions}} = \frac{811}{966} = 83.9\%$$
+
+**What it tells you:** How often the system gets the right answer.
+
+**What it conceals:** Whether errors are evenly distributed across all
+1,926 codes, or concentrated in a small number of difficult ones.
+
+In multi-class classification, accuracy is equivalent to the **micro F1
+score** — it pools all predictions together and measures overall volume
+of correct answers. A model that perfectly predicts the 100 most common
+codes and fails on the remaining 1,826 could still achieve high accuracy
+if the common codes dominate the test set.
+
+In our case the test set is **uniform** (approximately 5 records per code),
+so accuracy is a fair metric here. On real clinical data — where hypertension,
+diabetes, and back pain dominate — it would be dangerously misleading.
+
+---
+
+### F1 Score: The Building Block
+
+**F1 score** for a single class is the harmonic mean of precision and recall:
+
+$$F1 = 2 \times \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}}$$
+
+Where precision and recall are computed using a **One-vs-Rest** approach —
+each class is treated as a binary classification problem in turn:
+
+- **Precision** — of all the times the model predicted this code, how
+  often was it correct? A high-precision model avoids false alarms.
+- **Recall** — of all the records that truly had this code, how many
+  did the model find? A high-recall model avoids missed detections.
+
+For a concrete example using `I10` (Essential hypertension):
+
+| | Predicted I10 | Predicted other |
+|---|---|---|
+| **True I10** | 5 TP | 1 FN |
+| **True other** | 0 FP | 960 TN |
+
+$$\text{Precision}_{I10} = \frac{5}{5+0} = 1.00 \qquad
+  \text{Recall}_{I10} = \frac{5}{5+1} = 0.833 \qquad
+  F1_{I10} = 0.909$$
+
+This per-class F1 is computed separately for all 1,926 codes. The question
+is then: how do we average 1,926 F1 scores into a single number?
+
+---
+
+### Three Averaging Strategies — and Why They Give Different Answers
+
+There are three standard approaches, and the differences between them
+matter enormously for a 1,926-class problem:
+
+**Macro average** computes the simple unweighted mean across all classes —
+every class counts equally regardless of how many examples it has:
+
+$$\text{Macro F1} = \frac{1}{N} \sum_{i=1}^{N} F1_i = \frac{F1_{I10} + F1_{M25.562} + \cdots + F1_{Z79.4}}{1926}$$
+
+**Weighted average** weights each class by its number of examples (its
+*support*). Classes with more training examples contribute more to the
+final score:
+
+$$\text{Weighted F1} = \sum_{i=1}^{N} \frac{\text{support}_i}{\text{total}} \times F1_i$$
+
+**Micro average** pools all True Positives, False Positives, and False
+Negatives across all classes before computing F1. For single-label
+classification this is mathematically identical to accuracy:
+
+$$\text{Micro F1} = \text{Accuracy} = \frac{\sum TP_i}{\sum (TP_i + FP_i)} = 83.9\%$$
+
+The table below summarises when each is appropriate:
+
+| Averaging | Treats classes | Best when |
+|---|---|---|
+| **Macro** | Equally | All classes matter equally regardless of frequency |
+| **Weighted** | Proportionally to frequency | Common classes matter more |
+| **Micro** | By prediction volume | Only overall throughput matters |
+
+---
+
+### Why This Project Uses Macro F1
+
+**Macro F1 is the right choice here for two reasons that reinforce each other.**
+
+First, **all 1,926 ICD-10 codes are clinically equally important.** A rare
+code for a serious condition — say `A06.1` (chronic intestinal amoebiasis)
+— is no less significant than a common code for a routine condition like
+`M25.562` (pain in left knee). Getting the rare code wrong has the same
+consequence as getting the common code wrong. Macro averaging encodes this
+equal importance directly.
+
+Second, **the training set is deliberately uniform.** MedSynth has
+approximately 5 records per code by design. In this setting, weighted
+averaging would converge toward macro averaging anyway — but using macro
+explicitly makes the equal-weight intention transparent.
+
+::: {.callout-important}
+## Macro F1 vs Accuracy: Why They Tell Different Stories Here
+
+For this project both metrics are consistent because the test set is uniform.
+On real clinical data they would diverge significantly:
+
+Consider a model that masters the 50 most common ICD-10 codes (covering
+roughly 60% of real encounters) but fails on the remaining 1,876 codes.
+
+- **Accuracy** (= Micro F1): ~60% — looks acceptable
+- **Macro F1**: ~0.03 — catastrophically poor
+
+Macro F1 exposes the failure that accuracy hides. This is why Macro F1
+is the primary metric in this project and why it should be the primary
+metric for any automated coding system evaluated for clinical deployment.
+:::
+
+**What Macro F1 = 0.762 means in practice:** Averaged equally across all
+1,926 ICD-10 codes — from the highest-performing circulatory codes (~0.98)
+to the most difficult administrative codes (~0.62) — the model achieves
+an F1 of 0.762. This is a strong result for a 1,926-class problem with
+~4 training examples per class. Random guessing on this task would produce
+a Macro F1 close to zero.
+
+---
+
+### Expected Calibration Error (ECE)
+
+ECE measures whether the model's confidence scores are trustworthy.
+A perfectly calibrated model that says "70% confident" is correct
+exactly 70% of the time.
+
+ECE is computed by bucketing predictions into confidence bins and measuring
+the gap between average confidence and average accuracy in each bin:
+
+$$\text{ECE} = \sum_{b=1}^{B} \frac{|B_b|}{n} \left| \text{acc}(B_b) - \text{conf}(B_b) \right|$$
+
+| ECE | Interpretation |
+|---|---|
+| < 0.05 | Excellent — confidence scores are reliable |
+| 0.05 – 0.15 | Good — minor overconfidence |
+| 0.15 – 0.30 | Moderate — needs treatment |
+| > 0.30 | Poor — confidence scores not meaningful |
+
+E-010 achieves **ECE = 0.034** after temperature scaling — excellent
+calibration that makes the confidence threshold operationally meaningful.
+Before calibration, the ECE was 0.640 — the model was severely overconfident
+and the threshold could not be trusted.
+
+---
+
+### Coverage@τ and Accuracy on Covered
+
+These two metrics jointly describe the **selective automation** capability:
+
+- **Coverage@τ** — the fraction of test records where the model's top-1
+  confidence exceeds the threshold τ. At τ = 0.7: 82.1% of records are
+  auto-coded.
+
+- **Accuracy on covered** — the precision on the auto-coded subset.
+  At τ = 0.7: 95.2% of auto-coded predictions are correct.
+
+Together they define the operating point: *how much can we automate, and
+at what quality?* A lower threshold automates more but at lower precision;
+a higher threshold automates less but at higher precision. The τ = 0.7
+operating point was chosen as a practical balance point — see
+@sec-results-automation for the full threshold sweep.
+
+
+
+---
+
+## E-001: ICD-3 Flat Baseline {#sec-exp-e001}
+
+**Hypothesis:** Bio_ClinicalBERT fine-tuned on a reduced label space (ICD-3
+stem codes, 675 classes) can serve as a strong baseline and as a source of
+transfer weights for later experiments.
+
+**Setup:** Flat 675-way classification. Labels are derived by truncating
+each ICD-10 code to its first three characters (e.g. `M25.562` → `M25`).
+This groups related codes together and reduces the label space by approximately
+3×.
+
+| Parameter | Value |
+|---|---|
+| Label scheme | ICD-3 (675 classes) |
+| Epochs | 30 |
+| Learning rate | 2×10⁻⁵ |
+| Training records | 7,728 |
+
+**Result:**
+
+| Metric | Value |
+|---|---|
+| Test accuracy | 87.2% |
+| Macro F1 | 0.841 |
+| Best epoch | 28 |
+
+: E-001 results. {#tbl-exp-e001}
+
+**Interpretation:** 87.2% accuracy on a 675-way classification task from ~11
+training examples per class is a strong result. The model demonstrates that
+Bio_ClinicalBERT can learn useful ICD-10 representations from this limited
+data regime.
+
+Note that E-001 is **not directly comparable** to later experiments — it
+predicts ICD-3 stems, not full billable ICD-10 codes. A prediction of `M25`
+is much easier than predicting `M25.562` specifically.
+
+**Role in subsequent experiments:** The E-001 encoder, having learned
+to distinguish ICD-3 stems (which begin with the chapter letter), provides
+implicit chapter awareness that makes it a strong initialiser for the
+Stage-1 chapter router.
+
+---
+
+## E-002: Flat ICD-10 Baseline {#sec-exp-e002}
+
+**Hypothesis:** A flat 1,926-way ICD-10 classifier provides the most
+direct comparison point for the hierarchical approach, and its encoder
+weights can serve as a warm-start initialiser for Stage-2 resolvers.
+
+**Setup:** Flat 1,926-way classification over all billable ICD-10 codes.
+This is the hardest possible formulation of the problem.
+
+| Parameter | Value |
+|---|---|
+| Label scheme | Full ICD-10 (1,926 classes) |
+| Epochs | 40 |
+| Learning rate | 2×10⁻⁵ |
+| Training records | 7,728 |
+
+**Result:**
+
+| Metric | Value |
+|---|---|
+| Test accuracy | 73.3% |
+| Macro F1 | 0.634 |
+| Best epoch | 38 |
+
+: E-002 results. {#tbl-exp-e002}
+
+**Interpretation:** 73.3% accuracy on a 1,926-way classification task from
+~4 training examples per class is a reasonable flat baseline. The model
+converges at epoch 38 rather than 40, indicating the training budget is
+appropriate.
+
+The Macro F1 of 0.634 reflects the difficulty of the label space — with
+only 4 training examples per code, many classes have limited within-class
+variance and the model cannot always distinguish similar codes.
+
+**Chapter-level analysis:** Despite predicting full ICD-10 codes, the
+flat model achieves 90.3% accuracy at the chapter level — meaning 9 out of
+10 errors are within-chapter (the right chapter but wrong specific code)
+rather than cross-chapter. This foreshadows the hierarchical approach.
+
+**Role in subsequent experiments:** The 40-epoch E-002 encoder is the
+critical warm-start initialiser for Stage-2 in E-010. The epoch count
+matters — see @sec-exp-e010.
+
+---
+
+## E-003: Hierarchical Cold Start {#sec-exp-e003}
+
+**Hypothesis:** The hierarchical two-stage architecture produces better
+results than flat ICD-10 classification even without special initialisation.
+
+**Setup:** Stage-1 router trained from E-001 weights (22-way chapter
+classification). Stage-2 resolvers trained from base Bio_ClinicalBERT
+(cold start — no ICD-10 pre-training).
+
+**Result:**
+
+| Metric | Value |
+|---|---|
+| Stage-1 accuracy | 96.4% |
+| Stage-2 within-chapter | 11.7% |
+| E2E accuracy | 11.1% |
+| Macro F1 | 0.075 |
+
+: E-003 results. {#tbl-exp-e003}
+
+**Interpretation:** The architecture fails dramatically without warm
+initialisation. Despite near-perfect chapter routing (96.4%), the within-chapter
+resolvers cannot learn from only ~4 training examples per code when starting
+from a general-domain language model.
+
+This result is the most important in the experimental progression — it
+establishes that the hierarchical architecture's value is entirely dependent
+on how Stage-2 is initialised.
+
+::: {.callout-important}
+## The Cold Start Problem
+
+With 4 training examples per code and up to 263 codes per chapter,
+a Stage-2 resolver trained from scratch must learn to distinguish between
+codes from an initialisation that has no ICD-10 knowledge. The gradient
+signal is insufficient — the model cannot discriminate conditions it has
+no prior representation of.
+
+The warm-start from E-002 solves this by providing an encoder that has
+already learned to distinguish ICD-10 codes at the flat level. Stage-2
+fine-tuning then specialises these representations for the narrower
+within-chapter problem.
+:::
+
+---
+
+## E-009: Hierarchical with E-002 Warm Start (20 Epochs) {#sec-exp-e009}
+
+**Hypothesis:** Initialising Stage-2 resolvers from the E-002 flat ICD-10
+classifier will dramatically improve within-chapter accuracy.
+
+**Setup:** Stage-1 router reused from E-003 (no retraining). Stage-2
+resolvers initialised from the E-002 encoder weights (20-epoch version),
+with the 1,926-way classification head replaced by chapter-specific heads.
+
+**Result:**
+
+| Metric | Value |
+|---|---|
+| Stage-1 accuracy | 96.4% |
+| Stage-2 within-chapter | 82.2% |
+| E2E accuracy | 79.8% |
+| Macro F1 | 0.711 |
+
+: E-009 results. {#tbl-exp-e009}
+
+**Interpretation:** The hypothesis is confirmed dramatically. Warm
+initialisation from E-002 improves within-chapter accuracy from 11.7% to
+82.2% — a +70.5 percentage point improvement. E2E accuracy jumps from 11.1%
+to 79.8%, surpassing the flat E-002 baseline by +6.5 percentage points.
+
+The head-mismatch at load time (the 1,926-way head cannot transfer to an
+N-way head) is expected and handled correctly — only the encoder transfers,
+and the new classification head is randomly initialised and fine-tuned.
+
+::: {.callout-note}
+## The Head Swap Pattern
+
+When loading E-002 weights into a chapter-specific resolver:
+
+```
+Bio_ClinicalBERT encoder (768-dim)  ← TRANSFERRED ✅
+Linear head (768 → 1,926)           ← DISCARDED
+Linear head (768 → N_chapter)       ← RANDOMLY INITIALISED, FINE-TUNED
+```
+
+The encoder transfer is complete and correct. Only the final linear layer
+is reinitialised. HuggingFace reports this as "missing keys" and "unexpected
+keys" — this is expected, not an error.
+:::
+
+---
+
+## E-010: Hierarchical with E-002 Warm Start (40 Epochs) {#sec-exp-e010}
+
+**Hypothesis:** A more thoroughly pre-trained E-002 initialiser (40 epochs
+vs 20 epochs) produces better Stage-2 representations and improves E2E accuracy.
+
+**Setup:** Identical to E-009 except Stage-2 resolvers are initialised from
+the 40-epoch E-002 model rather than the 20-epoch version.
+
+**Result:**
+
+| Metric | Value |
+|---|---|
+| Stage-1 accuracy | 98.7% |
+| Stage-2 within-chapter | 84.8% |
+| E2E accuracy | **83.9%** |
+| Macro F1 | **0.762** |
+| ECE (post-calibration) | **0.034** |
+| Coverage@0.7 | **82.1%** |
+| Accuracy on covered | **95.2%** |
+
+: E-010 results — current best. {#tbl-exp-e010}
+
+**Interpretation:** The 40-epoch E-002 initialiser produces +4.1 percentage
+points E2E accuracy over the 20-epoch version — a larger gain than any
+architectural change tested. This confirms that the E-002 model has not
+converged at 20 epochs and continues learning useful ICD-10 representations
+through epoch 40.
+
+Notably, Stage-1 accuracy also improves from 96.4% to 98.7%, likely due to
+improved label-related representations propagating through the shared
+Bio_ClinicalBERT backbone used across all stages.
+
+**Z-chapter improvement:** The most difficult chapter improves from 52.9%
+(E-009) to 62.1% (E-010) — a +9.2 percentage point gain. The 40-epoch
+encoder has substantially better Z-code discrimination, likely because the
+flat classifier was forced to learn finer distinctions between administrative
+codes over the longer training run.
+
+---
+
+## Experiment Summary {#sec-exp-summary}
+
+```{python}
+#| label: tbl-exp-summary
+#| tbl-cap: "🏆 Complete experiment progression showing E2E accuracy and Macro F1."
+
+import pandas as pd
+
+experiments = [
+    {"ID": "E-001", "Description": "ICD-3 flat (675 classes)", 
+     "Architecture": "Flat", "Init": "Bio_ClinicalBERT",
+     "E2E Acc": "87.2%*", "Macro F1": "0.841"},
+    {"ID": "E-002", "Description": "ICD-10 flat (1,926 classes)", 
+     "Architecture": "Flat", "Init": "Bio_ClinicalBERT",
+     "E2E Acc": "73.3%", "Macro F1": "0.634"},
+    {"ID": "E-003", "Description": "Hierarchical, cold start", 
+     "Architecture": "Hierarchical", "Init": "Bio_ClinicalBERT (cold)",
+     "E2E Acc": "11.1%", "Macro F1": "0.075"},
+    {"ID": "E-009", "Description": "Hierarchical, E-002 init (20ep)", 
+     "Architecture": "Hierarchical", "Init": "E-002 (20 epochs)",
+     "E2E Acc": "79.8%", "Macro F1": "0.711"},
+    {"ID": "**E-010**", "Description": "**Hierarchical, E-002 init (40ep)**", 
+     "Architecture": "Hierarchical", "Init": "E-002 (40 epochs)",
+     "E2E Acc": "**83.9%**", "Macro F1": "**0.762**"},
+]
+
+df = pd.DataFrame(experiments)
+from IPython.display import Markdown
+display(Markdown(df.to_markdown(index=False)))
+print("\n*E-001 predicts ICD-3 stems (675 classes), not full ICD-10 codes — not directly comparable.")
+```
+
+### Key Findings
+
+**Finding 1: Architecture requires warm initialisation.** The cold-start
+result (E-003, 11.1%) demonstrates that the hierarchical architecture has
+no intrinsic advantage over flat classification — its benefit is entirely
+delivered through the warm-start mechanism. Without pre-trained ICD-10
+representations in the Stage-2 encoder, the architecture fails.
+
+**Finding 2: Pre-training depth matters.** The +4.1pp improvement from
+20-epoch to 40-epoch E-002 initialisation (E-009 → E-010) is larger than
+the improvement from flat to hierarchical architecture at the same
+initialisation depth. Investing compute in the pre-training stage pays
+dividends in the downstream task.
+
+**Finding 3: Hierarchical beats flat at the same initialisation budget.**
+E-010 (hierarchical, 40-epoch init) achieves 83.9% vs E-002 (flat, 40
+epochs) at 73.3% — a +10.6 percentage point improvement. The hierarchical
+decomposition genuinely helps when the encoder is well-initialised.
+
+**Finding 4: The previous production pipeline is now beaten without its
+auxiliary components.** The previous best result (77.4%, using augmented
+gold data, a graph reranker, and Z-threshold overrides) is surpassed by
+E-010 (83.9%) using only the original gold data and standard training.

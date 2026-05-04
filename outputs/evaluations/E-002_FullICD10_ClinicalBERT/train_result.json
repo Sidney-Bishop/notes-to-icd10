@@ -1,0 +1,153 @@
+{
+  "experiment_name": "E-002_FullICD10_ClinicalBERT",
+  "best_epoch": 19,
+  "best_val_accuracy": 0.5745341614906833,
+  "best_val_f1": 0.45581150255947,
+  "elapsed_seconds": 5751.011603583,
+  "training_history": [
+    {
+      "epoch": 1.0,
+      "eval_loss": 7.569218635559082,
+      "eval_macro_f1": 3.7017157452479226e-06,
+      "eval_accuracy": 0.0010351966873706005,
+      "train_loss": null
+    },
+    {
+      "epoch": 2.0,
+      "eval_loss": 7.5280303955078125,
+      "eval_macro_f1": 9.629736626703259e-05,
+      "eval_accuracy": 0.0010351966873706005,
+      "train_loss": null
+    },
+    {
+      "epoch": 3.0,
+      "eval_loss": 7.128275394439697,
+      "eval_macro_f1": 0.006510929116547649,
+      "eval_accuracy": 0.023809523809523808,
+      "train_loss": null
+    },
+    {
+      "epoch": 4.0,
+      "eval_loss": 6.711275577545166,
+      "eval_macro_f1": 0.0410229905435075,
+      "eval_accuracy": 0.07971014492753623,
+      "train_loss": null
+    },
+    {
+      "epoch": 5.0,
+      "eval_loss": 6.346149921417236,
+      "eval_macro_f1": 0.10936945974000258,
+      "eval_accuracy": 0.17391304347826086,
+      "train_loss": null
+    },
+    {
+      "epoch": 6.0,
+      "eval_loss": 6.034333229064941,
+      "eval_macro_f1": 0.18082854434537463,
+      "eval_accuracy": 0.2660455486542443,
+      "train_loss": null
+    },
+    {
+      "epoch": 7.0,
+      "eval_loss": 5.766170024871826,
+      "eval_macro_f1": 0.22759064055028178,
+      "eval_accuracy": 0.3198757763975155,
+      "train_loss": null
+    },
+    {
+      "epoch": 8.0,
+      "eval_loss": 5.512918949127197,
+      "eval_macro_f1": 0.27606081914117625,
+      "eval_accuracy": 0.3747412008281574,
+      "train_loss": null
+    },
+    {
+      "epoch": 9.0,
+      "eval_loss": 5.289818286895752,
+      "eval_macro_f1": 0.32323009234773936,
+      "eval_accuracy": 0.4306418219461698,
+      "train_loss": null
+    },
+    {
+      "epoch": 10.0,
+      "eval_loss": 5.0910749435424805,
+      "eval_macro_f1": 0.34371572719725935,
+      "eval_accuracy": 0.453416149068323,
+      "train_loss": null
+    },
+    {
+      "epoch": 11.0,
+      "eval_loss": 4.907397270202637,
+      "eval_macro_f1": 0.36563236505096963,
+      "eval_accuracy": 0.4772256728778468,
+      "train_loss": null
+    },
+    {
+      "epoch": 12.0,
+      "eval_loss": 4.757368564605713,
+      "eval_macro_f1": 0.3915055791293415,
+      "eval_accuracy": 0.5062111801242236,
+      "train_loss": null
+    },
+    {
+      "epoch": 13.0,
+      "eval_loss": 4.617746353149414,
+      "eval_macro_f1": 0.4028972175872445,
+      "eval_accuracy": 0.5165631469979296,
+      "train_loss": null
+    },
+    {
+      "epoch": 14.0,
+      "eval_loss": 4.499764442443848,
+      "eval_macro_f1": 0.41896437900054534,
+      "eval_accuracy": 0.5341614906832298,
+      "train_loss": null
+    },
+    {
+      "epoch": 15.0,
+      "eval_loss": 4.406191349029541,
+      "eval_macro_f1": 0.4296987977580969,
+      "eval_accuracy": 0.5486542443064182,
+      "train_loss": null
+    },
+    {
+      "epoch": 16.0,
+      "eval_loss": 4.320558071136475,
+      "eval_macro_f1": 0.44076975734657675,
+      "eval_accuracy": 0.5590062111801242,
+      "train_loss": null
+    },
+    {
+      "epoch": 17.0,
+      "eval_loss": 4.259861946105957,
+      "eval_macro_f1": 0.44627896041720094,
+      "eval_accuracy": 0.5652173913043478,
+      "train_loss": null
+    },
+    {
+      "epoch": 18.0,
+      "eval_loss": 4.219435691833496,
+      "eval_macro_f1": 0.4484398439843984,
+      "eval_accuracy": 0.567287784679089,
+      "train_loss": null
+    },
+    {
+      "epoch": 19.0,
+      "eval_loss": 4.190419673919678,
+      "eval_macro_f1": 0.45581150255947,
+      "eval_accuracy": 0.5745341614906833,
+      "train_loss": null
+    },
+    {
+      "epoch": 20.0,
+      "eval_loss": 4.182880401611328,
+      "eval_macro_f1": 0.4487394861272778,
+      "eval_accuracy": 0.5693581780538303,
+      "train_loss": null
+    }
+  ],
+  "num_classes": 1926,
+  "label_scheme": "icd10",
+  "model": "emilyalsentzer/Bio_ClinicalBERT",
+  "timestamp": "2026-04-25T13:35:33.495931"
+}
