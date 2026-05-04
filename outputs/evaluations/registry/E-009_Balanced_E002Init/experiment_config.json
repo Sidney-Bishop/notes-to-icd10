@@ -6,14 +6,16 @@
     "payload_type": "note_only",
     "label_scheme": "hierarchical",
     "code_status_filter": "billable",
+    "max_length": 512,
     "stage1_source": "E-003_Hierarchical_ICD10",
     "stage2_init_model": "E-002_FullICD10_ClinicalBERT",
     "stage2_num_epochs": 20,
     "stage2_learning_rate": 2e-05,
     "stage2_batch_size": 16,
-    "max_length": 512,
     "weight_decay": 0.01,
     "warmup_ratio": 0.1,
     "use_special_tokens": false,
-    "seed": 42
+    "seed": 42,
+    "stage2_retrain": true,
+    "_notebook": "05-Model_Hierarchical_ICD10_E002Init"
 }

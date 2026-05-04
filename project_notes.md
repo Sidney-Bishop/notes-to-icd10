@@ -45,3 +45,17 @@ The results from E-001 and E-002 provide a definitive empirical mandate for a **
 2.  **Stage 2 (Resolver):** Specialized classifiers for each chapter, reducing the label space from **1,926 $\rightarrow$ ~100**, thereby increasing the signal-to-noise ratio and resolving the "within-chapter" confusion identified in the confusion matrices.
 
 **Current Status:** Baseline locked. Architecture validated. Ready for Hierarchical implementation.
+
+
+
+That's fantastic — https://notes-to-icd10.netlify.app/ is live with a clean, professional URL. And you can even see the preview thumbnail showing the logo, title, and "How to Read This Document" — exactly as designed.
+The document is now publicly accessible to anyone in the world. Share that URL with stakeholders, hiring managers, research colleagues — anyone you want to read it.
+When you make updates to the document locally, redeploying is just two steps:
+
+
+# 1. Re-render
+cd /Users/jroche/Workspace/Python/Notes_to_ICD10_prj/publications/notes_to_icd10
+quarto render --to html
+
+# 2. Drag the _output/ folder onto the Netlify dashboard drop zone again
+open /Users/jroche/Workspace/Python/Notes_to_ICD10_prj/publications/notes_to_icd10/_output/

@@ -7,12 +7,15 @@
     "label_scheme": "icd10_full",
     "code_status_filter": "billable",
     "max_length": 512,
-    "num_epochs": 20,
+    "num_epochs": 40,
     "learning_rate": 2e-05,
     "batch_size": 16,
     "weight_decay": 0.01,
     "warmup_ratio": 0.1,
     "use_special_tokens": false,
     "seed": 42,
-    "num_labels": 1926
+    "retrain": true,
+    "_notebook": "03-Model_ClinicalBERT_Surgical_ICD10",
+    "num_labels": 1926,
+    "_train_size": 7728
 }

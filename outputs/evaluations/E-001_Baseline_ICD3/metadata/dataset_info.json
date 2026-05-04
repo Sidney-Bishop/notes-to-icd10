@@ -1,7 +1,7 @@
 {
     "experiment": "E-001_Baseline_ICD3",
-    "timestamp": "2026-04-11T21:12:46.433785",
-    "gold_parquet": "medsynth_gold_apso_20260408_171111.parquet",
+    "timestamp": "2026-05-03T19:15:32.414942",
+    "gold_parquet": "medsynth_gold_apso_20260426_131132.parquet",
     "payload_col": "apso_note",
     "label_col": "standard_icd10",
     "label_scheme": "icd3",

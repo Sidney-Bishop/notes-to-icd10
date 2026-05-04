@@ -39,6 +39,15 @@ import torch
 
 
 # ---------------------------------------------------------------------------
+# Keys excluded from MLflow param logging
+# ---------------------------------------------------------------------------
+# - Internal keys (prefixed with _) are implementation details, not params
+# - warmup_ratio is converted to warmup_steps inside make_training_args()
+#   and must not be re-logged by MLflow (causes "param already logged" error)
+_MLFLOW_EXCLUDE_KEYS = {"warmup_ratio"}
+
+
+# ---------------------------------------------------------------------------
 # Experiment context dataclass
 # ---------------------------------------------------------------------------
 
@@ -149,6 +158,24 @@ def setup_hf_cache(project_root: Path) -> Path:
 # 5. MLflow setup
 # ---------------------------------------------------------------------------
 
+def _mlflow_safe_params(cfg: dict) -> dict:
+    """
+    Filter cfg to only the params safe to log to MLflow.
+
+    Excludes:
+    - Lists and dicts (MLflow only accepts scalar params)
+    - Keys starting with '_' (internal helpers: _notebook, _train_size)
+    - Keys in _MLFLOW_EXCLUDE_KEYS (warmup_ratio — converted to
+      warmup_steps by make_training_args; re-logging causes conflict)
+    """
+    return {
+        k: v for k, v in cfg.items()
+        if not isinstance(v, (list, dict))
+        and not k.startswith("_")
+        and k not in _MLFLOW_EXCLUDE_KEYS
+    }
+
+
 def setup_mlflow(
     project_root:    Path,
     experiment_name: str,
@@ -171,9 +198,8 @@ def setup_mlflow(
 
     run = mlflow.start_run(run_name=run_name)
 
-    # Log scalar cfg values only — lists and dicts cause MLflow param errors
-    scalar_cfg = {k: v for k, v in cfg.items() if not isinstance(v, (list, dict))}
-    mlflow.log_params(scalar_cfg)
+    # Log only safe scalar params — excludes internal keys and warmup_ratio
+    mlflow.log_params(_mlflow_safe_params(cfg))
 
     print(f"   📊 MLflow backend: {db_path.name}")
     print(f"   📊 Run:            {run.info.run_id[:8]}...")
@@ -249,19 +275,19 @@ def make_training_args(
     if report_to is None:
         report_to = ["tensorboard", "mlflow"]
 
-    num_epochs  = cfg[epoch_key]
-    batch_size  = cfg[batch_key]
-    lr          = cfg[lr_key]
+    num_epochs   = cfg[epoch_key]
+    batch_size   = cfg[batch_key]
+    lr           = cfg[lr_key]
     weight_decay = cfg.get("weight_decay", 0.01)
-    seed        = cfg.get("seed", 42)
+    seed         = cfg.get("seed", 42)
     warmup_ratio = cfg.get("warmup_ratio", 0.1)
 
-    # Calculate warmup_steps — warmup_ratio is deprecated in HF ≥5.2
-    # We must derive it manually from total training steps
-    # Caller passes train_size if known; otherwise defaults to 0
+    # Calculate warmup_steps — warmup_ratio is deprecated in HF >=5.2
+    # Derived manually from total training steps to avoid the deprecation
+    # warning and the MLflow "param already logged" conflict.
     train_size = cfg.get("_train_size", 0)
     if train_size > 0:
-        total_steps = (train_size // batch_size) * num_epochs
+        total_steps  = (train_size // batch_size) * num_epochs
         warmup_steps = max(1, int(warmup_ratio * total_steps))
     else:
         warmup_steps = 0  # HF will use 0 — caller can patch if needed
@@ -287,8 +313,8 @@ def make_training_args(
         logging_steps                = 20,
         report_to                    = report_to,
         seed                         = seed,
-        fp16                         = False,           # MPS does not support fp16
-        dataloader_pin_memory        = False,           # MPS does not support pinned memory
+        fp16                         = False,
+        dataloader_pin_memory        = False,
         disable_tqdm                 = disable_tqdm,
         log_level                    = log_level,
     )
@@ -333,20 +359,11 @@ def promote_to_registry(
     Promotes the best checkpoint to the permanent registry.
 
     Saves:
-    - model weights + tokenizer → registry/{experiment_name}/model/
-    - label_mapping.json        → registry/{experiment_name}/
-    - final_metrics.json        → registry/{experiment_name}/
-    - experiment_config.json    → registry/{experiment_name}/
-    - training_dashboard.png    → registry/{experiment_name}/ (if exists)
-
-    Parameters
-    ----------
-    cfg          : experiment config dict (must have 'experiment_name', 'model_name')
-    trainer      : fitted HuggingFace Trainer
-    tokenizer    : fitted tokenizer
-    project_root : project root Path
-    train_result : TrainOutput from trainer.train()
-    extra_metrics: additional metrics to include in final_metrics.json
+    - model weights + tokenizer -> registry/{experiment_name}/model/
+    - label_mapping.json        -> registry/{experiment_name}/
+    - final_metrics.json        -> registry/{experiment_name}/
+    - experiment_config.json    -> registry/{experiment_name}/
+    - training_dashboard.png    -> registry/{experiment_name}/ (if exists)
 
     Returns the registry directory Path.
     """
@@ -372,7 +389,7 @@ def promote_to_registry(
     else:
         print(f"   ⚠️  Dashboard not found — skipping")
 
-    # 3. Save label mapping (label2id / id2label must be in trainer.model.config)
+    # 3. Save label mapping
     model_config = trainer.model.config
     if hasattr(model_config, "label2id") and model_config.label2id:
         mapping_path = registry_dir / "label_mapping.json"
@@ -418,10 +435,10 @@ def promote_to_registry(
     print(f"   📊 Val Macro F1:  {final_metrics.get('eval_macro_f1', 0):.4f}")
     print(f"   📊 Val Accuracy:  {final_metrics.get('eval_accuracy', 0):.4f}")
 
-    # 5. Save experiment config
+    # 5. Save experiment config — use same exclusion rules as MLflow logging
     config_path = registry_dir / "experiment_config.json"
     with open(config_path, "w") as f:
-        json.dump({k: v for k, v in cfg.items() if not isinstance(v, (list, dict))}, f, indent=4)
+        json.dump(_mlflow_safe_params(cfg), f, indent=4)
     print(f"   ✅ Experiment config saved")
 
     print(f"\n🏆 Registry: {registry_dir.resolve()}")
@@ -445,17 +462,7 @@ def setup_experiment(cfg: dict) -> ExperimentContext:
     6. Configure MLflow + open run
     7. Log cfg to audit trail
 
-    Parameters
-    ----------
-    cfg : experiment config dict. Must contain:
-          - experiment_id
-          - experiment_name
-          - model_name
-          - (optional) num_epochs, learning_rate, batch_size, seed, etc.
-
-    Returns
-    -------
-    ExperimentContext with all resolved paths and objects.
+    Returns ExperimentContext with all resolved paths and objects.
     """
     print("🔍 Setting up experiment environment...")
 

@@ -6,12 +6,14 @@
     "payload_type": "note_only",
     "label_scheme": "icd3",
     "max_length": 512,
-    "num_epochs": 20,
+    "num_epochs": 30,
     "learning_rate": 2e-05,
     "batch_size": 16,
     "weight_decay": 0.01,
     "use_special_tokens": false,
     "seed": 42,
     "retrain": true,
-    "num_labels": 675
+    "_notebook": "02-Model_ClinicalBERT_Baseline_ICD3",
+    "num_labels": 675,
+    "_train_size": 8192
 }

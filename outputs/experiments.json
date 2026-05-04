@@ -192,9 +192,9 @@
       }
     },
     "results": {
-      "e2e_accuracy": 0.7619,
-      "macro_f1": 0.6609,
-      "recorded": "2026-04-27T07:20:11.771899"
+      "e2e_accuracy": 0.7546583850931677,
+      "macro_f1": 0.6572053376177088,
+      "recorded": "2026-05-01T09:32:39.647067"
     }
   },
   "E-003_Stage1_Router": {
@@ -341,7 +341,7 @@
       "e2e_accuracy": 0.798,
       "macro_f1": 0.7105,
       "stage1_accuracy": 0.964,
-      "recorded": "2026-04-27T15:39:58.896712"
+      "recorded": "2026-05-01T17:49:54.463399"
     }
   },
   "EDA": {
@@ -380,9 +380,9 @@
     "created": "2026-04-26T17:06:41.257206",
     "stages": {},
     "results": {
-      "e2e_accuracy": 0.8691,
-      "macro_f1": 0.8434,
-      "recorded": "2026-04-26T17:06:41.257742"
+      "e2e_accuracy": 0.8798828125,
+      "macro_f1": 0.8531731309626045,
+      "recorded": "2026-04-30T19:21:36.414659"
     }
   },
   "E-003_Hierarchical_ICD10": {
@@ -444,24 +444,27 @@
       },
       "evaluate": {
         "status": "complete",
-        "started": "2026-04-30T12:39:33.621657",
+        "started": "2026-05-02T12:44:31.577655",
         "params": {
           "mode": "hierarchical",
           "stage1_experiment": "E-003_Hierarchical_ICD10",
           "threshold": 0.7,
           "sample": "all"
         },
-        "completed": "2026-04-30T12:40:36.999076",
+        "completed": "2026-05-02T12:45:35.912493",
         "artifacts": {
           "eval_dir": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/evaluations/E-010_40ep_E002Init/eval"
         }
       }
     },
     "results": {
-      "e2e_accuracy": 0.839,
-      "macro_f1": 0.762,
-      "stage1_accuracy": 0.987,
-      "recorded": "2026-04-30T12:45:17.894452"
+      "stage1_accuracy": 0.9855,
+      "stage2_accuracy": 0.8508,
+      "e2e_accuracy": 0.8385,
+      "macro_f1": 0.7628,
+      "ece": 0.0329,
+      "coverage_07": 0.8209,
+      "recorded": "2026-05-02T12:45:35.913052"
     }
   }
 }

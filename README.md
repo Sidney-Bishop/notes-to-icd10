@@ -10,21 +10,25 @@
 [![Dataset](https://img.shields.io/badge/dataset-MedSynth-orange.svg)](https://huggingface.co/datasets/Ahmad0067/MedSynth)
 
 Two-stage hierarchical ICD-10 coding from clinical notes using Bio_ClinicalBERT —
-**79.8% accuracy across 1,926 ICD-10 codes** from ~4 training examples per code.
+**83.9% accuracy across 1,926 ICD-10 codes** from ~4 training examples per code.
 
 ---
 
 ## 🏆 Results
 
-| Experiment | Architecture | Accuracy | Macro F1 |
-|---|---|---|---|
-| E-001 | ICD-3 flat, 675 classes | 87.2% | 0.841 |
-| E-002 | ICD-10 flat, 1,926 classes | 73.3% | 0.634 |
-| E-003 | Hierarchical, cold start Stage-2 | 11.1% | 0.075 |
-| **E-009** | **Hierarchical, E-002 init Stage-2** | **79.8%** | **0.711** |
+| Experiment | Architecture | Accuracy | Macro F1 | ECE | Coverage@0.7 |
+|---|---|---|---|---|---|
+| E-001 | ICD-3 flat, 675 classes | 87.2%* | 0.841 | — | — |
+| E-002 | ICD-10 flat, 1,926 classes | 73.3% | 0.634 | — | — |
+| E-003 | Hierarchical, cold start Stage-2 | 11.1% | 0.075 | — | — |
+| E-009 | Hierarchical, E-002 init (20 epochs) | 79.8% | 0.711 | — | — |
+| **E-010** | **Hierarchical, E-002 init (40 epochs)** | **83.9%** | **0.762** | **0.034** | **82.1%** |
 
-**Best model (E-009):** 79.8% top-1 accuracy, 0.711 Macro F1;
-96.4% chapter routing accuracy, 82.8% within-chapter accuracy.
+*E-001 uses ICD-3 (675 classes), not billable ICD-10 codes — not directly comparable.
+
+**Best model (E-010):** 83.9% top-1 accuracy, 0.762 Macro F1, 98.7% chapter
+routing accuracy, 84.8% within-chapter accuracy. Auto-codes 82.1% of cases
+at 95.2% accuracy; routes remaining 17.9% to human review.
 
 ---
 
@@ -32,22 +36,23 @@ Two-stage hierarchical ICD-10 coding from clinical notes using Bio_ClinicalBERT 
 
 This project builds an end-to-end pipeline that predicts specific ICD-10
 diagnostic codes from APSO-structured clinical notes. The core finding is
-that a **two-stage hierarchical architecture with E-002 initialisation**
-substantially outperforms flat ICD-10 classification —
-+6.5pp accuracy over the flat baseline on an extremely low-resource task.
+that a **two-stage hierarchical architecture with a well-trained E-002
+initialiser** substantially outperforms flat ICD-10 classification —
++10.6pp accuracy over the flat baseline on an extremely low-resource task.
 
 ### Key Findings
 
 - **Flat ICD-10 classification** (E-002) achieves 73.3% — a strong baseline
   given ~4 training examples per code across 1,926 classes
 - **Hierarchical architecture fails without correct initialisation** (E-003,
-  11.1%) — training Stage-2 resolvers from scratch on chapter-filtered
-  subsets is insufficient despite an accurate Stage-1 router (96.4%)
-- **E-002 initialisation fixes Stage-2** (E-009, 79.8%) — fine-tuning
-  existing ICD-10 representations rather than learning from scratch produces
-  a 7.2× within-chapter accuracy improvement (11.5% → 82.8%)
-- **Within-chapter accuracy of 82.8% exceeds the 80.4% target** needed to
-  outperform the flat baseline end-to-end
+  11.1%) — training Stage-2 resolvers from scratch is insufficient despite
+  a 96.4% accurate Stage-1 router
+- **E-002 initialisation fixes Stage-2** (E-009, 79.8%) — pre-learned ICD-10
+  representations transfer cleanly to per-chapter resolvers
+- **Epoch count matters** (E-010, 83.9%) — 40-epoch E-002 produces richer
+  encoder representations than 20-epoch, adding +4.1pp E2E accuracy
+- **Z-chapter is the primary remaining gap** — 62.1% E2E (263 codes,
+  administrative language with high lexical overlap)
 
 ---
 
@@ -123,9 +128,8 @@ architecture: raw CSV → silver Parquet → gold Parquet (APSO-processed),
 with full JSONL audit trails and DuckDB queryable metadata.
 
 **2. Training Pipeline** — `scripts/train.py` produces a Stage-1 router
-(22-way chapter classification) and per-chapter Stage-2 resolvers. Stage-1
-uses a general-purpose encoder; Stage-2 resolvers initialise from the E-002
-flat ICD-10 model weights for maximum representation transfer.
+(22-way chapter classification) and per-chapter Stage-2 resolvers. Stage-2
+resolvers initialise from the 40-epoch E-002 flat ICD-10 model weights.
 
 **3. Calibration System** — `scripts/calibrate.py` applies temperature
 scaling (Guo et al. 2017) to every model, optimising a scalar T via LBFGS
@@ -181,9 +185,9 @@ uv run jupyter notebook
 |---|---|---|
 | `01-EDA_SOAP.ipynb` | Gold layer generation | ~15 min |
 | `02-Model_ClinicalBERT_Baseline_ICD3.ipynb` | E-001 ICD-3 baseline | ~2.5 hrs |
-| `03-Model_ClinicalBERT_Surgical_ICD10.ipynb` | E-002 flat ICD-10 | ~4 hrs |
+| `03-Model_ClinicalBERT_Surgical_ICD10.ipynb` | E-002 flat ICD-10 (40 epochs) | ~4 hrs |
 | `04-Model_Hierarchical_ICD10.ipynb` | E-003 hierarchical cold start | ~2 hrs |
-| `05-Model_Hierarchical_ICD10_E002Init.ipynb` | E-009 best model | ~2 hrs |
+| `05-Model_Hierarchical_ICD10_E002Init.ipynb` | E-010 best model | ~2 hrs |
 
 Total training time: approximately 11–12 hours on Apple M5 Max.
 
@@ -195,7 +199,7 @@ step-by-step guide including verification commands at each stage.
 from src.inference import HierarchicalPredictor
 
 predictor = HierarchicalPredictor(
-    experiment_name='E-009_Balanced_E002Init',
+    experiment_name='E-010_40ep_E002Init',
     stage1_experiment='E-003_Stage1_Router',
 )
 
@@ -249,7 +253,7 @@ notes-to-icd10/
 │   ├── graph_reranker.py   # ICD-10 knowledge graph reranker
 │   ├── inference.py        # End-to-end pipeline inference
 │   ├── paths.py            # Canonical path resolution
-│   ├── plot_utils.py       # Figure persistence (R-003)
+│   ├── plot_utils.py       # Figure persistence
 │   └── evaluation.py       # Metrics: Macro F1, Accuracy, Top-5
 ├── Run notes.md            # Step-by-step script pipeline guide
 ├── REFACTORING_PLAN.md     # Development roadmap and status
@@ -280,10 +284,11 @@ a 22-way chapter routing problem followed by within-chapter resolution,
 reducing the effective label space per resolver from 1,926 to ~100.
 
 ### Transfer Learning Chain
-Each stage initialises from the best available prior model — creating a
-progressive transfer learning chain: base Bio_ClinicalBERT → E-002 flat
-ICD-10 → E-009 per-chapter resolvers. This accumulates ICD-10 knowledge
-across experiments rather than relearning from scratch at each stage.
+Each stage initialises from the best available prior model:
+`Bio_ClinicalBERT → E-002 (40-epoch flat ICD-10) → E-010 Stage-2 resolvers`.
+This accumulates ICD-10 knowledge across experiments. The epoch count of
+E-002 is critical — 40 epochs produces substantially richer representations
+than 20 epochs (+4.1pp E2E accuracy on Stage-2 resolvers).
 
 ---
 
@@ -296,7 +301,7 @@ across experiments rather than relearning from scratch at each stage.
   an extremely challenging regime. Results reflect the limits of this
   constraint rather than the architecture ceiling.
 - **Z-chapter difficulty:** Administrative codes (Z-chapter, 263 classes)
-  achieve only 52.9% E2E accuracy due to highly similar clinical language
+  achieve 62.1% E2E accuracy due to highly similar clinical language
   across codes. This is the primary remaining improvement target.
 - **Apple Silicon tested:** Training was conducted on Apple M5 Max with
   MPS. CUDA compatibility is expected but untested.

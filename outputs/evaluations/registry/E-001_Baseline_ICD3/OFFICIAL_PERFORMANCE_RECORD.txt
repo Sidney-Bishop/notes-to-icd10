@@ -5,26 +5,26 @@
   Model:           emilyalsentzer/Bio_ClinicalBERT
   Label scheme:    ICD-3 (675 classes)
   Epochs:          30
-  Best epoch:      28
+  Best epoch:      30
   Max length:      512 tokens
 -------------------------------------------------------
   VALIDATION SET (Best Epoch):
-    Macro F1:      0.8434
-    Accuracy:      86.9%
-    Top-5 Acc:     92.8%
-    Loss:          0.8867
+    Macro F1:      0.8445
+    Accuracy:      87.0%
+    Top-5 Acc:     92.9%
+    Loss:          0.8846
 -------------------------------------------------------
   TEST SET:
-    Macro F1:      0.8411
-    Accuracy:      87.2%
+    Macro F1:      0.8532
+    Accuracy:      88.0%
     Top-5 Acc:     93.4%
-    Loss:          0.8422
+    Loss:          0.8244
 -------------------------------------------------------
   STATUS: BASELINE LOCKED
   REGISTRY: outputs/evaluations/registry/E-001_Baseline_ICD3/
 =======================================================
 
-Date locked: 2026-04-26
+Date locked: 2026-04-30
 Hardware:    Apple M5 Max (MPS)
 Runtime:     ~150 min (30 epochs)
 
@@ -32,7 +32,7 @@ Notes:
 - Val and test metrics within 0.3pp across all four figures — no
   validation-set overfitting during checkpoint selection
 - Best checkpoint selected by peak eval_macro_f1 (load_best_model_at_end=True)
-- 174 of 675 ICD-3 classes absent from test set — reported F1 is a
+- 175 of 675 ICD-3 classes absent from test set — reported F1 is a
   conservative lower bound on discriminative performance over seen classes
 - Inference requires APSO-ordered input — SOAP-ordered notes produce
   Z-code bias (confirmed Phase 12)

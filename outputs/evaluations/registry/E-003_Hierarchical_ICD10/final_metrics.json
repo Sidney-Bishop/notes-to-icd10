@@ -1,42 +1,42 @@
 {
     "experiment_id": "E-003",
     "experiment_name": "E-003_Hierarchical_ICD10",
-    "timestamp": "2026-04-10T09:51:44.651915",
+    "timestamp": "2026-05-01T14:21:13.211416",
     "stage1": {
         "init_model": "E-001_Baseline_ICD3",
         "num_classes": 22,
-        "num_epochs": 10,
-        "val_accuracy": 0.9555,
-        "val_macro_f1": 0.9677,
-        "val_top5": 0.9855,
-        "test_accuracy": 0.9534,
-        "test_macro_f1": 0.9589,
-        "test_top5": 0.9834
+        "num_epochs": 5,
+        "val_accuracy": 0.9658385093167702,
+        "val_macro_f1": 0.9724348634811587,
+        "val_top5": 0.9917184114456177,
+        "test_accuracy": 0.9637681159420289,
+        "test_macro_f1": 0.9705766581518437,
+        "test_top5": 0.9906832575798035
     },
     "stage2": {
         "num_resolvers": 19,
         "skip_chapters": [
-            "P",
+            "Q",
             "U",
-            "Q"
+            "P"
         ],
-        "weighted_val_f1": 0.092,
-        "weighted_val_acc": 0.136,
+        "weighted_val_f1": 0.09661639339939736,
+        "weighted_val_acc": 0.13780694322102138,
         "init_model": "fresh Bio_ClinicalBERT"
     },
     "end_to_end": {
-        "test_accuracy": 0.1055,
-        "test_macro_f1": 0.0702,
-        "stage1_routing": 0.9534,
-        "within_chapter": 0.1107
+        "test_accuracy": 0.11283643892339544,
+        "test_macro_f1": 0.07517517517517518,
+        "stage1_routing": 0.9637681159420289,
+        "within_chapter": 0.11707841031149302
     },
     "baseline_e002": {
-        "test_accuracy": 0.469,
-        "test_macro_f1": 0.352
+        "test_accuracy": 0.7329,
+        "test_macro_f1": 0.6344
     },
     "delta_vs_e002": {
-        "accuracy": -0.3635,
-        "macro_f1": -0.2818
+        "accuracy": -0.6200635610766045,
+        "macro_f1": -0.5592248248248248
     },
-    "key_finding": "Stage-1 chapter router (95.3% accuracy) substantially exceeded E-002 flat chapter accuracy (82.9%). Stage-2 underperformed due to training data fragmentation and fresh initialisation. Fix: initialise Stage-2 from E-002 registry model in E-004a."
+    "key_finding": "Stage-1 chapter router (96.4% test accuracy) exceeded E-002 flat chapter accuracy (91.2%). Stage-2 underperformed due to fresh initialisation \u2014 within-chapter accuracy 11.7% vs 80.4% target. Fix: initialise Stage-2 from E-002 registry model in E-004a."
 }

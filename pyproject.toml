@@ -52,6 +52,7 @@ dependencies = [
     "en-ner-bc5cdr-md",
     "hdbscan>=0.8.42",
     "umap-learn>=0.5.12",
+    "tabulate>=0.10.0",
 ]
 
 [dependency-groups]

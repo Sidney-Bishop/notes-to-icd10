@@ -115,5 +115,122 @@
     "experiment": "E-003_Hierarchical_ICD10",
     "dpi": 200,
     "fmt": "png"
+  },
+  {
+    "saved": "2026-04-30T19:18:49.874707",
+    "path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/visualizations/02-Model_ClinicalBERT_Baseline_ICD3/training_dashboard_20260430_191849.png",
+    "notebook": "02-Model_ClinicalBERT_Baseline_ICD3",
+    "description": "training_dashboard",
+    "experiment": "E-001_Baseline_ICD3",
+    "dpi": 200,
+    "fmt": "png"
+  },
+  {
+    "saved": "2026-04-30T19:20:34.385228",
+    "path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/visualizations/02-Model_ClinicalBERT_Baseline_ICD3/confusion_matrix_top10_20260430_192034.png",
+    "notebook": "02-Model_ClinicalBERT_Baseline_ICD3",
+    "description": "confusion_matrix_top10",
+    "experiment": "E-001_Baseline_ICD3",
+    "dpi": 150,
+    "fmt": "png"
+  },
+  {
+    "saved": "2026-05-01T09:26:32.189965",
+    "path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/visualizations/03-Model_ClinicalBERT_Surgical_ICD10/training_dashboard_20260501_092631.png",
+    "notebook": "03-Model_ClinicalBERT_Surgical_ICD10",
+    "description": "training_dashboard",
+    "experiment": "E-002_FullICD10_ClinicalBERT",
+    "dpi": 200,
+    "fmt": "png"
+  },
+  {
+    "saved": "2026-05-01T09:27:42.996661",
+    "path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/visualizations/03-Model_ClinicalBERT_Surgical_ICD10/confusion_matrix_top10_20260501_092742.png",
+    "notebook": "03-Model_ClinicalBERT_Surgical_ICD10",
+    "description": "confusion_matrix_top10",
+    "experiment": "E-002_FullICD10_ClinicalBERT",
+    "dpi": 150,
+    "fmt": "png"
+  },
+  {
+    "saved": "2026-05-01T09:28:51.452106",
+    "path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/visualizations/03-Model_ClinicalBERT_Surgical_ICD10/chapter_confusion_matrix_20260501_092851.png",
+    "notebook": "03-Model_ClinicalBERT_Surgical_ICD10",
+    "description": "chapter_confusion_matrix",
+    "experiment": "E-002_FullICD10_ClinicalBERT",
+    "dpi": 150,
+    "fmt": "png"
+  },
+  {
+    "saved": "2026-05-01T12:02:29.358294",
+    "path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/visualizations/04-Model_Hierarchical_ICD10/stage1_router_dashboard_20260501_120229.png",
+    "notebook": "04-Model_Hierarchical_ICD10",
+    "description": "stage1_router_dashboard",
+    "experiment": "E-003_Hierarchical_ICD10",
+    "dpi": 200,
+    "fmt": "png"
+  },
+  {
+    "saved": "2026-05-01T12:06:02.894813",
+    "path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/visualizations/04-Model_Hierarchical_ICD10/stage1_router_dashboard_20260501_120602.png",
+    "notebook": "04-Model_Hierarchical_ICD10",
+    "description": "stage1_router_dashboard",
+    "experiment": "E-003_Hierarchical_ICD10",
+    "dpi": 200,
+    "fmt": "png"
+  },
+  {
+    "saved": "2026-05-03T19:09:57.931812",
+    "path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/visualizations/02-Model_ClinicalBERT_Baseline_ICD3/training_dashboard_20260503_190957.png",
+    "notebook": "02-Model_ClinicalBERT_Baseline_ICD3",
+    "description": "training_dashboard",
+    "experiment": "E-001_Baseline_ICD3",
+    "dpi": 200,
+    "fmt": "png"
+  },
+  {
+    "saved": "2026-05-03T19:15:59.039286",
+    "path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/visualizations/02-Model_ClinicalBERT_Baseline_ICD3/training_dashboard_20260503_191558.png",
+    "notebook": "02-Model_ClinicalBERT_Baseline_ICD3",
+    "description": "training_dashboard",
+    "experiment": "E-001_Baseline_ICD3",
+    "dpi": 200,
+    "fmt": "png"
+  },
+  {
+    "saved": "2026-05-03T19:21:40.006875",
+    "path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/visualizations/02-Model_ClinicalBERT_Baseline_ICD3/training_dashboard_20260503_192139.png",
+    "notebook": "02-Model_ClinicalBERT_Baseline_ICD3",
+    "description": "training_dashboard",
+    "experiment": "E-001_Baseline_ICD3",
+    "dpi": 200,
+    "fmt": "png"
+  },
+  {
+    "saved": "2026-05-03T19:23:14.514077",
+    "path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/visualizations/02-Model_ClinicalBERT_Baseline_ICD3/training_dashboard_20260503_192314.png",
+    "notebook": "02-Model_ClinicalBERT_Baseline_ICD3",
+    "description": "training_dashboard",
+    "experiment": "E-001_Baseline_ICD3",
+    "dpi": 200,
+    "fmt": "png"
+  },
+  {
+    "saved": "2026-05-03T19:24:57.097336",
+    "path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/visualizations/02-Model_ClinicalBERT_Baseline_ICD3/training_dashboard_20260503_192456.png",
+    "notebook": "02-Model_ClinicalBERT_Baseline_ICD3",
+    "description": "training_dashboard",
+    "experiment": "E-001_Baseline_ICD3",
+    "dpi": 200,
+    "fmt": "png"
+  },
+  {
+    "saved": "2026-05-03T19:26:45.163726",
+    "path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/visualizations/02-Model_ClinicalBERT_Baseline_ICD3/training_dashboard_20260503_192644.png",
+    "notebook": "02-Model_ClinicalBERT_Baseline_ICD3",
+    "description": "training_dashboard",
+    "experiment": "E-001_Baseline_ICD3",
+    "dpi": 200,
+    "fmt": "png"
   }
 ]
