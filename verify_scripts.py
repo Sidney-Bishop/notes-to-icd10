@@ -71,9 +71,11 @@ z_override_active = (
 check("Z override removed", not z_override_active,
       "Z override still active — will corrupt all predictions")
 
-multi_conv = "_find_ch_model_dir" in inference_text
+# Multi-convention loading is now delegated to ExperimentPaths in src/paths.py.
+# Verify inference.py imports and uses it rather than duplicating the logic.
+multi_conv = "ExperimentPaths" in inference_text and "stage2_model_dir" in inference_text
 check("Multi-convention stage2 loader present", multi_conv,
-      "_find_ch_model_dir missing")
+      "ExperimentPaths not used for stage2 path resolution in inference.py")
 
 # ── 4. Check train.py — logger must be present ──────────────
 print("\n[4] Checking train.py...")
