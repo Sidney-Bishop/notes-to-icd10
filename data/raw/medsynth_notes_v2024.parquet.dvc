@@ -1,0 +1,13 @@
+md5: 143316d061ac8ba8e54fcb21f578cb90
+frozen: true
+deps:
+- checksum: '"a2c7f83f2246d92fab2b9766e715d1c28b7a57ff64a706920a74188052d9d2eb"'
+  size: 36219359
+  hash: md5
+  path: 
+    https://huggingface.co/datasets/SidneyBishop/medsynth-icd10/resolve/main/raw/medsynth_notes_v2024.parquet
+outs:
+- md5: 1a88476074220bdce2877cf0bf3c30f8
+  size: 36219359
+  hash: md5
+  path: medsynth_notes_v2024.parquet
