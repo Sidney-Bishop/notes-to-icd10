@@ -1,1 +1,4 @@
-
+[core]
+    remote = hf
+['remote "hf"']
+    url = https://huggingface.co/datasets/SidneyBishop/medsynth-dvc-store
