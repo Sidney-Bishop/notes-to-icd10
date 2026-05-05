@@ -1,0 +1,5 @@
+outs:
+- md5: d38200977ff030238fb10f8049ef430e
+  size: 1292
+  hash: md5
+  path: MANIFEST_medsynth_gold_apso_20260505_194721.json

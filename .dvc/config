@@ -1,4 +1,4 @@
 [core]
-    remote = hf
-['remote "hf"']
-    url = https://huggingface.co/datasets/SidneyBishop/medsynth-dvc-store
+    remote = localstore
+['remote "localstore"']
+    url = /Users/jroche/dvcstore-icd10
