@@ -3,16 +3,17 @@ project:
   name: "icd10-prediction"
   version: "1.1.0"
   description: "Surgical ICD-10 prediction from clinical text (Surgical Era)"
-  repository: "https://github.com/your-org/icd10-prediction"
+  repository: "https://github.com/Sidney-Bishop/notes-to-icd10"
 
 paths:
   # Data paths (Medallion Architecture)
   data:
-    raw: "data/raw/"           # Immutable original MedSynth records
-    silver: "data/silver/"     # Polars-cleaned, Pydantic-validated Parquet files [cite: 2026-01-29]
-    gold: "data/gold/"         # Final SOAP-extracted partitions for E-002 [cite: 2026-01-27]
-    cache: ".hf_cache/"        # Hugging Face cache
-    db: "db/"                  # DuckDB persistent metadata (audit_trail.ddb) [cite: 2026-02-10]
+    raw: "data/raw/"              # Legacy staging (deprecated - use medsynth)
+    medsynth: "data/medsynth/"    # Canonical DVC-tracked MedSynth source (icd10_notes.parquet)
+    silver: "data/silver/"        # Polars-cleaned, Pydantic-validated Parquet files
+    gold: "data/gold/"            # Final SOAP-extracted partitions for E-002
+    cache: ".hf_cache/"           # Hugging Face cache
+    db: "db/"                     # DuckDB persistent metadata (audit_trail.ddb)
   
   # Model artifacts
   models:
@@ -48,6 +49,7 @@ paths:
 datasets:
   medsynth:
     name: "Ahmad0067/MedSynth"
+    canonical_path: "data/medsynth/icd10_notes.parquet"
     id_field: "ID"
     text_fields: ["Note", "Dialogue"]
     label_field: "ICD10"
@@ -73,6 +75,6 @@ artifacts:
 
 metadata:
   created: "2026-01-23"
-  last_updated: "2026-02-20"
+  last_updated: "2026-05-05"
   author: "Sidney Bishop"
-  status: "Surgical Pivot (DuckDB + Polars)"
+  status: "Surgical Pivot (DuckDB + Polars) - Single DVC source"

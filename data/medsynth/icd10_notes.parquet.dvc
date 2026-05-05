@@ -2,4 +2,4 @@ outs:
 - md5: 806e07c208899ee2da025401c12d1d50
   size: 19751871
   hash: md5
-  path: medsynth_notes_v2024.parquet
+  path: icd10_notes.parquet
