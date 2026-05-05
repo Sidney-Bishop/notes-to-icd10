@@ -7,7 +7,7 @@ deps:
   path: 
     https://huggingface.co/datasets/SidneyBishop/medsynth-icd10/resolve/main/raw/medsynth_notes_v2024.parquet
 outs:
-- md5: 1a88476074220bdce2877cf0bf3c30f8
-  size: 36219359
+- md5: 806e07c208899ee2da025401c12d1d50
+  size: 19751871
   hash: md5
   path: medsynth_notes_v2024.parquet
