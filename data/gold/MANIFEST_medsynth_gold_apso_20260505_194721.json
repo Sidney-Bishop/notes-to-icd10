@@ -1,0 +1,45 @@
+{
+  "generated_at": "2026-05-05T18:47:21.456434+00:00",
+  "git_commit": "89d7b4ead79e9a798c825435cd450ef12509a273",
+  "hf_repo": "SidneyBishop/notes-to-icd10",
+  "files": {
+    "gold_parquet": {
+      "path": "data/gold/medsynth_gold_apso_20260505_194721.parquet",
+      "sha256": "220dafcfe6a8aa53c0a728dbf3537ed1407897f2c92050831c7ebb31c7218bc7",
+      "rows": 10240,
+      "size_bytes": 63508928
+    },
+    "medsynth": {
+      "path": "data/medsynth/icd10_notes.parquet",
+      "sha256": "7fa03f67b113b57a5f17349c712946553b4b186e1a11f39d74e0821d02fc5ac8",
+      "rows": 10240,
+      "size_bytes": 19751871
+    },
+    "cdc_fy2026": {
+      "path": "data/gold/cdc_fy2026_icd10.parquet",
+      "sha256": "2433adf954c3f49296a40761b83afb98c2d61cd78ca43f335fbdd4167e5fb93d",
+      "rows": 74719,
+      "size_bytes": 1403800
+    }
+  },
+  "validation_split": {
+    "billable": 9660,
+    "invalid": 495,
+    "noisy_111": 60,
+    "placeholder_x": 25
+  },
+  "schema": {
+    "id": "String",
+    "note": "String",
+    "dialogue": "String",
+    "label": "List(String)",
+    "subjective": "String",
+    "objective": "String",
+    "assessment": "String",
+    "plan": "String",
+    "standard_icd10": "String",
+    "code_status": "String",
+    "apso_note": "String",
+    "apso_token_estimate": "Int64"
+  }
+}
