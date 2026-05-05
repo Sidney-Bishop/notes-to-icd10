@@ -43,6 +43,11 @@ ICD10_REDACT_PATTERN = (
     r'\b[A-Z][0-9]{2}[0-9A-Z]{0,5}\b'     # raw: M25562, N390, J18
 )
 
+# NEW: remove the entire parenthetical wrapper "(ICD-10: CODE)" to avoid
+# leaving "(ICD-10: [REDACTED])" artifacts that signal label presence.
+# Handles "ICD-10", "ICD10", case-insensitive, with optional spaces.
+PARENTHETICAL_ICD10_PATTERN = r'(?i)\s*\(\s*ICD-?10\s*:\s*(?:[A-Z][0-9]{2}\.[0-9A-Z]{1,4}|[A-Z][0-9]{2}[0-9A-Z]{0,5})\s*\)'
+
 REDACTION_MARKER = "[REDACTED]"
 
 # Section headers used for inference-time regex extraction
@@ -52,7 +57,6 @@ _SOAP_PATTERNS = {
     'assessment': r'(?i)assessment:?\s*(.*?)(?=\d\.\s*plan|plan:|$)',
     'plan':       r'(?i)plan:?\s*(.*)',
 }
-
 
 # ---------------------------------------------------------------------------
 # DataFrame-level helpers (Polars)
@@ -72,12 +76,12 @@ def build_apso_note(df: pl.DataFrame) -> pl.DataFrame:
     This is a direct port of Phase 3a in notebook 01-EDA_SOAP.ipynb.
 
     Parameters
-    ----------
+
     df : pl.DataFrame
         Gold layer DataFrame with pre-extracted SOAP section columns.
 
     Returns
-    -------
+
     pl.DataFrame
         Input DataFrame with ``apso_note`` column added.
     """
@@ -98,28 +102,27 @@ def build_apso_note(df: pl.DataFrame) -> pl.DataFrame:
         ).str.strip_chars().alias("apso_note")
     ])
 
-
 def redact_icd10_sections(df: pl.DataFrame) -> pl.DataFrame:
     """
     Redact ICD-10 code strings from all SOAP section columns and rebuild apso_note.
 
-    Replaces explicit ICD-10 strings with ``[REDACTED]`` in the four SOAP
-    section columns (``assessment``, ``plan``, ``objective``, ``subjective``),
-    then rebuilds ``apso_note`` from the cleaned sections so it is the single
-    source of truth for downstream model input.
+    Removes the full parenthetical "(ICD-10: CODE)" wrapper entirely, then
+    replaces any remaining standalone ICD-10 strings with ``[REDACTED]`` in the
+    four SOAP section columns (``assessment``, ``plan``, ``objective``,
+    ``subjective``), then rebuilds ``apso_note`` from the cleaned sections.
 
     The original ``note`` column is NOT modified — it is preserved for
-    audit traceability and tasks where the original text is needed.
+    audit traceability.
 
     This is a direct port of Phase 3c in notebook 01-EDA_SOAP.ipynb.
 
     Parameters
-    ----------
+
     df : pl.DataFrame
         Gold layer DataFrame with ``apso_note`` and SOAP section columns present.
 
     Returns
-    -------
+
     pl.DataFrame
         DataFrame with redacted section columns and rebuilt ``apso_note``.
     """
@@ -134,8 +137,10 @@ def redact_icd10_sections(df: pl.DataFrame) -> pl.DataFrame:
     sections = ['assessment', 'plan', 'objective', 'subjective']
 
     # Step 1: Redact each section into a temporary _clean column
+    # First strip the "(ICD-10: CODE)" parenthetical, then redact stray codes
     df = df.with_columns([
         pl.col(section)
+        .str.replace_all(PARENTHETICAL_ICD10_PATTERN, '')
         .str.replace_all(ICD10_REDACT_PATTERN, REDACTION_MARKER)
         .alias(f"{section}_clean")
         for section in sections
@@ -159,7 +164,6 @@ def redact_icd10_sections(df: pl.DataFrame) -> pl.DataFrame:
 
     return df
 
-
 # ---------------------------------------------------------------------------
 # Single-string interface (inference)
 # ---------------------------------------------------------------------------
@@ -178,18 +182,18 @@ def prepare_inference_input(note: str) -> str:
     section columns are not available.
 
     Parameters
-    ----------
+
     note : str
         Raw clinical note in SOAP format.
 
     Returns
-    -------
+
     str
         APSO-reordered, ICD-10-redacted note ready for tokenisation.
         Sections missing from the input are silently omitted.
 
     Notes
-    -----
+
     The regex extraction is less reliable than the Pydantic-based extraction
     used in the training pipeline (100% success on MedSynth). For production
     use with notes that may have non-standard section headers, consider routing
@@ -224,7 +228,10 @@ def prepare_inference_input(note: str) -> str:
         )
         apso_note = note.strip()
 
-    # Redact ICD-10 code strings — same pattern as Phase 3c
+    # Redact ICD-10 code strings — same logic as Phase 3c
+    # Step 1: strip "(ICD-10: CODE)" parentheticals
+    apso_note = re.sub(PARENTHETICAL_ICD10_PATTERN, '', apso_note)
+    # Step 2: redact any remaining standalone codes
     apso_note = re.sub(ICD10_REDACT_PATTERN, REDACTION_MARKER, apso_note)
 
     return apso_note

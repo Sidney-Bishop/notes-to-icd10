@@ -88,27 +88,68 @@ from src.preprocessing import build_apso_note, redact_icd10_sections, ICD10_REDA
 # PHASE 1a: Raw MedSynth ingestion
 # ==============================================================================
 
+# def phase_1a_ingest() -> pl.DataFrame:
+#     """
+#     Load raw MedSynth from HuggingFace and apply structural validation.
+
+#     Mirrors the ingestion logic in notebook 01 Phase 1a:
+#       - Fetches the train split of Ahmad0067/MedSynth
+#       - Strips whitespace from column names (present in the HuggingFace release)
+#       - Validates: no null IDs, no null Notes, ICD10 column present
+#       - Sentinel-imputes the 2 null Dialogue records identified in Phase 1a
+
+#     Returns the raw DataFrame with columns: ID, Note, Dialogue, ICD10.
+#     The ICD10 column is kept as-is (list of raw strings without decimals).
+#     """
+#     print("\n── Phase 1a: Ingestion ──────────────────────────────────────────────")
+
+#     try:
+#         from datasets import load_dataset
+#     except ImportError as e:
+#         raise ImportError(
+#             "The 'datasets' package is required. Install with: pip install datasets"
+#         ) from e
+
+#     print("📥 Loading MedSynth from HuggingFace (Ahmad0067/MedSynth)...")
+#     ds = load_dataset("Ahmad0067/MedSynth", split="train")
+#     df = pl.from_arrow(ds.data.table)
+#     df = df.rename({c: c.strip() for c in df.columns})
+
+#     print(f"   ✅ Loaded {len(df):,} records, columns: {df.columns}")
+
+#     # Structural integrity assertions (mirrors Phase 1a checks)
+#     assert "ID"       in df.columns, "❌ ID column missing"
+#     assert "Note"     in df.columns, "❌ Note column missing"
+#     assert "Dialogue" in df.columns, "❌ Dialogue column missing"
+#     assert "ICD10"    in df.columns, "❌ ICD10 column missing"
+
+#     null_ids   = df.filter(pl.col("ID").is_null()).height
+#     null_notes = df.filter(pl.col("Note").is_null()).height
+#     if null_ids > 0:
+#         raise ValueError(f"❌ {null_ids} null IDs found — cannot proceed without unique record identifiers.")
+#     if null_notes > 0:
+#         raise ValueError(f"❌ {null_notes} null Notes found — cannot proceed with empty clinical notes.")
+
+#     null_dialogues = df.filter(pl.col("Dialogue").is_null()).height
+#     if null_dialogues > 0:
+#         print(f"   ⚠️  {null_dialogues} null Dialogue(s) — applying sentinel imputation")
+#         df = df.with_columns([
+#             pl.col("Dialogue").fill_null("[NO_TRANSCRIPT_AVAILABLE]")
+#         ])
+
+#     # Cast ID to String for downstream consistency
+#     df = df.with_columns([pl.col("ID").cast(pl.String)])
+
+#     print(f"   ✅ Structural integrity confirmed: {len(df):,} records")
+#     return df
+
+
 def phase_1a_ingest() -> pl.DataFrame:
-    """
-    Load raw MedSynth from HuggingFace and apply structural validation.
-
-    Mirrors the ingestion logic in notebook 01 Phase 1a:
-      - Fetches the train split of Ahmad0067/MedSynth
-      - Strips whitespace from column names (present in the HuggingFace release)
-      - Validates: no null IDs, no null Notes, ICD10 column present
-      - Sentinel-imputes the 2 null Dialogue records identified in Phase 1a
-
-    Returns the raw DataFrame with columns: ID, Note, Dialogue, ICD10.
-    The ICD10 column is kept as-is (list of raw strings without decimals).
-    """
     print("\n── Phase 1a: Ingestion ──────────────────────────────────────────────")
-
     try:
         from datasets import load_dataset
     except ImportError as e:
-        raise ImportError(
-            "The 'datasets' package is required. Install with: pip install datasets"
-        ) from e
+        raise ImportError("The 'datasets' package is required. Install with: pip install datasets") from e
 
     print("📥 Loading MedSynth from HuggingFace (Ahmad0067/MedSynth)...")
     ds = load_dataset("Ahmad0067/MedSynth", split="train")
@@ -117,29 +158,36 @@ def phase_1a_ingest() -> pl.DataFrame:
 
     print(f"   ✅ Loaded {len(df):,} records, columns: {df.columns}")
 
-    # Structural integrity assertions (mirrors Phase 1a checks)
-    assert "ID"       in df.columns, "❌ ID column missing"
-    assert "Note"     in df.columns, "❌ Note column missing"
+    # --- Robustness fix 2026-05-04 ---
+    # Old HF release: ID, Note, Dialogue, ICD10
+    # New HF release: Note, Dialogue, ICD10, ICD10_desc (no ID)
+    if "ID" not in df.columns:
+        print("   ⚠️  ID column missing — generating sequential IDs")
+        df = df.with_columns(pl.int_range(0, len(df)).cast(pl.String).alias("ID"))
+    
+    # Drop extra column if present (doesn't hurt pipeline)
+    if "ICD10_desc" in df.columns:
+        df = df.drop("ICD10_desc")
+    
+    # Now validate required columns
+    assert "ID" in df.columns, "❌ ID column missing"
+    assert "Note" in df.columns, "❌ Note column missing"
     assert "Dialogue" in df.columns, "❌ Dialogue column missing"
-    assert "ICD10"    in df.columns, "❌ ICD10 column missing"
+    assert "ICD10" in df.columns, "❌ ICD10 column missing"
 
-    null_ids   = df.filter(pl.col("ID").is_null()).height
+    null_ids = df.filter(pl.col("ID").is_null()).height
     null_notes = df.filter(pl.col("Note").is_null()).height
     if null_ids > 0:
-        raise ValueError(f"❌ {null_ids} null IDs found — cannot proceed without unique record identifiers.")
+        raise ValueError(f"❌ {null_ids} null IDs found")
     if null_notes > 0:
-        raise ValueError(f"❌ {null_notes} null Notes found — cannot proceed with empty clinical notes.")
+        raise ValueError(f"❌ {null_notes} null Notes found")
 
     null_dialogues = df.filter(pl.col("Dialogue").is_null()).height
     if null_dialogues > 0:
         print(f"   ⚠️  {null_dialogues} null Dialogue(s) — applying sentinel imputation")
-        df = df.with_columns([
-            pl.col("Dialogue").fill_null("[NO_TRANSCRIPT_AVAILABLE]")
-        ])
+        df = df.with_columns([pl.col("Dialogue").fill_null("[NO_TRANSCRIPT_AVAILABLE]")])
 
-    # Cast ID to String for downstream consistency
     df = df.with_columns([pl.col("ID").cast(pl.String)])
-
     print(f"   ✅ Structural integrity confirmed: {len(df):,} records")
     return df
 

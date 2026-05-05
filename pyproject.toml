@@ -53,12 +53,15 @@ dependencies = [
     "hdbscan>=0.8.42",
     "umap-learn>=0.5.12",
     "tabulate>=0.10.0",
+    "pyopenssl>=26.1.0",
+    "huggingface-hub>=1.7.1",
 ]
 
 [dependency-groups]
 dev = [
     "pytest>=8.0.0",
     "black>=24.0.0",
+    "dvc[gdrive]>=3.67.1",
 ]
 
 [tool.uv.sources]

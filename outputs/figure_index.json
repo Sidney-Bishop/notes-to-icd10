@@ -286,5 +286,23 @@
     "experiment": "",
     "dpi": 150,
     "fmt": "png"
+  },
+  {
+    "saved": "2026-05-04T20:15:05.496688",
+    "path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/visualizations/01-EDA_SOAP/icd10_frequency_histogram_20260504_201505.png",
+    "notebook": "01-EDA_SOAP",
+    "description": "icd10_frequency_histogram",
+    "experiment": "",
+    "dpi": 150,
+    "fmt": "png"
+  },
+  {
+    "saved": "2026-05-04T20:15:46.425868",
+    "path": "/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/visualizations/01-EDA_SOAP/token_pressure_kde_20260504_201546.png",
+    "notebook": "01-EDA_SOAP",
+    "description": "token_pressure_kde",
+    "experiment": "",
+    "dpi": 150,
+    "fmt": "png"
   }
 ]
