@@ -3,8 +3,13 @@ verify_scripts.py — Pre-flight script verification
 
 Run this before every training session to confirm:
 1. Python cache is clear
-2. All scripts contain the correct code
-3. No stale versions are in use
+2. All required scripts and source files exist
+3. inference.py uses ExperimentPaths (no duplicated path logic)
+3b. prepare_data.py uses HF Hub (no CDC FTP), enforces SHA256
+3c. generate_manifest.py captures git commit, SHA256, schema
+3d. DVC pointer files and gold MANIFEST are present
+4. train.py, calibrate.py, evaluate.py have ExperimentLogger wired up
+5-8. Various correctness checks carried forward from prior refactors
 
 Usage:
     python3 verify_scripts.py
@@ -53,10 +58,14 @@ required_files = [
     SRC / "experiment_logger.py",
     SRC / "paths.py",
     SRC / "inference.py",
+    SRC / "gatekeeper.py",
+    SRC / "preprocessing.py",
     SCRIPTS / "train.py",
     SCRIPTS / "calibrate.py",
     SCRIPTS / "evaluate.py",
     SCRIPTS / "prepare_splits.py",
+    SCRIPTS / "prepare_data.py",
+    SCRIPTS / "generate_manifest.py",
 ]
 for f in required_files:
     check(f.name, f.exists(), f"missing at {f}")
@@ -77,7 +86,56 @@ multi_conv = "ExperimentPaths" in inference_text and "stage2_model_dir" in infer
 check("Multi-convention stage2 loader present", multi_conv,
       "ExperimentPaths not used for stage2 path resolution in inference.py")
 
-# ── 4. Check train.py — logger must be present ──────────────
+# ── 3b. Check prepare_data.py — HF Hub architecture ────────
+print("\n[3b] Checking prepare_data.py...")
+prepare_text = (SCRIPTS / "prepare_data.py").read_text()
+check("HF Hub used instead of CDC FTP",
+      "hf_hub_download" in prepare_text and "ftp.cdc.gov" not in prepare_text,
+      "Still using CDC FTP — should use hf_hub_download")
+check("SHA256 constants defined",
+      "EXPECTED_SHA256" in prepare_text,
+      "EXPECTED_SHA256 dict missing — downloads not verified")
+check("SHA256 verification called",
+      "_verify_sha256" in prepare_text,
+      "_verify_sha256() not called — hash enforcement missing")
+check("Offline flag present",
+      "--offline" in prepare_text,
+      "No --offline flag — pipeline will hang in offline environments")
+
+# ── 3c. Check generate_manifest.py — provenance capture ─────
+print("\n[3c] Checking generate_manifest.py...")
+manifest_text = (SCRIPTS / "generate_manifest.py").read_text()
+check("Manifest captures git commit",
+      "git_commit" in manifest_text,
+      "git_commit not recorded in manifest")
+check("Manifest captures SHA256",
+      "sha256" in manifest_text,
+      "SHA256 not recorded in manifest")
+check("Manifest captures schema",
+      "schema" in manifest_text,
+      "Polars schema not recorded in manifest")
+
+# ── 3d. Check DVC pointer files exist ───────────────────────
+print("\n[3d] Checking DVC pointer files...")
+dvc_files = [
+    ROOT / "data" / "medsynth" / "icd10_notes.parquet.dvc",
+    ROOT / "data" / "gold" / "cdc_fy2026_icd10.parquet.dvc",
+]
+for dvc_file in dvc_files:
+    check(f"{dvc_file.name} present", dvc_file.exists(),
+          f"DVC pointer missing at {dvc_file}")
+
+gold_dvc = list((ROOT / "data" / "gold").glob("medsynth_gold_apso_*.parquet.dvc"))
+check("Gold parquet DVC pointer present",
+      len(gold_dvc) > 0,
+      "No medsynth_gold_apso_*.parquet.dvc found in data/gold/")
+
+gold_manifest = list((ROOT / "data" / "gold").glob("MANIFEST_*.json"))
+check("Gold MANIFEST present",
+      len(gold_manifest) > 0,
+      "No MANIFEST_*.json found in data/gold/ — run generate_manifest.py")
+
+# ── 4. Check train.py — logger must be present ──────────────# ── 4. Check train.py — logger must be present ──────────────
 print("\n[4] Checking train.py...")
 train_text = (SCRIPTS / "train.py").read_text()
 check("ExperimentLogger imported in train.py",
