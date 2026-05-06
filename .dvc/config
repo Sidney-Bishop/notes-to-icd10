@@ -1,4 +1,5 @@
 [core]
     remote = localstore
-['remote "localstore"']
-    url = /Users/jroche/dvcstore-icd10
+    autostage = true
+[remote "localstore"]
+    url = CONFIGURE_LOCAL
