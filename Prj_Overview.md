@@ -36,7 +36,7 @@ The notebook implements a **Zero-Trust data quality framework**: every transform
 |-------|------|-------------|-------------------|
 | **Phase 0** | Infrastructure Setup | Establish project root, validate directory structure, initialize audit logging | All required directories writable; config integrity verified |
 | **Phase 1a** | Ingestion & Silver Layer | Load raw MedSynth dataset, validate structural integrity, normalize ICD-10 format | All records present; no missing fields |
-| **Phase 1b** | CDC FY2026 Validation | Validate ICD-10 codes against official government reference; classify by billability | Codes verified against current year standard |
+| **Phase 1b** | CDC FY2026 Validation | Validate ICD-10 codes against official government reference; classify by billability | Codes verified against HF-locked FY2026 standard (74,719 codes) |
 | **Phase 1b.1** | Composition Audit | Analyze label distribution; verify uniform sampling design | 2,037 unique codes confirmed; minimum 5 records per code |
 | **Phase 1c** | Token Pressure Audit | Measure text length vs. model context window constraints | 64.7% of notes exceed 512-token limit |
 | **Phase 1d** | Raw Discovery Auditor | Visual inspection of raw data via browser interface | Human validation of data quality |
@@ -63,7 +63,7 @@ After processing, the pipeline produces a **fully-annotated dataset** with 10,24
 | **Original Text** | Raw clinical note, original SOAP format, full dialogue |
 | **APSO Reordered** | Assessment-first note ordering for optimal model processing |
 | **Canonical ICD-10 Code** | Decimal-restored, CDC FY2026 compliant code format |
-| **Code Status** | Classification: `billable` (94.3%), `noisy_111` (5.4%), or `placeholder_x` (0.24%) |
+| **Code Status** | Classification: `billable` (94.3%), `invalid_or_malformed` (4.8%), `noisy_111` (0.6%), or `placeholder_x` (0.24%) |
 | **Extracted Sections** | Individual Subjective, Objective, Assessment, Plan sections, all redacted |
 | **Token Estimates** | Pre-computed token counts for truncation-aware sampling |
 
@@ -75,8 +75,9 @@ After processing, the pipeline produces a **fully-annotated dataset** with 10,24
 |--------|-------|---------------------|
 | **Total Records** | 10,240 | Full dataset retained - no data removed |
 | **Billable Leaf Codes** | 9,660 (94.3%) | High-quality training labels for production modeling |
-| **Valid Parent Codes** | 555 (5.4%) | Real billing practice, retained for robustness |
-| **Placeholder-X Codes** | 25 (0.24%) | Legitimate codes, retained with status annotation |
+| **Invalid/Malformed Codes** | 495 (4.8%) | Not in FY2026 standard — excluded from training |
+| **Valid Parent Codes (noisy_111)** | 60 (0.6%) | Chapter headers — excluded from training |
+| **Placeholder-X Codes** | 25 (0.24%) | Require 7th character — excluded from training |
 | **Token Truncation Risk** | 64.7% notes exceed 512 tokens | APSO-Flip addresses this before modeling |
 | **ICD-10 Code Leakage** | 28.5% → 0% (redacted) | Model will train on clinical reasoning, not pattern-matching |
 | **SOAP Extraction** | 100% success | Reliable for downstream feature engineering |
@@ -89,8 +90,8 @@ After processing, the pipeline produces a **fully-annotated dataset** with 10,24
 
 2. **Label Selection**: Filter by `code_status` as appropriate:
    - **Strict mode** (billable only): 9,660 records for production-grade training
-   - **Maximum data**: 10,240 records including parent codes
-   - **Exclude placeholder-X**: 10,215 records if CDC description embedding is required
+   - **Research mode** (all valid): 9,660 records — invalid codes (495) should be excluded
+   - **Full audit**: 10,240 records including validation failures for analysis
 
 3. **Model Behavior**: The redaction marker `[REDACTED]` is preserved in the text - models will see this placeholder where codes were removed.
 
@@ -1871,6 +1872,11 @@ Every experiment is logged to two files:
 Both files are tracked in git (force-added with `git add -f`). Model weights
 and large binary artifacts in `outputs/evaluations/` are gitignored.
 
+**As of May 2026, data artifacts follow the same pattern:**
+- `data/gold/MANIFEST_*.json` — tracked in git (force-added)
+- `data/gold/*.parquet` — tracked by DVC (`.dvc` pointers in git)
+- `data/gold/*.parquet.dvc` — DVC metadata files tracked in git
+
 Check the current registry state:
 ```bash
 uv run python -c "from src.experiment_logger import status; status()"
@@ -2037,14 +2043,17 @@ that require `git add -f`:
 ```bash
 git add -f outputs/experiments.json
 git add -f outputs/run.log
+git add -f data/gold/MANIFEST_*.json  # SHA256 manifests for audit trail
 ```
 
 Commit message conventions:
 - `E-NNN: <result> — <description>` for experiment commits
 - `R-NNN: <description>` for refactoring commits
+- `feat: HF-locked canonical + Phase 4 manifest` for data infrastructure (example: commit 6dda8ac)
 - `fix: <description>` for bug fixes
 - `docs: <description>` for documentation updates
 
 ---
 
 *Section added: 2 May 2026*
+*Updated: 6 May 2026 — Added HF Hub + DVC reproducibility layer (R-010)*

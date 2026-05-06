@@ -7,7 +7,8 @@
 [![Python](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Model](https://img.shields.io/badge/model-Bio_ClinicalBERT-green.svg)](https://huggingface.co/emilyalsentzer/Bio_ClinicalBERT)
-[![Dataset](https://img.shields.io/badge/dataset-MedSynth-orange.svg)](https://huggingface.co/datasets/Ahmad0067/MedSynth)
+[![Dataset](https://img.shields.io/badge/dataset-SidneyBishop%2Fnotes--to--icd10-orange.svg)](https://huggingface.co/datasets/SidneyBishop/notes-to-icd10)
+[![DVC](https://img.shields.io/badge/data-DVC-blueviolet.svg)](https://dvc.org)
 
 Two-stage hierarchical ICD-10 coding from clinical notes using Bio_ClinicalBERT —
 **83.9% accuracy across 1,926 ICD-10 codes** from ~4 training examples per code.
@@ -152,6 +153,76 @@ registry at `outputs/experiments.json`.
 
 ---
 
+## 🔒 Reproducibility: DVC + Hugging Face
+
+This project made an explicit architectural decision in Phase 1b (May 2026) to **eliminate external data drift** by locking all canonical datasets to Hugging Face Hub and versioning all derived artifacts with DVC.
+
+### The Problem We Solved
+
+Initial versions pulled ICD-10 codes directly from CDC FTP and CMS sources at runtime. This created three critical risks:
+1. **Non-reproducibility** — CDC updates codes annually (FY2026 → FY2027 changes ~400 codes)
+2. **Build fragility** — FTP outages and rate limits broke `prepare_data.py` unpredictably
+3. **Audit failure** — no cryptographic provenance for regulatory or research review
+
+### Our Solution: Three-Layer Locking
+
+**Layer 1 — Hugging Face Hub (Canonical Sources)**
+- All source data now lives at [`SidneyBishop/notes-to-icd10`](https://huggingface.co/datasets/SidneyBishop/notes-to-icd10)
+- `scripts/prepare_data.py` was refactored to use `hf_hub_download()` instead of FTP:
+  ```python
+  hf_hub_download(repo_id="SidneyBishop/notes-to-icd10", filename="icd10_notes.parquet")
+  hf_hub_download(repo_id="SidneyBishop/notes-to-icd10", filename="cdc_fy2026_icd10.parquet")
+  ```
+- Immutable, versioned, and publicly accessible — anyone cloning the repo gets byte-identical inputs on first run
+
+**Layer 2 — DVC (Derived Artifacts)**
+- Large binary artifacts (gold Parquet ~63MB, model weights ~1.5GB) are tracked by DVC, not git
+- Workflow: `dvc add data/gold/medsynth_gold_apso_*.parquet` → creates lightweight `.dvc` pointer file
+- `dvc push` uploads to remote storage; `dvc pull` restores exact bytes
+- Git tracks only `.dvc` files and manifests, keeping repository <50MB
+
+**Layer 3 — Phase 4 Manifest (Cryptographic Proof)**
+- `scripts/generate_manifest.py` creates `data/gold/MANIFEST_*.json` with:
+  - SHA256 hashes for every input and output file
+  - Exact row counts and CDC validation split
+  - Git commit hash and UTC timestamp
+  - Full Polars schema
+
+Current locked gold (commit 6dda8ac, tag v0.1.0-phase1b-locked):
+- **gold_parquet**: `220dafcfe6a8aa53c0a728dbf3537ed1407897f2c92050831c7ebb31c7218bc7` (10,240 rows, 63.5 MB)
+- **medsynth source**: `7fa03f67b113b57a5f17349c712946553b4b186e1a11f39d74e0821d02fc5ac8`
+- **cdc_fy2026**: `2433adf954c3f49296a40761b83afb98c2d61cd78ca43f335fbdd4167e5fb93d` (74,719 codes)
+- **validation split**: 9,660 billable / 495 invalid / 60 non_billable_parent / 25 placeholder_x
+
+### Decision Rationale
+
+We chose HF Hub over raw git-LFS because:
+- HF provides built-in dataset versioning and CDN distribution
+- `datasets.load_dataset()` integration for notebooks
+- Public discoverability for research reproducibility
+
+We chose DVC over git-LFS because:
+- DVC supports multiple remotes (S3, GDrive, SSH) without GitHub LFS quotas
+- `.dvc` files are human-readable YAML, enabling code review of data changes
+- Pipeline-aware caching prevents redundant recomputation
+
+### Fresh Clone Test
+
+As you noted, cloning to `/tmp` now works without external dependencies:
+```bash
+git clone https://github.com/Sidney-Bishop/notes-to-icd10.git /tmp/test
+cd /tmp/test
+dvc pull  # restores exact gold parquet from DVC remote
+# OR
+python scripts/generate_manifest.py  # rebuilds from HF Hub, verifies SHA256
+```
+Both paths produce identical SHA256 hashes, with zero calls to CDC FTP.
+
+---
+
+
+---
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -166,12 +237,17 @@ registry at `outputs/experiments.json`.
 git clone https://github.com/Sidney-Bishop/notes-to-icd10.git
 cd notes-to-icd10
 uv sync
+
+# Pull locked data artifacts (gold parquet, models)
+dvc pull
 ```
 
 ### Dataset
 ```python
 from datasets import load_dataset
-dataset = load_dataset("Ahmad0067/MedSynth")
+# Canonical HF-locked dataset (MedSynth + CDC FY2026)
+dataset = load_dataset("SidneyBishop/notes-to-icd10")
+# Contains: icd10_notes (10,240 rows) and cdc_fy2026_icd10 (74,719 codes)
 ```
 
 ### Run the Pipeline
@@ -228,8 +304,11 @@ notes-to-icd10/
 ├── data/
 │   ├── cache/              # HuggingFace model cache (gitignored)
 │   ├── gold/               # Gold layer Parquet — APSO-processed
+│   │   ├── *.parquet.dvc   # DVC pointers (tracked)
+│   │   └── MANIFEST_*.json # SHA256 manifests (tracked)
+│   ├── medsynth/           # HF-downloaded source (gitignored)
 │   ├── ontology/           # ICD-10 ↔ UMLS knowledge graph data
-│   └── raw/                # Original MedSynth CSV (gitignored)
+│   └── raw/                # Original sources (gitignored)
 ├── notebooks/
 │   ├── 01-EDA_SOAP.ipynb
 │   ├── 02-Model_ClinicalBERT_Baseline_ICD3.ipynb
@@ -242,6 +321,8 @@ notes-to-icd10/
 │       ├── registry/       # Promoted model artifacts (gitignored)
 │       └── E-00*/          # Per-experiment training artifacts (gitignored)
 ├── scripts/
+│   ├── prepare_data.py       # HF-locked ingestion + CDC validation
+│   ├── generate_manifest.py  # Phase 4 SHA256 manifest generator
 │   ├── train.py            # Flat and hierarchical training
 │   ├── calibrate.py        # Temperature scaling
 │   ├── evaluate.py         # Full evaluation suite
@@ -255,6 +336,7 @@ notes-to-icd10/
 │   ├── paths.py            # Canonical path resolution
 │   ├── plot_utils.py       # Figure persistence
 │   └── evaluation.py       # Metrics: Macro F1, Accuracy, Top-5
+├── upload_to_hf.py         # Utility to push canonical data to HF Hub
 ├── Run notes.md            # Step-by-step script pipeline guide
 ├── REFACTORING_PLAN.md     # Development roadmap and status
 ├── verify_scripts.py       # Pre-flight health checks
@@ -270,7 +352,17 @@ notes-to-icd10/
 ### Zero-Trust Ingestion
 Every record is validated against a Pydantic schema before entering
 the pipeline — catching empty notes, malformed ICD-10 codes, and label
-inconsistencies at ingestion time.
+inconsistencies at ingestion time. **As of Phase 1b, all sources are locked
+to Hugging Face Hub (`SidneyBishop/notes-to-icd10`) rather than live CDC FTP feeds,**
+ensuring byte-identical reproduction across environments.
+
+### CDC FY2026 Validation
+Phase 1b validates all 10,240 codes against the canonical FY2026 ICD-10-CM
+table (74,719 codes) downloaded from HF Hub. Results are frozen in the manifest:
+- **billable** (9,660): Valid leaf codes suitable for billing
+- **invalid_or_malformed** (495): Not present in FY2026
+- **non_billable_parent** (60): Chapter/category headers (e.g., "E11")
+- **placeholder_x** (25): Codes requiring 7th character extension
 
 ### APSO-Flip Preprocessing
 Clinical notes are restructured so the Assessment section appears at
@@ -316,19 +408,31 @@ uv sync  # installs everything
 ```
 
 Key libraries: `transformers`, `torch`, `polars`, `mlflow`, `pydantic`,
-`scikit-learn`, `datasets`, `huggingface-hub`
+`scikit-learn`, `datasets`, `huggingface-hub`, `dvc`
 
 ---
 
 ## 📄 Citation
 
-If you use this work, please cite the MedSynth dataset:
+If you use this work, please cite:
+
+**MedSynth dataset:**
 ```bibtex
 @misc{rezaie2025medsynth,
   title   = {MedSynth: Synthetic Medical Dialogue Dataset for ICD-10 Coding},
   author  = {Rezaie Mianroodi, et al.},
   year    = {2025},
   url     = {https://arxiv.org/abs/2508.01401}
+}
+```
+
+**Canonical HF dataset (this repo):**
+```bibtex
+@dataset{bishop2026notestoicd10,
+  title = {notes-to-icd10: HF-locked MedSynth + CDC FY2026},
+  author = {Bishop, Sidney and Roche, Jason},
+  year = {2026},
+  url = {https://huggingface.co/datasets/SidneyBishop/notes-to-icd10}
 }
 ```
 
@@ -346,11 +450,6 @@ via [GitHub Issues](https://github.com/Sidney-Bishop/notes-to-icd10/issues).
 MIT License — see [LICENSE](LICENSE) for details.
 
 Copyright (c) 2026 Jason Roche
-
-
-
-
-HF_TOKEN_REDACTED
 
 
 

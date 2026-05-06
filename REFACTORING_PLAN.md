@@ -4,8 +4,9 @@
 Written as a handoff document — a new conversation with Claude should be
 able to pick this up and proceed without needing the full project history.
 
-**Date:** 2 May 2026
+**Date:** 6 May 2026
 **Current best result:** E-010_40ep_E002Init — 83.9% E2E | 0.763 F1 | 0.033 ECE | 82.1% Coverage@0.7 (95.2% acc)
+**Data status:** Phase 1b locked — HF canonical + DVC + SHA256 manifest (commit 6dda8ac)
 
 ---
 
@@ -23,6 +24,8 @@ Key files:
 - `scripts/train.py` — training orchestrator
 - `scripts/calibrate.py` — temperature scaling
 - `scripts/evaluate.py` — evaluation pipeline
+- `scripts/prepare_data.py` — HF-locked ingestion + CDC validation (Phase 1b)
+- `scripts/generate_manifest.py` — Phase 4 SHA256 manifest generator
 - `verify_scripts.py` — pre-flight checks (run before every training session)
 - `Run notes.md` — step-by-step reproduction guide
 - `Prj_Overview.md` — full project history and architectural decisions
@@ -43,6 +46,13 @@ Enforced in `scripts/train.py`.
 40-epoch E-002 produces +4.1pp E2E over 20-epoch E-002 on Stage-2 resolvers.
 The encoder representations continue improving through epoch 40 on this dataset.
 Always use 40 epochs for E-002 training.
+
+**3. All data sources must be HF-locked, never live CDC FTP.**
+As of 5 May 2026, `prepare_data.py` pulls exclusively from Hugging Face Hub
+(`SidneyBishop/notes-to-icd10`). This eliminates data drift, ensures reproducible
+SHA256 hashes, and enables fresh clones to rebuild without external dependencies.
+The canonical gold dataset is locked at 10,240 rows with validation split
+9,660/495/60/25 (billable/invalid/noisy_111/placeholder_x).
 
 ---
 
@@ -207,6 +217,41 @@ pickle (`data/graph/icd10_knowledge_graph.pkl`) is clean.
 
 ---
 
+
+---
+
+### R-010 — HF-Locked Canonical Data + DVC + Manifest
+**Priority: High**
+**Status: ✅ COMPLETE (5 May 2026)**
+
+Eliminated CDC FTP dependency by locking all canonical datasets to Hugging Face Hub and implementing three-layer reproducibility.
+
+**What was built:**
+- `scripts/prepare_data.py` refactored to use `hf_hub_download()` instead of FTP
+  - Pulls `icd10_notes.parquet` (10,240 rows) from HF
+  - Pulls `cdc_fy2026_icd10.parquet` (74,719 codes) from HF
+- `scripts/generate_manifest.py` — Phase 4 manifest generator with SHA256 hashing
+- `upload_to_hf.py` — utility to push canonical data to HF Hub
+- DVC tracking for `data/gold/*.parquet` (`.dvc` files in git, binaries in DVC remote)
+- `data/gold/MANIFEST_*.json` force-added to git (bypassing .gitignore) for audit trail
+
+**Decisions documented:**
+1. **Why HF Hub over CDC FTP:** Eliminates annual code drift (FY2026→FY2027), removes build fragility, provides CDN distribution
+2. **Why DVC over git-LFS:** Supports multiple remotes without GitHub quotas, human-readable YAML pointers, pipeline-aware caching
+3. **Why manifests in git:** Cryptographic provenance (SHA256) must be version-controlled alongside code for regulatory audit
+
+**Locked artifacts (commit 6dda8ac):**
+- Gold parquet: `220dafcfe6a8aa53c0a728dbf3537ed1407897f2c92050831c7ebb31c7218bc7`
+- MedSynth source: `7fa03f67b113b57a5f17349c712946553b4b186e1a11f39d74e0821d02fc5ac8`
+- CDC FY2026: `2433adf954c3f49296a40761b83afb98c2d61cd78ca43f335fbdd4167e5fb93d`
+
+**Verification:**
+- Fresh clone to /tmp + `dvc pull` restores exact bytes
+- `python scripts/generate_manifest.py` rebuilds from HF and verifies hashes
+- Zero external calls to ftp.cdc.gov
+
+---
+
 ## Implementation Order
 
 | Order | Requirement | Status |
@@ -219,7 +264,8 @@ pickle (`data/graph/icd10_knowledge_graph.pkl`) is clean.
 | 6 | R-005 (Pydantic validation) | ✅ Complete |
 | 7 | R-008 (unit tests) | ✅ Complete |
 | 8 | R-009 (dependency audit) | ✅ Complete |
-| 9 | R-004 (MLflow querying) | ⏳ Pending (low priority) |
+| 9 | **R-010 (HF-locked data + DVC)** | **✅ Complete (5 May 2026)** |
+| 10 | R-004 (MLflow querying) | ⏳ Pending (low priority) |
 
 ---
 
@@ -230,6 +276,7 @@ pickle (`data/graph/icd10_knowledge_graph.pkl`) is clean.
 | 1 | **Z-chapter contrastive fine-tuning** | +5-10pp Z | Medium — 2 weeks |
 | 2 | **Lower Z threshold to 0.5** | More Z coverage at ~85% precision | Low |
 | 3 | **MIMIC-IV validation** | Reveals synthetic→real gap | Blocked on PhysioNet |
+| 4 | **DVC remote setup for models** | Enable `dvc pull` for E-010 weights | Low — 1 day |
 
 **E-011 finding:** E-010 + GraphReranker = 83.9% / F1 0.763 — identical to
 E-010 alone. The graph reranker has minimal impact on E-010's well-calibrated
@@ -269,11 +316,14 @@ If starting fresh, give Claude this context:
 > in the project root. The current best model is E-010_40ep_E002Init at 83.9%
 > E2E, 0.763 F1, 0.033 ECE, 82.1% Coverage@0.7. All scripts pass
 > `uv run python verify_scripts.py`. All refactoring requirements are complete
-> except R-004 (low priority). The unit test suite is at `tests/` — run with
-> `uv run pytest tests/ -v`. The next research priority is Z-chapter
-> contrastive fine-tuning or MIMIC-IV validation (blocked on PhysioNet access)."
+> except R-004 (low priority). **Phase 1b data is locked to HF Hub
+> (SidneyBishop/notes-to-icd10) with DVC + SHA256 manifests (commit 6dda8ac).**
+> The unit test suite is at `tests/` — run with `uv run pytest tests/ -v`.
+> To reproduce: `git clone` → `dvc pull` → `python scripts/generate_manifest.py`.
+> The next research priority is Z-chapter contrastive fine-tuning or MIMIC-IV
+> validation (blocked on PhysioNet access)."
 
 ---
 
-*Last updated: 2 May 2026*
-*Author: Refactoring session with Claude Sonnet 4.6*
+*Last updated: 6 May 2026*
+*Author: Refactoring session with Claude Sonnet 4.6 + Data Locking (R-010)*

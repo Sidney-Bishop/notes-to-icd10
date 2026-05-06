@@ -4,8 +4,9 @@
 from scratch. Every command has been run and verified. Follow this document
 exactly to reproduce any result.
 
-**Last updated:** 30 April 2026
+**Last updated:** 6 May 2026
 **Current best:** E-010_40ep_E002Init — 83.9% E2E | 0.762 F1 | 0.034 ECE | 82.1% Coverage@0.7
+**Data status:** Phase 1b locked — HF Hub + DVC (commit 6dda8ac)
 
 ---
 
@@ -20,9 +21,10 @@ pwd
 which python
 # Expected: .../Notes_to_ICD10_prj/.venv/bin/python
 
-# 3. Confirm gold data exists
+# 3. Confirm gold data exists (DVC or rebuild)
 ls data/gold/
-# Expected: medsynth_gold_apso_*.parquet  medsynth_gold_augmented.parquet
+# Expected: medsynth_gold_apso_*.parquet  MANIFEST_*.json
+# If missing: run `dvc pull` or `python scripts/generate_manifest.py`
 
 # 4. Confirm the experiment registry is accessible
 uv run python -c "from src.experiment_logger import status; status()"
@@ -35,6 +37,10 @@ uv run python -c "import torch; print(torch.backends.mps.is_available())"
 # 6. Always run pre-flight before any training
 uv run python verify_scripts.py
 # Expected: ✅ All checks passed — safe to run training
+
+# 7. (Optional) Verify HF data sources
+uv run python -c "from huggingface_hub import hf_hub_download; print('HF Hub accessible')"
+# Expected: HF Hub accessible
 ```
 
 If any of the above fail, **stop and fix before proceeding**.
@@ -43,10 +49,19 @@ If any of the above fail, **stop and fix before proceeding**.
 
 ## Data Files — What They Are
 
-| File | Records | Description |
-|------|---------|-------------|
-| `data/gold/medsynth_gold_apso_*.parquet` | 9,660 | Original gold layer — APSO-flipped, ICD-10 redacted, CDC FY2026 validated, billable only |
-| `data/gold/medsynth_gold_augmented.parquet` | 11,214 | Above + 974 synthetic records for chapters O and Z |
+| File | Records | Description | Source |
+|------|---------|-------------|--------|
+| `data/gold/medsynth_gold_apso_*.parquet` | 10,240 | Original gold layer — APSO-flipped, ICD-10 redacted, CDC FY2026 validated (9,660 billable + 580 non-billable) | Built from HF Hub |
+| `data/gold/medsynth_gold_apso_*.parquet.dvc` | — | DVC pointer file (tracked in git) | — |
+| `data/gold/MANIFEST_*.json` | — | SHA256 manifest with validation split | Generated |
+| `data/gold/medsynth_gold_augmented.parquet` | 11,214 | Above + 974 synthetic records for chapters O and Z | Historic |
+
+**Data Sources (as of 5 May 2026):**
+- All canonical data now pulled from Hugging Face Hub: `SidneyBishop/notes-to-icd10`
+- `icd10_notes.parquet` (10,240 rows, SHA256: 7fa03f6...)
+- `cdc_fy2026_icd10.parquet` (74,719 codes, SHA256: 2433adf...)
+- No external CDC FTP calls — `prepare_data.py` uses `hf_hub_download()`
+- DVC tracks derived gold parquet; `dvc pull` restores exact bytes
 
 **Which gold file to use:**
 
@@ -117,10 +132,23 @@ best production pipeline using augmented gold + graph reranker + Z override
 
 ---
 
-## Stage 0 — Prepare Deterministic Splits
+## Stage 0 — Prepare Data and Deterministic Splits
 
 **Run once. Do not re-run unless you want to invalidate all previous results.**
 
+**Option A: Pull locked data (recommended)**
+```bash
+dvc pull
+dvc status  # should show "up to date"
+```
+
+**Option B: Rebuild from HF Hub (verifies reproducibility)**
+```bash
+python scripts/generate_manifest.py
+# Pulls from HF Hub, validates CDC FY2026, generates gold + SHA256 manifest
+```
+
+**Then prepare splits:**
 ```bash
 uv run python scripts/prepare_splits.py \
     --experiment E-010_40ep_E002Init \
@@ -137,6 +165,9 @@ Chapter A: 48 records → 38 train / 5 val / 5 test
 
 **Verify:**
 ```bash
+# Check manifest exists
+ls data/gold/MANIFEST_*.json
+# Check splits created
 ls outputs/evaluations/E-010_40ep_E002Init/stage2/
 # Expected: A B C D E F G H I J K L M N O P Q R S T U Z
 ```
@@ -461,6 +492,7 @@ Both must pass before running anything else.
 | Presplits mandatory | Without fixed splits, test sets differ per run and results are not comparable. |
 | Z override permanently removed | "physical exam" appears in every APSO template — phrase override corrupts 100% of predictions. |
 | Skip chapters P, Q, U | Too few records for reliable training. Majority-class fallback is more accurate. |
+| **HF Hub + DVC for data (May 2026)** | **Eliminates CDC FTP drift, enables byte-identical reproduction, provides SHA256 audit trail** |
 
 ---
 
@@ -469,8 +501,14 @@ Both must pass before running anything else.
 **"No module named src.paths"**
 Not in project root. Run `cd .../Notes_to_ICD10_prj`.
 
+**"FileNotFoundError: data/gold/medsynth_gold_apso_*.parquet"**
+Gold data not pulled. Run `dvc pull` or `python scripts/generate_manifest.py` to rebuild from HF Hub.
+
 **"Could not find artifacts.yaml"**
 Same issue — not in project root, or venv not active.
+
+**"hf_hub_download failed"**
+No internet or HF Hub down. Check connection, or use `dvc pull` if data already cached in DVC remote.
 
 **Stage-2 shows "⚠️ No checkpoint for chapter X, using base model"**
 `--stage2-init` path wrong or E-002 weights missing.
@@ -493,7 +531,7 @@ Reduce `--batch-size` to 8 or 4.
 
 ---
 
-## Full Leaderboard — 30 April 2026
+## Full Leaderboard — 6 May 2026 (Phase 1b locked)
 
 | Rank | Experiment | Stage-1 | E2E | F1 | ECE | Cov@0.7 | Cov Acc |
 |---|---|---|---|---|---|---|---|
@@ -515,5 +553,6 @@ Reduce `--batch-size` to 8 or 4.
 
 ---
 
-*Last updated: 30 April 2026*
+*Last updated: 6 May 2026*
 *Current best: E-010_40ep_E002Init — 83.9% E2E | 0.762 F1 | 0.034 ECE*
+*Data: HF-locked + DVC (commit 6dda8ac)*

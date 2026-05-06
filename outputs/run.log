@@ -115,3 +115,6 @@ Run scripts/train.py --experiment E-010_40ep_E002Init first.
 2026-05-04 14:45:21 | FIGURE   | 01-EDA_SOAP                    | token_pressure_kde             | /Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/visualizations/01-EDA_SOAP/token_pressure_kde_20260504_144521.png
 2026-05-04 20:15:05 | FIGURE   | 01-EDA_SOAP                    | icd10_frequency_histogram      | /Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/visualizations/01-EDA_SOAP/icd10_frequency_histogram_20260504_201505.png
 2026-05-04 20:15:46 | FIGURE   | 01-EDA_SOAP                    | token_pressure_kde             | /Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/visualizations/01-EDA_SOAP/token_pressure_kde_20260504_201546.png
+2026-05-06 17:07:48 | START    | E-010_40ep_E002Init            | evaluate             | evaluate.py | mode=hierarchical | stage1_experiment=E-003_Hierarchical_ICD10 | threshold=0.7 | sample=all
+2026-05-06 17:09:09 | COMPLETE | E-010_40ep_E002Init            | evaluate             | evaluate.py | eval_dir=/Users/jroche/Workspace/Python/Notes_to_ICD10_prj/outputs/evaluations/E-010_40ep_E002Init/eval
+2026-05-06 17:09:09 | RESULTS  | E-010_40ep_E002Init            | evaluate             | evaluate.py | e2e_accuracy=0.8385 | macro_f1=0.7628 | ece=0.0329 | coverage_07=0.8209 | stage1_accuracy=0.9855 | stage2_accuracy=0.8508
