@@ -208,15 +208,21 @@ We chose DVC over git-LFS because:
 
 ### Fresh Clone Test
 
-As you noted, cloning to `/tmp` now works without external dependencies:
+Cloning and running from scratch works without any external CDC dependencies:
 ```bash
 git clone https://github.com/Sidney-Bishop/notes-to-icd10.git /tmp/test
 cd /tmp/test
-dvc pull  # restores exact gold parquet from DVC remote
-# OR
-python scripts/generate_manifest.py  # rebuilds from HF Hub, verifies SHA256
+uv sync
+
+# Option A: restore from DVC remote (fast, requires configured remote)
+uv run dvc remote modify --local localstore url /path/to/your/dvcstore
+uv run dvc pull
+
+# Option B: rebuild from HF Hub (slower, works on any machine)
+uv run python scripts/prepare_data.py
 ```
-Both paths produce identical SHA256 hashes, with zero calls to CDC FTP.
+Both paths produce byte-identical gold data validated against the committed
+SHA256 manifest, with zero calls to CDC FTP infrastructure.
 
 ---
 
@@ -227,20 +233,41 @@ Both paths produce identical SHA256 hashes, with zero calls to CDC FTP.
 
 ### Prerequisites
 
-- Python 3.11
+- Python 3.12
+- [uv](https://docs.astral.sh/uv/getting-started/installation/) — fast Python package manager (`pip install uv` or `brew install uv`)
 - Apple Silicon Mac (MPS acceleration) or CUDA GPU
-- ~50GB disk space for models and data
+- **~20GB disk space** for the current best models (E-003 + E-010)
+- **~800GB** if running the full training pipeline from scratch (checkpoints accumulate ~75GB per experiment — run `scripts/cleanup.py` after each run)
 - ~16GB RAM minimum, 32GB+ recommended
 
 ### Installation
+
 ```bash
+# 1. Clone and install dependencies
 git clone https://github.com/Sidney-Bishop/notes-to-icd10.git
 cd notes-to-icd10
 uv sync
 
-# Pull locked data artifacts (gold parquet, models)
-dvc pull
+# 2. Run the pre-flight check to confirm everything is wired up correctly
+uv run python verify_scripts.py
+
+# 3. Configure your local DVC remote (one-time setup)
+#    Replace the path with wherever you want to store large binary artifacts
+uv run dvc remote modify --local localstore url /path/to/your/dvcstore
+
+# 4. Pull tracked data artifacts from the DVC remote
+uv run dvc pull
+#    If the remote is not yet populated (fresh setup), run the pipeline instead:
+#    uv run python scripts/prepare_data.py
+#    This downloads source data from HF Hub, validates SHA256, and builds the gold layer.
 ```
+
+> **Note on disk space:** Training checkpoints accumulate ~3.6GB per resolver.
+> After each training run, reclaim space with:
+> ```bash
+> uv run python scripts/cleanup.py --dry-run  # preview
+> uv run python scripts/cleanup.py            # delete checkpoints, keep models
+> ```
 
 ### Dataset
 ```python
@@ -267,7 +294,7 @@ uv run jupyter notebook
 
 Total training time: approximately 11–12 hours on Apple M5 Max.
 
-Or run end-to-end via scripts — see `Run notes.md` for the complete
+Or run end-to-end via scripts — see `Run_notes.md` for the complete
 step-by-step guide including verification commands at each stage.
 
 ### Inference
@@ -450,6 +477,3 @@ via [GitHub Issues](https://github.com/Sidney-Bishop/notes-to-icd10/issues).
 MIT License — see [LICENSE](LICENSE) for details.
 
 Copyright (c) 2026 Jason Roche
-
-
-
