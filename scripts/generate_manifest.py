@@ -23,17 +23,22 @@ from datetime import datetime, timezone
 
 import polars as pl
 
-def _bootstrap_project_root() -> Path:
+# Bootstrap: locate project root before src/ is on sys.path.
+# find_project_root() is defined in src/config.py — single source of truth.
+def _find_root() -> "Path":
     current = Path.cwd()
-    while current!= current.parent:
+    while current != current.parent:
         if (current / "artifacts.yaml").exists():
             return current.resolve()
         current = current.parent
-    raise FileNotFoundError("artifacts.yaml not found")
+    raise FileNotFoundError("artifacts.yaml not found — run from within the project tree.")
 
-PROJECT_ROOT = _bootstrap_project_root()
+PROJECT_ROOT = _find_root()
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
+
+# Now src/ is importable — use the canonical implementation going forward.
+from src.config import find_project_root  # noqa: E402 (import after sys.path setup)
 
 from src.config import config
 

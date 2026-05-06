@@ -76,6 +76,12 @@ def find_project_root() -> Path:
     Walk up from cwd until artifacts.yaml is found.
     Adds the root to sys.path so `import src` works.
     Raises FileNotFoundError if artifacts.yaml is not found.
+
+    Note: the canonical implementation of this function lives in
+    src/config.py (find_project_root). This version is kept here
+    because nb_setup.py may be called before src/ is on sys.path,
+    making a direct import impossible at that point. Once src/ is
+    importable, prefer: from src.config import find_project_root
     """
     current = Path.cwd()
     while current != current.parent:

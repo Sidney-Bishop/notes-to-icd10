@@ -23,6 +23,43 @@ from typing import Dict, Any, List, Optional, Union
 from contextlib import contextmanager
 
 
+def find_project_root(start: Path = None) -> Path:
+    """
+    Walk upward from ``start`` (default: cwd) until ``artifacts.yaml`` is found.
+
+    This is the canonical project root resolver used by all scripts and notebooks.
+    Defined here in ``src/config.py`` — the project's configuration authority —
+    so there is exactly one implementation to update if the sentinel file changes.
+
+    The function intentionally does not import anything from ``src/`` so it can
+    be called before the project root has been added to ``sys.path``.
+
+    Parameters
+    ----------
+    start : Path, optional
+        Directory to begin the upward search. Defaults to ``Path.cwd()``.
+
+    Returns
+    -------
+    Path
+        Resolved absolute path to the project root.
+
+    Raises
+    ------
+    FileNotFoundError
+        If ``artifacts.yaml`` is not found in any ancestor directory.
+    """
+    current = (start or Path.cwd()).resolve()
+    while current != current.parent:
+        if (current / "artifacts.yaml").exists():
+            return current
+        current = current.parent
+    raise FileNotFoundError(
+        "Could not find 'artifacts.yaml' — run from within the project tree, "
+        "or pass start=Path('/path/to/project')."
+    )
+
+
 class ArtifactConfig:
     """
     Project-wide source of truth for the Surgical Era.
