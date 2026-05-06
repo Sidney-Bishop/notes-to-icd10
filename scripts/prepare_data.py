@@ -2,7 +2,7 @@
 prepare_data.py — Headless Gold layer preparation pipeline.
 Locked to canonical HF datasets: SidneyBishop/notes-to-icd10
 """
-import re, sys, argparse
+import hashlib, re, sys, argparse
 from pathlib import Path
 from datetime import datetime
 
@@ -26,9 +26,60 @@ from src.gatekeeper import validate_dataframe
 from src.preprocessing import build_apso_note, redact_icd10_sections, ICD10_REDACT_PATTERN
 
 # --- Canonical HF sources ---
-HF_REPO_ID = "SidneyBishop/notes-to-icd10"
+HF_REPO_ID      = "SidneyBishop/notes-to-icd10"
 HF_MEDSYNTH_PATH = "data/medsynth/icd10_notes.parquet"
-HF_CDC_PATH = "data/reference/cdc_fy2026_icd10.parquet"
+HF_CDC_PATH      = "data/reference/cdc_fy2026_icd10.parquet"
+
+# SHA256 hashes of the canonical source files on HF Hub.
+# These are the single source of truth — if either hash changes it means
+# the upstream dataset has been modified, which would silently invalidate
+# the gold layer and all trained models. The pipeline raises immediately
+# rather than continuing on unexpected data.
+EXPECTED_SHA256 = {
+    "icd10_notes.parquet":      "7fa03f67b113b57a5f17349c712946553b4b186e1a11f39d74e0821d02fc5ac8",
+    "cdc_fy2026_icd10.parquet": "2433adf954c3f49296a40761b83afb98c2d61cd78ca43f335fbdd4167e5fb93d",
+}
+
+
+def _sha256(path: Path) -> str:
+    """Compute SHA256 of a file in streaming chunks."""
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(65536), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _verify_sha256(path: Path, key: str) -> None:
+    """
+    Assert that a file matches its canonical SHA256 hash.
+
+    Parameters
+    ----------
+    path : Path
+        File to verify.
+    key : str
+        Filename key in EXPECTED_SHA256 (e.g. "icd10_notes.parquet").
+
+    Raises
+    ------
+    ValueError
+        If the hash does not match. The error message instructs the user
+        to delete the cached file and retry so the pipeline can re-download
+        a clean copy.
+    KeyError
+        If key is not in EXPECTED_SHA256 (programming error, not user error).
+    """
+    expected = EXPECTED_SHA256[key]
+    actual   = _sha256(path)
+    if actual != expected:
+        raise ValueError(
+            f"\n❌ SHA256 mismatch for {path.name}"
+            f"\n   expected : {expected}"
+            f"\n   actual   : {actual}"
+            f"\n   → Delete {path} and re-run to fetch a clean copy."
+        )
+    print(f"   🔒 SHA256 verified: {path.name}")
 
 def phase_1a_ingest() -> pl.DataFrame:
     print("\n── Phase 1a: Ingestion ──────────────────────────────────────────────")
@@ -42,6 +93,9 @@ def phase_1a_ingest() -> pl.DataFrame:
             filename=HF_MEDSYNTH_PATH,
             repo_type="dataset"
         )
+        # Verify the downloaded file matches the canonical hash before
+        # reading or caching — rejects corrupt or tampered downloads.
+        _verify_sha256(Path(hf_file), "icd10_notes.parquet")
         df = pl.read_parquet(hf_file)
         # Ensure canonical schema
         if "ID" not in df.columns:
@@ -57,6 +111,7 @@ def phase_1a_ingest() -> pl.DataFrame:
         df.write_parquet(raw_path, compression="zstd")
         print(f" ✅ Cached {len(df):,} records")
     else:
+        _verify_sha256(raw_path, "icd10_notes.parquet")
         df = pl.read_parquet(raw_path)
         print(f" ✅ Loaded {len(df):,} records from cache")
 
@@ -70,6 +125,7 @@ def _load_cdc(gold_dir: Path, offline=False):
     cache.parent.mkdir(parents=True, exist_ok=True)
 
     if cache.exists():
+        _verify_sha256(cache, "cdc_fy2026_icd10.parquet")
         return pl.read_parquet(cache)
 
     if offline:
@@ -81,6 +137,8 @@ def _load_cdc(gold_dir: Path, offline=False):
         filename=HF_CDC_PATH,
         repo_type="dataset"
     )
+    # Verify before caching — rejects corrupt or tampered downloads.
+    _verify_sha256(Path(hf_file), "cdc_fy2026_icd10.parquet")
     df = pl.read_parquet(hf_file)
     df.write_parquet(cache, compression="zstd")
     print(f" ✅ CDC FY2026: {len(df):,} billable codes")
