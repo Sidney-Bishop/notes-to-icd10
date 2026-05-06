@@ -206,23 +206,21 @@ We chose DVC over git-LFS because:
 - `.dvc` files are human-readable YAML, enabling code review of data changes
 - Pipeline-aware caching prevents redundant recomputation
 
-### Fresh Clone Test
+### Fresh Clone Verification
 
-Cloning and running from scratch works without any external CDC dependencies:
+The pipeline is fully reproducible from a cold clone with no external
+infrastructure beyond HF Hub:
+
 ```bash
 git clone https://github.com/Sidney-Bishop/notes-to-icd10.git /tmp/test
 cd /tmp/test
 uv sync
-
-# Option A: restore from DVC remote (fast, requires configured remote)
-uv run dvc remote modify --local localstore url /path/to/your/dvcstore
-uv run dvc pull
-
-# Option B: rebuild from HF Hub (slower, works on any machine)
 uv run python scripts/prepare_data.py
 ```
-Both paths produce byte-identical gold data validated against the committed
-SHA256 manifest, with zero calls to CDC FTP infrastructure.
+
+This downloads both canonical source files from `SidneyBishop/notes-to-icd10`,
+validates their SHA256 hashes, and produces a gold parquet with an identical
+validation split (9,660 / 495 / 60 / 25) — zero calls to CDC FTP infrastructure.
 
 ---
 
@@ -236,8 +234,8 @@ SHA256 manifest, with zero calls to CDC FTP infrastructure.
 - Python 3.12
 - [uv](https://docs.astral.sh/uv/getting-started/installation/) — fast Python package manager (`pip install uv` or `brew install uv`)
 - Apple Silicon Mac (MPS acceleration) or CUDA GPU
-- **~20GB disk space** for the current best models (E-003 + E-010)
-- **~800GB** if running the full training pipeline from scratch (checkpoints accumulate ~75GB per experiment — run `scripts/cleanup.py` after each run)
+- **~20GB disk space** for the current best models (E-003 Stage-1 router + E-010)
+- **~800GB** if running the full training pipeline from scratch — run `scripts/cleanup.py` after each experiment to reclaim checkpoint space (~75GB per run)
 - ~16GB RAM minimum, 32GB+ recommended
 
 ### Installation
@@ -248,25 +246,30 @@ git clone https://github.com/Sidney-Bishop/notes-to-icd10.git
 cd notes-to-icd10
 uv sync
 
-# 2. Run the pre-flight check to confirm everything is wired up correctly
+# 2. Run the pre-flight check — confirms all scripts are correctly wired up
 uv run python verify_scripts.py
 
-# 3. Configure your local DVC remote (one-time setup)
-#    Replace the path with wherever you want to store large binary artifacts
-uv run dvc remote modify --local localstore url /path/to/your/dvcstore
-
-# 4. Pull tracked data artifacts from the DVC remote
-uv run dvc pull
-#    If the remote is not yet populated (fresh setup), run the pipeline instead:
-#    uv run python scripts/prepare_data.py
-#    This downloads source data from HF Hub, validates SHA256, and builds the gold layer.
+# 3. Build the gold data layer
+#    Downloads icd10_notes.parquet and cdc_fy2026_icd10.parquet directly
+#    from HF Hub (SidneyBishop/notes-to-icd10), validates SHA256 on both,
+#    runs the full Phase 1-4 pipeline, and exports the gold parquet.
+uv run python scripts/prepare_data.py
 ```
 
-> **Note on disk space:** Training checkpoints accumulate ~3.6GB per resolver.
+Expected output from step 3:
+```
+Phase 1a: 🔒 SHA256 verified: icd10_notes.parquet  ✅ Cached 10,240 records
+Phase 1b: 🔒 SHA256 verified: cdc_fy2026_icd10.parquet  ✅ CDC FY2026: 74,719 billable codes
+          billable 9,660 / invalid_or_malformed 495 / non_billable_parent 60 / placeholder_x 25
+Phase 1e: ✅ Silver: 10,240
+Phase 4:  ✅ medsynth_gold_apso_<timestamp>.parquet
+```
+
+> **Disk space note:** Training checkpoints accumulate ~75GB per experiment.
 > After each training run, reclaim space with:
 > ```bash
-> uv run python scripts/cleanup.py --dry-run  # preview
-> uv run python scripts/cleanup.py            # delete checkpoints, keep models
+> uv run python scripts/cleanup.py --dry-run  # preview what will be deleted
+> uv run python scripts/cleanup.py            # delete checkpoints, keep final models
 > ```
 
 ### Dataset
