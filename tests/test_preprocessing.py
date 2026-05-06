@@ -29,6 +29,7 @@ from src.preprocessing import (
     prepare_inference_input,
     ICD10_REDACT_PATTERN,
     PARENTHETICAL_ICD10_PATTERN,
+    REDACTED_ARTIFACT_PATTERN,
     REDACTION_MARKER,
 )
 
@@ -141,6 +142,28 @@ class TestParentheticalICD10Pattern:
         result = re.sub(PARENTHETICAL_ICD10_PATTERN, "", text)
         assert "Chronic left knee pain" in result
         assert "physiotherapy" in result
+
+    def test_icd_code_keyword_separator_removed(self):
+        """(ICD-10 code M25.562) — 'code' keyword separator instead of colon."""
+        import re
+        text = "Pain in the left knee (ICD-10 code M25.562)."
+        result = re.sub(PARENTHETICAL_ICD10_PATTERN, "", text)
+        result = re.sub(ICD10_REDACT_PATTERN, REDACTION_MARKER, result)
+        result = re.sub(REDACTED_ARTIFACT_PATTERN, "", result)
+        assert "ICD" not in result.upper()
+        assert "M25.562" not in result
+        assert "Pain in the left knee" in result
+
+    def test_bare_code_in_parens_leaves_no_artifact(self):
+        """(M25.551) bare code in parens — no ([REDACTED]) artifact after cleanup."""
+        import re
+        text = "Pain in the right hip (M25.551)."
+        result = re.sub(PARENTHETICAL_ICD10_PATTERN, "", text)
+        result = re.sub(ICD10_REDACT_PATTERN, REDACTION_MARKER, result)
+        result = re.sub(REDACTED_ARTIFACT_PATTERN, "", result)
+        assert "([REDACTED])" not in result
+        assert "M25.551" not in result
+        assert "Pain in the right hip" in result
 
     def test_multiple_parentheticals_in_one_note(self):
         """Multiple (ICD-10: CODE) wrappers in a single note — all removed."""
