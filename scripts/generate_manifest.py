@@ -1,7 +1,19 @@
 """
 generate_manifest.py — Phase 4 export manifest with SHA256 hashes
 Locked to canonical HF datasets: SidneyBishop/notes-to-icd10
+
+Usage
+-----
+# Generate manifest for an existing gold file (no pipeline re-run):
+    python scripts/generate_manifest.py --gold-path data/gold/medsynth_gold_apso_20260505_194721.parquet
+
+# Run the full pipeline first, then generate manifest:
+    python scripts/generate_manifest.py
+
+# Dry run — print manifest without writing to disk:
+    python scripts/generate_manifest.py --gold-path <path> --dry-run
 """
+import argparse
 from pathlib import Path
 import hashlib
 import json
@@ -33,11 +45,48 @@ def sha256(path: Path) -> str:
     return h.hexdigest()
 
 def main():
-    print("Running full prepare_data.py...")
-    subprocess.run([sys.executable, "scripts/prepare_data.py"], check=True)
+    pa = argparse.ArgumentParser(
+        description="Generate a SHA256-anchored provenance manifest for a gold parquet."
+    )
+    pa.add_argument(
+        "--gold-path",
+        type=Path,
+        default=None,
+        help=(
+            "Path to an existing gold parquet. If omitted, runs the full "
+            "prepare_data.py pipeline first and picks the latest output."
+        ),
+    )
+    pa.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Print the manifest to stdout without writing it to disk.",
+    )
+    args = pa.parse_args()
 
     gold_dir = config.resolve_path("data", "gold")
-    latest = sorted(gold_dir.glob("medsynth_gold_apso_*.parquet"))[-1]
+
+    if args.gold_path is not None:
+        # Use the provided path — no pipeline re-run needed.
+        latest = args.gold_path.resolve()
+        if not latest.exists():
+            print(f"❌ Gold file not found: {latest}")
+            sys.exit(1)
+        print(f"\n── Using existing gold file ────────────────────────────────────")
+        print(f"   {latest.name}")
+    else:
+        # No path given — run the full pipeline and pick the latest output.
+        print("\n── Running full prepare_data.py pipeline ───────────────────────")
+        subprocess.run(
+            [sys.executable, str(PROJECT_ROOT / "scripts" / "prepare_data.py")],
+            check=True
+        )
+        candidates = sorted(gold_dir.glob("medsynth_gold_apso_*.parquet"))
+        if not candidates:
+            print("❌ No gold parquet found after pipeline run.")
+            sys.exit(1)
+        latest = candidates[-1]
+
     print(f"\nLatest gold: {latest.name}")
 
     df = pl.read_parquet(latest)
@@ -72,10 +121,15 @@ def main():
                 "size_bytes": path.stat().st_size,
             }
 
-    out = gold_dir / f"MANIFEST_{latest.stem}.json"
-    out.write_text(json.dumps(manifest, indent=2))
-    print(f"\n✅ Manifest written: {out}")
-    print(json.dumps(manifest, indent=2))
+    manifest_json = json.dumps(manifest, indent=2)
+    print(f"\n{manifest_json}")
+
+    if args.dry_run:
+        print("\n⏭  Dry run — manifest not written to disk.")
+    else:
+        out = gold_dir / f"MANIFEST_{latest.stem}.json"
+        out.write_text(manifest_json)
+        print(f"\n✅ Manifest written: {out}")
 
 if __name__ == "__main__":
     main()
