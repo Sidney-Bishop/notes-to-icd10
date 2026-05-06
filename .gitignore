@@ -119,6 +119,7 @@ data/cache/*
 !data/raw/*.dvc
 !data/silver/*.dvc
 !data/gold/*.dvc
+!data/gold/MANIFEST_*.json
 !data/cache/*.dvc
 
 # Do NOT exclude data/ entirely — keeps the directory structure in git
