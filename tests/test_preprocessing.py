@@ -28,6 +28,7 @@ if str(_root) not in sys.path:
 from src.preprocessing import (
     prepare_inference_input,
     ICD10_REDACT_PATTERN,
+    PARENTHETICAL_ICD10_PATTERN,
     REDACTION_MARKER,
 )
 
@@ -62,6 +63,142 @@ class TestICD10RedactPattern:
             match = re.search(ICD10_REDACT_PATTERN, f" {term} ")
             assert match is None, \
                 f"Expected {term} NOT to match ICD-10 pattern"
+
+
+# ---------------------------------------------------------------------------
+# PARENTHETICAL_ICD10_PATTERN — full wrapper stripping
+# ---------------------------------------------------------------------------
+
+class TestParentheticalICD10Pattern:
+    """
+    Verify that (ICD-10: CODE) and (ICD10: CODE) wrappers are removed
+    entirely by PARENTHETICAL_ICD10_PATTERN — not just the code string.
+
+    The critical distinction from ICD10_REDACT_PATTERN:
+      ICD10_REDACT_PATTERN:      "Pain in left knee (ICD-10: M25.562)"
+                                 → "Pain in left knee (ICD-10: [REDACTED])"
+      PARENTHETICAL_ICD10_PATTERN applied first:
+                                 → "Pain in left knee"
+
+    Leaving "(ICD-10: [REDACTED])" in the text would signal to the model
+    that a label was present at that position — defeating redaction.
+    """
+
+    def test_parenthetical_with_decimal_code_removed(self):
+        """(ICD-10: M25.562) — canonical format with decimal."""
+        import re
+        text = "Pain in the left knee (ICD-10: M25.562)."
+        result = re.sub(PARENTHETICAL_ICD10_PATTERN, "", text)
+        assert "(ICD-10:" not in result
+        assert "M25.562" not in result
+        assert "Pain in the left knee" in result
+
+    def test_parenthetical_with_raw_code_removed(self):
+        """(ICD-10: M25562) — raw format without decimal."""
+        import re
+        text = "Chronic knee pain (ICD-10: M25562) persists."
+        result = re.sub(PARENTHETICAL_ICD10_PATTERN, "", text)
+        assert "(ICD-10:" not in result
+        assert "M25562" not in result
+        assert "persists" in result
+
+    def test_parenthetical_no_hyphen_removed(self):
+        """(ICD10: N39.0) — variant without hyphen."""
+        import re
+        text = "Urinary tract infection (ICD10: N39.0)."
+        result = re.sub(PARENTHETICAL_ICD10_PATTERN, "", text)
+        assert "ICD10" not in result
+        assert "N39.0" not in result
+        assert "Urinary tract infection" in result
+
+    def test_parenthetical_case_insensitive(self):
+        """(icd-10: E11.65) — lowercase variant."""
+        import re
+        text = "Type 2 diabetes (icd-10: E11.65) with complications."
+        result = re.sub(PARENTHETICAL_ICD10_PATTERN, "", text)
+        assert "icd" not in result.lower() or "E11.65" not in result
+        assert "complications" in result
+
+    def test_no_icd_artifact_left_after_removal(self):
+        """Critical: '(ICD-10: [REDACTED])' must NOT appear after both patterns applied."""
+        import re
+        text = "Diagnosis: Pain in left knee (ICD-10: M25.562)."
+        # Apply parenthetical pattern first (as in prepare_inference_input)
+        step1 = re.sub(PARENTHETICAL_ICD10_PATTERN, "", text)
+        # Then apply code redaction — should find nothing left to redact
+        step2 = re.sub(ICD10_REDACT_PATTERN, REDACTION_MARKER, step1)
+        assert "(ICD-10: [REDACTED])" not in step2
+        assert "M25.562" not in step2
+        assert REDACTION_MARKER not in step2, (
+            "No stray code should remain after parenthetical was stripped — "
+            f"got: {step2!r}"
+        )
+
+    def test_clinical_text_outside_parenthetical_preserved(self):
+        """Text outside the parenthetical should be completely unchanged."""
+        import re
+        text = "Assessment: Chronic left knee pain (ICD-10: M25.562). Plan: physiotherapy."
+        result = re.sub(PARENTHETICAL_ICD10_PATTERN, "", text)
+        assert "Chronic left knee pain" in result
+        assert "physiotherapy" in result
+
+    def test_multiple_parentheticals_in_one_note(self):
+        """Multiple (ICD-10: CODE) wrappers in a single note — all removed."""
+        import re
+        text = (
+            "Type 2 diabetes (ICD-10: E11.65) with hypertension (ICD-10: I10). "
+            "Continue current management."
+        )
+        result = re.sub(PARENTHETICAL_ICD10_PATTERN, "", text)
+        assert "(ICD-10:" not in result
+        assert "E11.65" not in result
+        assert "I10" not in result
+        assert "Continue current management" in result
+
+    def test_parenthetical_removed_in_redact_icd10_sections(self):
+        """
+        End-to-end: redact_icd10_sections() must fully remove the parenthetical
+        wrapper, not leave (ICD-10: [REDACTED]) in the apso_note column.
+        """
+        from src.preprocessing import build_apso_note, redact_icd10_sections
+        import polars as pl
+
+        df = pl.DataFrame({
+            "subjective":     ["Knee pain for 3 months"],
+            "objective":      ["Swelling, reduced ROM"],
+            "assessment":     ["Pain in left knee (ICD-10: M25.562)."],
+            "plan":           ["Physiotherapy, NSAIDs"],
+            "standard_icd10": ["M25.562"],
+        })
+        df = build_apso_note(df)
+        result = redact_icd10_sections(df)
+        apso = result["apso_note"][0]
+
+        assert "(ICD-10: [REDACTED])" not in apso, (
+            "Parenthetical wrapper was not fully removed — "
+            f"'(ICD-10: [REDACTED])' still present in: {apso!r}"
+        )
+        assert "M25.562" not in apso
+        assert "Pain in left knee" in apso
+
+    def test_parenthetical_removed_in_prepare_inference_input(self):
+        """
+        End-to-end: prepare_inference_input() must fully remove the
+        parenthetical wrapper on the single-string inference path.
+        """
+        note = (
+            "Subjective: Knee pain.\n"
+            "Objective: Swelling present.\n"
+            "Assessment: Pain in left knee (ICD-10: M25.562).\n"
+            "Plan: Physiotherapy."
+        )
+        result = prepare_inference_input(note)
+        assert "(ICD-10: [REDACTED])" not in result, (
+            "Parenthetical wrapper was not fully removed on inference path — "
+            f"'(ICD-10: [REDACTED])' still present in: {result!r}"
+        )
+        assert "M25.562" not in result
+        assert "Pain in left knee" in result
 
 
 # ---------------------------------------------------------------------------
