@@ -43,31 +43,17 @@ ICD10_REDACT_PATTERN = (
     r'\b[A-Z][0-9]{2}[0-9A-Z]{0,5}\b'     # raw: M25562, N390, J18
 )
 
-# Remove the entire parenthetical wrapper containing an ICD-10 code reference
-# to avoid leaving artifacts that signal where a label was present.
-#
-# Handles all observed MedSynth variants:
-#   (ICD-10: M25.562)        — colon separator
-#   (ICD-10 code M25.562)    — "code" keyword separator
-#   (ICD10: N39.0)           — no hyphen
-#   (ICD10 M25562)           — no hyphen, no separator, raw format
-#   (icd-10: e11.65)         — lowercase
-#
-# Applied BEFORE ICD10_REDACT_PATTERN to prevent leaving ([REDACTED]) artifacts.
-# A second cleanup pass removes any stray ([REDACTED]) that survive.
-PARENTHETICAL_ICD10_PATTERN = (
-    r'(?i)\s*\(\s*ICD-?10'          # opening: (ICD-10 or (ICD10, case-insensitive
-    r'(?:\s*:|\s+code)?\s*'          # optional separator: ":" or " code"
-    r'(?:[A-Z][0-9]{2}\.[0-9A-Z]{1,4}|[A-Z][0-9]{2}[0-9A-Z]{0,5})'  # the code
-    r'\s*\)'                          # closing paren
-)
-
-# Cleanup pattern: remove stray ([REDACTED]) artifacts left when
-# ICD10_REDACT_PATTERN fires inside a parenthetical that PARENTHETICAL_ICD10_PATTERN
-# didn't match (e.g. unusual separators). Applied after both redaction passes.
-REDACTED_ARTIFACT_PATTERN = r'\(\s*\[REDACTED\]\s*\)'
+# Broad pattern validated against full corpus audit (Phase 3b.2).
+# Removes any parenthetical containing the word "ICD" — covers all
+# MedSynth variants: (ICD-10: CODE), (ICD-10 Code: CODE), (ICD-10 code CODE),
+# (ICD-10), (ICD-10 description), (ICD-10-CM CODE), (CODE ICD-10), etc.
+# Word boundary \b prevents matching AICD (medical device abbreviation).
+PARENTHETICAL_ICD10_PATTERN = r'(?i)\s*\([^)]*\bICD[^)]*\)'
 
 REDACTION_MARKER = "[REDACTED]"
+
+# Cleanup pattern: remove stray ([REDACTED]) artifacts.
+REDACTED_ARTIFACT_PATTERN = r'\(\s*\[REDACTED\]\s*\)'
 
 # Section headers used for inference-time regex extraction
 _SOAP_PATTERNS = {
@@ -161,6 +147,7 @@ def redact_icd10_sections(df: pl.DataFrame) -> pl.DataFrame:
         pl.col(section)
         .str.replace_all(PARENTHETICAL_ICD10_PATTERN, '')
         .str.replace_all(ICD10_REDACT_PATTERN, REDACTION_MARKER)
+        .str.replace_all(REDACTED_ARTIFACT_PATTERN, '')
         .alias(f"{section}_clean")
         for section in sections
     ])
@@ -248,11 +235,11 @@ def prepare_inference_input(note: str) -> str:
         apso_note = note.strip()
 
     # Redact ICD-10 code strings — same logic as Phase 3c
-    # Pass 1: strip full parentheticals e.g. "(ICD-10: M25.562)" / "(ICD-10 code M25562)"
+    # Step 1: strip "(ICD-10: CODE)" parentheticals
     apso_note = re.sub(PARENTHETICAL_ICD10_PATTERN, '', apso_note)
-    # Pass 2: redact any remaining standalone codes
+    # Step 2: redact any remaining standalone codes
     apso_note = re.sub(ICD10_REDACT_PATTERN, REDACTION_MARKER, apso_note)
-    # Pass 3: clean up stray ([REDACTED]) artifacts from unusual parenthetical formats
+    # Step 3: clean up stray ([REDACTED]) artifacts
     apso_note = re.sub(REDACTED_ARTIFACT_PATTERN, '', apso_note)
 
     return apso_note
