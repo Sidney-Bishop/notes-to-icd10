@@ -2,8 +2,8 @@
 
 **Audience:** Business stakeholders and non-technical readers  
 **Purpose:** Plain-language explanation of what this project does, why it is hard, and how we approached it  
-**Last updated:** 27 April 2026  
-**Current best result:** 79.8% accuracy on 1,926 ICD-10 codes
+**Last updated:** 8 May 2026  
+**Current best result:** 77.2% accuracy on 1,926 ICD-10 codes
 
 ---
 
@@ -107,14 +107,14 @@ We did not jump straight to predicting full ICD-10 codes. Instead, we built up p
 
 **The model:** Bio_ClinicalBERT — a version of the BERT language model pre-trained specifically on clinical text. We fine-tuned it to predict one of 675 ICD-3 categories.
 
-**Training:** 30 epochs (~150 minutes on Apple M5 Max). A key finding from this notebook: the model continued improving all the way to epoch 28 before plateauing. This confirmed that high-cardinality clinical classification requires significantly more training than standard benchmarks — 10 epochs would have missed 8 percentage points of F1.
+**Training:** 30 epochs (~157 minutes on Apple M5 Max). A key finding from this notebook: the model continued improving all the way to epoch 28 before plateauing. This confirmed that high-cardinality clinical classification requires significantly more training than standard benchmarks — 10 epochs would have missed 8 percentage points of F1.
 
 **The result:**
 
 | Metric | Value | What it means |
 |---|---|---|
-| Test Accuracy | 87.2% | Correct ICD-3 category 87 times in 100 |
-| Macro F1 | 0.841 | Consistent performance across all 675 categories |
+| Test Accuracy | 87.6% | Correct ICD-3 category 88 times in 100 |
+| Macro F1 | 0.8456 | Consistent performance across all 675 categories |
 | Top-5 Accuracy | 93.4% | Correct category in top 5 predictions 93% of the time |
 
 **Why this matters:** This was a crucial proof of concept. The clinical notes contain learnable diagnostic signal, the preprocessing works, and Bio_ClinicalBERT is the right model family. Without this confirmation, everything that follows would be built on unproven foundations.
@@ -136,13 +136,13 @@ We did not jump straight to predicting full ICD-10 codes. Instead, we built up p
 
 | Metric | Value |
 |---|---|
-| Test Accuracy | 73.3% |
-| Macro F1 | 0.634 |
-| Top-5 Accuracy | 87.6% |
+| Test Accuracy | 73.0% |
+| Macro F1 | 0.626 |
+| Top-5 Accuracy | 87.3% |
 
-73.3% accuracy on a 1,926-way classification task with only 4 training examples per code is genuinely strong. But it establishes the **flat baseline** — the best a single model can do when asked to simultaneously distinguish all 1,926 codes.
+73.0% accuracy on a 1,926-way classification task with only 4 training examples per code is genuinely strong. But it establishes the **flat baseline** — the best a single model can do when asked to simultaneously distinguish all 1,926 codes.
 
-**The critical insight from chapter-level analysis:** The model achieves **91.2% accuracy** at predicting which of 22 clinical chapters a note belongs to, but only 73.3% at the full code level. This 17.9 percentage point gap tells us exactly what the model struggles with: it knows a patient has a musculoskeletal condition; it struggles to pinpoint exactly which of 222 musculoskeletal codes applies.
+**The critical insight from chapter-level analysis:** The model achieves **91.2% accuracy** at predicting which of 22 clinical chapters a note belongs to, but only 73.0% at the full code level. This 18.2 percentage point gap tells us exactly what the model struggles with: it knows a patient has a musculoskeletal condition; it struggles to pinpoint exactly which of 222 musculoskeletal codes applies.
 
 Furthermore, 67.1% of the model's errors stay within the correct clinical chapter — wrong specific code, right domain. Only 8.8% of predictions cross into a completely different clinical territory. The model has learned the broad structure of ICD-10 almost perfectly. The remaining challenge is **within-chapter precision**.
 
@@ -163,7 +163,7 @@ A natural intuition — and a very reasonable one — is that the two stages wou
 
 1. **Routing errors are catastrophic.** If Stage 1 sends a note to the wrong resolver, Stage 2 cannot recover — the correct code is simply not available in the wrong resolver's label space. A 675-way ICD-3 classifier with only ~15 examples per category would make significantly more routing errors than a 22-way chapter classifier with ~440 examples per chapter.
 
-2. **E-001 already solves ICD-3.** Notebook 02 trains a dedicated 675-way ICD-3 classifier achieving 87.2% accuracy. If ICD-3 routing were the goal, E-001 is the answer. The hierarchical notebooks explore a structurally different decomposition.
+2. **E-001 already solves ICD-3.** Notebook 02 trains a dedicated 675-way ICD-3 classifier achieving 87.6% accuracy. If ICD-3 routing were the goal, E-001 is the answer. The hierarchical notebooks explore a structurally different decomposition.
 
 The tradeoff is real: routing at chapter level leaves Stage 2 with ~100 codes to resolve per chapter (rather than ~3 per ICD-3 group). But the higher routing reliability justifies this.
 
@@ -176,7 +176,7 @@ Clinical Note
 │  22-way classifier                      │
 │  "Which of 22 clinical chapters?"       │
 │  e.g. → Chapter M (Musculoskeletal)     │
-│  Accuracy: 96.4%                        │
+│  Accuracy: 96.3%                        │
 └──────────────────┬──────────────────────┘
                    │
                    ▼
@@ -189,13 +189,13 @@ Clinical Note
 └─────────────────────────────────────────┘
 ```
 
-**Stage 1 training:** The chapter router was initialised from E-001's weights (the ICD-3 classifier), since E-001 had already learned to associate clinical language with broad diagnostic groupings. It achieved **96.4% chapter routing accuracy** in just 5 epochs — exceeding the flat model's implicit chapter accuracy of 91.2%. A key operational finding: the router converges at epoch 4; training beyond 5 epochs wastes compute.
+**Stage 1 training:** The chapter router was initialised from E-001's weights (the ICD-3 classifier), since E-001 had already learned to associate clinical language with broad diagnostic groupings. It achieved **96.3% chapter routing accuracy** in just 5 epochs — exceeding the flat model's implicit chapter accuracy of 91.2%. A key operational finding: 5 epochs is the confirmed correct budget.
 
 **Stage 2 training — what went wrong:**
 
 Stage 2 models were initialised from **fresh Bio_ClinicalBERT weights** — the base model with no ICD-10 knowledge whatsoever. Each of 19 resolvers had to learn ICD-10 code distinctions from scratch, using only the ~440 records in its chapter (~4 per code).
 
-**End-to-end result: 11.1% accuracy** — far worse than the flat baseline of 73.3%.
+**End-to-end result: 12.7% accuracy** — far worse than the flat baseline of 73.0%.
 
 The architecture was correct. The initialisation was wrong.
 
@@ -222,22 +222,22 @@ The most telling evidence: Chapter M had 888 training records — far above any 
 | A (Infectious Diseases) | 100% | Perfect — was 0% in E-003 |
 | N (Genitourinary) | 94.1% | |
 | B, I, C, R, S ... | 87–92% | Strong across the board |
-| Z (Administrative) | 59.5% | Still the hardest chapter |
-| **Weighted average** | **83.5%** | vs 13.4% in E-003 |
+| Z (Administrative) | 57.9% | Still the hardest chapter |
+| **Weighted average** | **82.5%** | vs 15.3% in E-003 |
 
-The E-002 initialisation delivered a **70 percentage point improvement** in within-chapter accuracy. Chapter A — which had completely failed (0%) in E-003 — achieved perfect accuracy. The difference is entirely explained by the starting weights.
+The E-002 initialisation delivered a **67 percentage point improvement** in within-chapter accuracy. Chapter A — which had completely failed (0%) in E-003 — achieved perfect accuracy. The difference is entirely explained by the starting weights.
 
 **End-to-end result:**
 
 | Approach | Accuracy | vs Flat Baseline |
 |---|---|---|
-| Flat ICD-10 (E-002, Notebook 03) | 73.3% | baseline |
-| Hierarchical cold start (E-003, Notebook 04) | 11.1% | −62.2pp |
-| **Hierarchical E-002 init (E-009, Notebook 05)** | **79.8%** | **+6.5pp** ✅ |
+| Flat ICD-10 (E-002, Notebook 03) | 73.0% | baseline |
+| Hierarchical cold start (E-003, Notebook 04) | 12.7% | −60.3pp |
+| **Hierarchical E-002 init (E-009, Notebook 05)** | **77.2%** | **+4.2pp** ✅ |
 
-**The hierarchical approach definitively beats the flat baseline** — 79.8% vs 73.3%, a +6.5 percentage point improvement. This is the first time in the project that the hierarchical architecture has clearly outperformed a single flat model.
+**The hierarchical approach definitively beats the flat baseline** — 77.2% vs 73.0%, a +4.2 percentage point improvement. This is the first time in the project that the hierarchical architecture has clearly outperformed a single flat model.
 
-**Extended training:** We also ran additional training for the 6 weakest chapter resolvers (Z, K, E, H, T, S) for 10 more epochs at a lower learning rate. The result: essentially no change (±0.008 F1 across all 6 chapters). The models had already reached their ceiling. Phase 2 weights are the final resolvers.
+**Extended training:** We also ran additional training for the 6 weakest chapter resolvers (Z, K, E, H, T, S) for 10 more epochs at a lower learning rate. The result: mixed — K and S improved modestly (+0.067/+0.037 F1), while E and H regressed, and Z barely moved (+0.001). The Phase 4b models are effectively the final Stage-2 resolvers.
 
 ---
 
@@ -246,20 +246,20 @@ The E-002 initialisation delivered a **70 percentage point improvement** in with
 | Notebook | Experiment | Task | Accuracy | Key Learning |
 |---|---|---|---|---|
 | 01 | EDA | Dataset understanding | — | APSO ordering is critical; 5 examples per code is the constraint |
-| 02 | E-001 | ICD-3 (675 categories) | 87.2% | Clinical notes are learnable; 30 epochs needed |
-| 03 | E-002 | Flat ICD-10 (1,926 codes) | 73.3% | Sets the flat baseline; 91.2% chapter accuracy |
-| 04 | E-003 | Hierarchical, fresh init | 11.1% | Right architecture, wrong initialisation |
-| 05 | E-009 | Hierarchical, E-002 init | **79.8%** | **Beats flat baseline; E-002 init is the key** |
+| 02 | E-001 | ICD-3 (675 categories) | 87.6% | Clinical notes are learnable; 30 epochs needed |
+| 03 | E-002 | Flat ICD-10 (1,926 codes) | 73.0% | Sets the flat baseline; 91.2% chapter accuracy |
+| 04 | E-003 | Hierarchical, fresh init | 12.7% | Right architecture, wrong initialisation |
+| 05 | E-009 | Hierarchical, E-002 init | **77.2%** | **Beats flat baseline; E-002 init is the key** |
 
 ---
 
-## What 79.8% Accuracy Means in Practice
+## What 77.2% Accuracy Means in Practice
 
 On the held-out test set of 966 clinical notes that the model had never seen:
 
-- **771 notes** (79.8%) — exactly correct ICD-10 code predicted
-- **160 notes** (16.6%) — routed to the correct chapter, wrong specific code within it
-- **35 notes** (3.6%) — routed to the wrong chapter entirely
+- **746 notes** (77.2%) — exactly correct ICD-10 code predicted
+- **184 notes** (19.0%) — routed to the correct chapter, wrong specific code within it
+- **36 notes** (3.7%) — routed to the wrong chapter entirely
 
 **Top-5 accuracy is 87–99% across most chapters.** This means the correct ICD-10 code appears in the model's top 5 predictions for the vast majority of notes. In a clinical coding assistance workflow — where a human coder selects from a ranked shortlist rather than a full 1,926-code catalogue — the correct code would be surfaced for virtually every patient encounter.
 
@@ -269,7 +269,7 @@ On the held-out test set of 966 clinical notes that the model had never seen:
 
 ### The Z-Chapter Problem (Primary Target)
 
-Administrative codes (Chapter Z) achieved only 52.9% end-to-end accuracy. These codes cover routine health encounters with deliberately generic clinical language — by design, a routine check-up note reads similarly regardless of the specific Z-code. This is a structural challenge, not a training deficiency. Targeted approaches (contrastive learning, data augmentation specific to Z-codes) are the next avenue.
+Administrative codes (Chapter Z) achieved only 47.1% end-to-end accuracy. These codes cover routine health encounters with deliberately generic clinical language — by design, a routine check-up note reads similarly regardless of the specific Z-code. This is a structural challenge, not a training deficiency. Targeted approaches (contrastive learning, data augmentation specific to Z-codes) are the next avenue.
 
 ### The Data Constraint
 
@@ -277,7 +277,7 @@ MedSynth's uniform 5-examples-per-code design does not reflect real-world clinic
 
 ### The Remaining Gap
 
-The +6.5pp improvement from hierarchical over flat is meaningful but modest. The theoretical ceiling (based on Stage 1 routing accuracy of 96.4% × the within-chapter target of 80.4%) suggests the architecture could reach approximately 77–80% E2E with better Stage 2 performance. The current 79.8% result is already near this ceiling, with Z-chapter being the primary remaining lever.
+The +4.2pp improvement from hierarchical over flat is meaningful but modest. The theoretical ceiling (based on Stage-1 routing accuracy of 96.3% × the within-chapter target of 80.1%) suggests the architecture could reach approximately 77% E2E with better Stage-2 performance. The current 77.2% result is already near this ceiling, with Z-chapter being the primary remaining lever.
 
 ---
 
@@ -300,6 +300,6 @@ The +6.5pp improvement from hierarchical over flat is meaningful but modest. The
 
 ---
 
-*This document reflects the state of the project as of 27 April 2026.*  
-*Current best result: E-009 — 79.8% accuracy, 0.711 Macro F1 on 1,926 ICD-10 codes.*  
-*All five notebooks have been reviewed, re-run, and documented.*
+*This document reflects the state of the project as of 8 May 2026.*  
+*Current best result: E-009 — 77.2% accuracy, 0.679 Macro F1 on 1,926 ICD-10 codes.*  
+*All five notebooks have been reviewed, re-run, and validated from a cold clone.*
