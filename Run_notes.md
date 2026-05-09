@@ -174,6 +174,36 @@ ls outputs/evaluations/E-010_40ep_E002Init/stage2/
 
 ---
 
+---
+
+## Stage 0b — Build Knowledge Graph (~5 min)
+
+**Required before calibration and evaluation.** The graph reranker used by
+`evaluate.py` and `src/inference.py` depends on `data/graph/icd10_knowledge_graph.pkl`.
+Without it, `evaluate.py` will fail with `FileNotFoundError`.
+
+**Run once per gold layer** — if you regenerate the gold parquet, rebuild the graph.
+
+```bash
+uv run python scripts/build_graph.py
+```
+
+**Expected output:**
+```
+Graph: 6,837 nodes, 258,954 edges
+Codes:   1,926
+Concepts:4,889
+✅ Graph complete
+```
+
+**Verify:**
+```bash
+ls data/graph/icd10_knowledge_graph.pkl
+# Expected: file exists, ~50MB
+```
+
+---
+
 ## Stage 1 — E-002: Flat ICD-10 Baseline (40 epochs)
 
 **Purpose:** Flat classifier over all 1,926 ICD-10 codes. Serves two purposes:
