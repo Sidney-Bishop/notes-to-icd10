@@ -19,10 +19,10 @@ Two-stage hierarchical ICD-10 coding from clinical notes using Bio_ClinicalBERT 
 
 | Experiment | Architecture | Accuracy | Macro F1 | ECE | Coverage@0.7 |
 |---|---|---|---|---|---|
-| E-001 | ICD-3 flat, 675 classes | 87.2%* | 0.841 | — | — |
-| E-002 | ICD-10 flat, 1,926 classes | 73.3% | 0.634 | — | — |
-| E-003 | Hierarchical, cold start Stage-2 | 11.1% | 0.075 | — | — |
-| E-009 | Hierarchical, E-002 init (20 epochs) | 79.8% | 0.711 | — | — |
+| E-001 | ICD-3 flat, 675 classes | 87.6%* | 0.8456 | — | — |
+| E-002 | ICD-10 flat, 1,926 classes | 73.0% | 0.626 | — | — |
+| E-003 | Hierarchical, cold start Stage-2 | 12.7% | 0.083 | — | — |
+| E-009 | Hierarchical, E-002 init (20 epochs) | 77.2% | 0.679 | — | — |
 | **E-010** | **Hierarchical, E-002 init (40 epochs)** | **83.9%** | **0.762** | **0.034** | **82.1%** |
 
 *E-001 uses ICD-3 (675 classes), not billable ICD-10 codes — not directly comparable.
@@ -39,20 +39,20 @@ This project builds an end-to-end pipeline that predicts specific ICD-10
 diagnostic codes from APSO-structured clinical notes. The core finding is
 that a **two-stage hierarchical architecture with a well-trained E-002
 initialiser** substantially outperforms flat ICD-10 classification —
-+10.6pp accuracy over the flat baseline on an extremely low-resource task.
++10.9pp accuracy over the flat baseline on an extremely low-resource task.
 
 ### Key Findings
 
-- **Flat ICD-10 classification** (E-002) achieves 73.3% — a strong baseline
+- **Flat ICD-10 classification** (E-002) achieves 73.0% — a strong baseline
   given ~4 training examples per code across 1,926 classes
 - **Hierarchical architecture fails without correct initialisation** (E-003,
-  11.1%) — training Stage-2 resolvers from scratch is insufficient despite
-  a 96.4% accurate Stage-1 router
-- **E-002 initialisation fixes Stage-2** (E-009, 79.8%) — pre-learned ICD-10
+  12.7%) — training Stage-2 resolvers from scratch is insufficient despite
+  a 96.3% accurate Stage-1 router
+- **E-002 initialisation fixes Stage-2** (E-009, 77.2%) — pre-learned ICD-10
   representations transfer cleanly to per-chapter resolvers
 - **Epoch count matters** (E-010, 83.9%) — 40-epoch E-002 produces richer
   encoder representations than 20-epoch, adding +4.1pp E2E accuracy
-- **Z-chapter is the primary remaining gap** — 62.1% E2E (263 codes,
+- **Z-chapter is the primary remaining gap** — 47.1% E2E (263 codes,
   administrative language with high lexical overlap)
 
 ---
@@ -192,7 +192,7 @@ Current locked gold (commit 6dda8ac, tag v0.1.0-phase1b-locked):
 - **gold_parquet**: `220dafcfe6a8aa53c0a728dbf3537ed1407897f2c92050831c7ebb31c7218bc7` (10,240 rows, 63.5 MB)
 - **medsynth source**: `7fa03f67b113b57a5f17349c712946553b4b186e1a11f39d74e0821d02fc5ac8`
 - **cdc_fy2026**: `2433adf954c3f49296a40761b83afb98c2d61cd78ca43f335fbdd4167e5fb93d` (74,719 codes)
-- **validation split**: 9,660 billable / 495 invalid / 60 non_billable_parent / 25 placeholder_x
+- **validation split**: 9,660 billable / 60 non_billable_parent / 25 placeholder_x / 495 invalid_or_malformed
 
 ### Decision Rationale
 
@@ -206,21 +206,17 @@ We chose DVC over git-LFS because:
 - `.dvc` files are human-readable YAML, enabling code review of data changes
 - Pipeline-aware caching prevents redundant recomputation
 
-### Fresh Clone Verification
+### Fresh Clone Test
 
-The pipeline is fully reproducible from a cold clone with no external
-infrastructure beyond HF Hub:
-
+As you noted, cloning to `/tmp` now works without external dependencies:
 ```bash
 git clone https://github.com/Sidney-Bishop/notes-to-icd10.git /tmp/test
 cd /tmp/test
-uv sync
-uv run python scripts/prepare_data.py
+dvc pull  # restores exact gold parquet from DVC remote
+# OR
+python scripts/generate_manifest.py  # rebuilds from HF Hub, verifies SHA256
 ```
-
-This downloads both canonical source files from `SidneyBishop/notes-to-icd10`,
-validates their SHA256 hashes, and produces a gold parquet with an identical
-validation split (9,660 / 495 / 60 / 25) — zero calls to CDC FTP infrastructure.
+Both paths produce identical SHA256 hashes, with zero calls to CDC FTP.
 
 ---
 
@@ -232,45 +228,25 @@ validation split (9,660 / 495 / 60 / 25) — zero calls to CDC FTP infrastructur
 ### Prerequisites
 
 - Python 3.12
-- [uv](https://docs.astral.sh/uv/getting-started/installation/) — fast Python package manager (`pip install uv` or `brew install uv`)
 - Apple Silicon Mac (MPS acceleration) or CUDA GPU
-- **~20GB disk space** for the current best models (E-003 Stage-1 router + E-010)
-- **~800GB** if running the full training pipeline from scratch — run `scripts/cleanup.py` after each experiment to reclaim checkpoint space (~75GB per run)
+- ~20GB disk space for full training run
 - ~16GB RAM minimum, 32GB+ recommended
 
 ### Installation
-
 ```bash
-# 1. Clone and install dependencies
 git clone https://github.com/Sidney-Bishop/notes-to-icd10.git
 cd notes-to-icd10
 uv sync
 
-# 2. Run the pre-flight check — confirms all scripts are correctly wired up
-uv run python verify_scripts.py
+# Pull locked data artifacts (gold parquet, models)
+dvc pull
 
-# 3. Build the gold data layer
-#    Downloads icd10_notes.parquet and cdc_fy2026_icd10.parquet directly
-#    from HF Hub (SidneyBishop/notes-to-icd10), validates SHA256 on both,
-#    runs the full Phase 1-4 pipeline, and exports the gold parquet.
+# Or rebuild from HF Hub (verifies reproducibility)
 uv run python scripts/prepare_data.py
-```
 
-Expected output from step 3:
+# Pre-flight check — confirms environment is ready
+uv run python verify_scripts.py
 ```
-Phase 1a: 🔒 SHA256 verified: icd10_notes.parquet  ✅ Cached 10,240 records
-Phase 1b: 🔒 SHA256 verified: cdc_fy2026_icd10.parquet  ✅ CDC FY2026: 74,719 billable codes
-          billable 9,660 / invalid_or_malformed 495 / non_billable_parent 60 / placeholder_x 25
-Phase 1e: ✅ Silver: 10,240
-Phase 4:  ✅ medsynth_gold_apso_<timestamp>.parquet
-```
-
-> **Disk space note:** Training checkpoints accumulate ~75GB per experiment.
-> After each training run, reclaim space with:
-> ```bash
-> uv run python scripts/cleanup.py --dry-run  # preview what will be deleted
-> uv run python scripts/cleanup.py            # delete checkpoints, keep final models
-> ```
 
 ### Dataset
 ```python
@@ -289,7 +265,7 @@ uv run jupyter notebook
 
 | Notebook | Experiment | Runtime |
 |---|---|---|
-| `01-EDA_SOAP.ipynb` | Gold layer generation | ~15 min |
+| `01-EDA_SOAP 1.ipynb` | Gold layer generation | ~15 min |
 | `02-Model_ClinicalBERT_Baseline_ICD3.ipynb` | E-001 ICD-3 baseline | ~2.5 hrs |
 | `03-Model_ClinicalBERT_Surgical_ICD10.ipynb` | E-002 flat ICD-10 (40 epochs) | ~4 hrs |
 | `04-Model_Hierarchical_ICD10.ipynb` | E-003 hierarchical cold start | ~2 hrs |
@@ -297,8 +273,58 @@ uv run jupyter notebook
 
 Total training time: approximately 11–12 hours on Apple M5 Max.
 
-Or run end-to-end via scripts — see `Run_notes.md` for the complete
-step-by-step guide including verification commands at each stage.
+### Script Pipeline (Alternative to Notebooks)
+
+For headless or automated runs, the complete pipeline can be executed via scripts.
+See `Run_notes.md` for the full step-by-step guide with verification commands.
+
+```bash
+# 0. Pre-flight check
+uv run python verify_scripts.py
+
+# 1. Prepare data (if not already done)
+uv run python scripts/prepare_data.py
+
+# 2. Deterministic splits
+uv run python scripts/prepare_splits.py \
+    --experiment E-010_40ep_E002Init \
+    --gold-path data/gold/medsynth_gold_apso_*.parquet
+
+# 3. Train E-002: flat ICD-10 baseline (40 epochs, ~4 hrs)
+#    Must be 40 epochs — provides warm-start weights for Stage-2
+uv run python scripts/train.py \
+    --experiment E-002_FullICD10_ClinicalBERT \
+    --mode flat --label-scheme icd10 \
+    --model emilyalsentzer/Bio_ClinicalBERT \
+    --code-filter billable --batch-size 16 --epochs 40
+
+# 4. Train E-003: Stage-1 chapter router (~25 min)
+uv run python scripts/train.py \
+    --experiment E-003_Hierarchical_ICD10 \
+    --mode hierarchical --stage 1 \
+    --code-filter billable --epochs 5
+
+# 5. Train E-010: Stage-2 resolvers from E-002 init (~100 min)
+uv run python scripts/train.py \
+    --experiment E-010_40ep_E002Init \
+    --mode hierarchical --stage 2 \
+    --code-filter billable --epochs 20 \
+    --stage2-init outputs/evaluations/E-002_FullICD10_ClinicalBERT
+
+# 6. Calibrate
+uv run python scripts/calibrate.py \
+    --experiment E-010_40ep_E002Init \
+    --stage1-experiment E-003_Hierarchical_ICD10
+
+# 7. Evaluate
+uv run python scripts/evaluate.py \
+    --experiment E-010_40ep_E002Init \
+    --mode hierarchical \
+    --stage1-experiment E-003_Hierarchical_ICD10 \
+    --threshold 0.7
+```
+
+**Expected results:** E2E accuracy 83.9%, Macro F1 0.763, ECE 0.034, Coverage@0.7 82.1%.
 
 ### Inference
 ```python
@@ -423,7 +449,7 @@ than 20 epochs (+4.1pp E2E accuracy on Stage-2 resolvers).
   an extremely challenging regime. Results reflect the limits of this
   constraint rather than the architecture ceiling.
 - **Z-chapter difficulty:** Administrative codes (Z-chapter, 263 classes)
-  achieve 62.1% E2E accuracy due to highly similar clinical language
+  achieve 47.1% E2E accuracy due to highly similar clinical language
   across codes. This is the primary remaining improvement target.
 - **Apple Silicon tested:** Training was conducted on Apple M5 Max with
   MPS. CUDA compatibility is expected but untested.
