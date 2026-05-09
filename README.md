@@ -290,11 +290,7 @@ uv run python scripts/prepare_splits.py \
     --experiment E-010_40ep_E002Init \
     --gold-path data/gold/medsynth_gold_apso_*.parquet
 
-# 3. Build knowledge graph (~5 min)
-#    Required for calibration and inference — must exist before evaluate.py
-uv run python scripts/build_graph.py
-
-# 4. Train E-002: flat ICD-10 baseline (40 epochs, ~4 hrs)
+# 3. Train E-002: flat ICD-10 baseline (40 epochs, ~4 hrs)
 #    Must be 40 epochs — provides warm-start weights for Stage-2
 uv run python scripts/train.py \
     --experiment E-002_FullICD10_ClinicalBERT \
@@ -302,25 +298,25 @@ uv run python scripts/train.py \
     --model emilyalsentzer/Bio_ClinicalBERT \
     --code-filter billable --batch-size 16 --epochs 40
 
-# 5. Train E-003: Stage-1 chapter router (~25 min)
+# 4. Train E-003: Stage-1 chapter router (~25 min)
 uv run python scripts/train.py \
     --experiment E-003_Hierarchical_ICD10 \
     --mode hierarchical --stage 1 \
     --code-filter billable --epochs 5
 
-# 6. Train E-010: Stage-2 resolvers from E-002 init (~100 min)
+# 5. Train E-010: Stage-2 resolvers from E-002 init (~100 min)
 uv run python scripts/train.py \
     --experiment E-010_40ep_E002Init \
     --mode hierarchical --stage 2 \
     --code-filter billable --epochs 20 \
     --stage2-init outputs/evaluations/E-002_FullICD10_ClinicalBERT
 
-# 7. Calibrate
+# 6. Calibrate
 uv run python scripts/calibrate.py \
     --experiment E-010_40ep_E002Init \
     --stage1-experiment E-003_Hierarchical_ICD10
 
-# 8. Evaluate
+# 7. Evaluate
 uv run python scripts/evaluate.py \
     --experiment E-010_40ep_E002Init \
     --mode hierarchical \
@@ -329,6 +325,28 @@ uv run python scripts/evaluate.py \
 ```
 
 **Expected results:** E2E accuracy 83.9%, Macro F1 0.763, ECE 0.034, Coverage@0.7 82.1%.
+
+### Disk Management
+
+Training checkpoints accumulate during the pipeline (~3.6GB per resolver).
+After training completes successfully, reclaim disk space with:
+
+```bash
+# Preview what will be deleted (safe — no changes made)
+uv run python scripts/cleanup.py --dry-run
+
+# Delete all checkpoints (~150-270GB freed depending on experiments run)
+uv run python scripts/cleanup.py
+
+# Keep the current best experiment, clean everything else
+uv run python scripts/cleanup.py --keep E-010_40ep_E002Init
+
+# Clean a specific experiment only
+uv run python scripts/cleanup.py --experiment E-003_Hierarchical_ICD10
+```
+
+What is **kept:** final model weights, label maps, temperature calibration, eval results.
+What is **deleted:** `checkpoint-N/` and `checkpoints/` directories only.
 
 ### Inference
 ```python
@@ -387,7 +405,8 @@ notes-to-icd10/
 │   ├── calibrate.py        # Temperature scaling
 │   ├── evaluate.py         # Full evaluation suite
 │   ├── predict.py          # Single-note inference
-│   └── prepare_splits.py   # Deterministic train/val/test splits
+│   ├── prepare_splits.py   # Deterministic train/val/test splits
+│   └── cleanup.py          # Remove training checkpoints, reclaim disk space
 ├── src/
 │   ├── config.py           # Centralised configuration + audit trail
 │   ├── experiment_logger.py # Structured experiment registry
