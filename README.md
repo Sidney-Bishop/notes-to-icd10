@@ -290,7 +290,11 @@ uv run python scripts/prepare_splits.py \
     --experiment E-010_40ep_E002Init \
     --gold-path data/gold/medsynth_gold_apso_*.parquet
 
-# 3. Train E-002: flat ICD-10 baseline (40 epochs, ~4 hrs)
+# 3. Build knowledge graph (~5 min)
+#    Required for calibration and inference — must exist before evaluate.py
+uv run python scripts/build_graph.py
+
+# 4. Train E-002: flat ICD-10 baseline (40 epochs, ~4 hrs)
 #    Must be 40 epochs — provides warm-start weights for Stage-2
 uv run python scripts/train.py \
     --experiment E-002_FullICD10_ClinicalBERT \
@@ -298,25 +302,25 @@ uv run python scripts/train.py \
     --model emilyalsentzer/Bio_ClinicalBERT \
     --code-filter billable --batch-size 16 --epochs 40
 
-# 4. Train E-003: Stage-1 chapter router (~25 min)
+# 5. Train E-003: Stage-1 chapter router (~25 min)
 uv run python scripts/train.py \
     --experiment E-003_Hierarchical_ICD10 \
     --mode hierarchical --stage 1 \
     --code-filter billable --epochs 5
 
-# 5. Train E-010: Stage-2 resolvers from E-002 init (~100 min)
+# 6. Train E-010: Stage-2 resolvers from E-002 init (~100 min)
 uv run python scripts/train.py \
     --experiment E-010_40ep_E002Init \
     --mode hierarchical --stage 2 \
     --code-filter billable --epochs 20 \
     --stage2-init outputs/evaluations/E-002_FullICD10_ClinicalBERT
 
-# 6. Calibrate
+# 7. Calibrate
 uv run python scripts/calibrate.py \
     --experiment E-010_40ep_E002Init \
     --stage1-experiment E-003_Hierarchical_ICD10
 
-# 7. Evaluate
+# 8. Evaluate
 uv run python scripts/evaluate.py \
     --experiment E-010_40ep_E002Init \
     --mode hierarchical \
