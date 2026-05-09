@@ -4,8 +4,8 @@
 from scratch. Every command has been run and verified. Follow this document
 exactly to reproduce any result.
 
-**Last updated:** 6 May 2026
-**Current best:** E-010_40ep_E002Init — 83.9% E2E | 0.762 F1 | 0.034 ECE | 82.1% Coverage@0.7
+**Last updated:** 9 May 2026
+**Current best:** E-010_40ep_E002Init — 86.8% E2E | 0.799 F1 | 0.021 ECE | 85.6% Coverage@0.7
 **Data status:** Phase 1b locked — HF Hub + DVC (commit 6dda8ac)
 
 ---
@@ -51,7 +51,7 @@ If any of the above fail, **stop and fix before proceeding**.
 
 | File | Records | Description | Source |
 |------|---------|-------------|--------|
-| `data/gold/medsynth_gold_apso_*.parquet` | 10,240 | Original gold layer — APSO-flipped, ICD-10 redacted, CDC FY2026 validated (9,660 billable + 580 non-billable) | Built from HF Hub |
+| `data/gold/medsynth_gold_apso_*.parquet` | 10,240 | Original gold layer — APSO-flipped, ICD-10 redacted, CDC FY2026 validated (9,660 billable + 60 noisy_111 + 25 placeholder_x + 495 invalid_or_malformed) | Built from HF Hub |
 | `data/gold/medsynth_gold_apso_*.parquet.dvc` | — | DVC pointer file (tracked in git) | — |
 | `data/gold/MANIFEST_*.json` | — | SHA256 manifest with validation split | Generated |
 | `data/gold/medsynth_gold_augmented.parquet` | 11,214 | Above + 974 synthetic records for chapters O and Z | Historic |
@@ -113,20 +113,20 @@ outputs/run.log                      ← append-only run log (do not edit manual
 
 ```
 E-001  (ICD-3 flat baseline — proof of concept)
-  └── 87.2% accuracy, 675 classes
+  └── 87.6% accuracy, 675 classes
 
 E-002  (flat ICD-10, 40 epochs — CRITICAL: must be 40 epochs on original gold)
-  └── 73.3% accuracy, 1,926 classes
+  └── 73.0% accuracy, 1,926 classes
   └── provides warm-start weights for all Stage-2 resolvers
         ↓
 E-003  (Stage-1 chapter router — train once, reuse in all hierarchical experiments)
-  └── 96.4–98.7% chapter routing accuracy
+  └── 96.3–97.0% chapter routing accuracy
         ↓
 E-010  (current best — hierarchical, 40-epoch E-002 init, original gold)
-  └── 83.9% E2E accuracy, 0.762 F1, 82.1% Coverage@0.7 at 95.2% accuracy
+  └── 86.8% E2E accuracy, 0.799 F1, 85.6% Coverage@0.7 at 95.6% accuracy
 ```
 
-**Why not augmented gold?** E-010 on original gold (83.9%) beats the previous
+**Why not augmented gold?** E-010 on original gold (86.8%) beats the previous
 best production pipeline using augmented gold + graph reranker + Z override
 (77.4%). The 40-epoch E-002 init is more valuable than augmentation.
 
@@ -174,6 +174,37 @@ ls outputs/evaluations/E-010_40ep_E002Init/stage2/
 
 ---
 
+
+---
+
+## Stage 0b — Build Knowledge Graph (~5 min)
+
+**Required before calibration and evaluation.** The graph reranker used by
+`evaluate.py` and `src/inference.py` depends on `data/graph/icd10_knowledge_graph.pkl`.
+Without it, `evaluate.py` will fail with `FileNotFoundError`.
+
+**Run once per gold layer** — if you regenerate the gold parquet, rebuild the graph.
+
+```bash
+uv run python scripts/build_graph.py
+```
+
+**Expected output:**
+```
+Graph: 6,837 nodes, 258,954 edges
+Codes:   1,926
+Concepts:4,889
+✅ Graph complete
+```
+
+**Verify:**
+```bash
+ls data/graph/icd10_knowledge_graph.pkl
+# Expected: file exists, ~50MB
+```
+
+---
+
 ## Stage 1 — E-002: Flat ICD-10 Baseline (40 epochs)
 
 **Purpose:** Flat classifier over all 1,926 ICD-10 codes. Serves two purposes:
@@ -193,7 +224,7 @@ uv run python scripts/train.py \
     --epochs 40
 ```
 
-**Expected:** ~240 minutes. Best epoch ~38–40. Val accuracy ~76%.
+**Expected:** ~200 minutes. Best epoch ~35–40. Val accuracy ~80%.
 
 **Verify:**
 ```bash
@@ -230,7 +261,7 @@ uv run python scripts/train.py \
     --epochs 5
 ```
 
-**Expected:** ~25 minutes. Best epoch ~4. Val accuracy ~96–97%.
+**Expected:** ~25 minutes. Best epoch ~4–5. Val accuracy ~94–96%.
 
 **Verify:**
 ```bash
@@ -250,7 +281,7 @@ print('Chapters:', len(lm['label2id']))
 ## Stage 3 — E-010: Stage-2 Resolvers (40-epoch E-002 init)
 
 **Purpose:** 19 per-chapter resolvers, each initialised from the 40-epoch
-E-002 encoder. This is the key step that produces the 83.9% result.
+E-002 encoder. This is the key step that produces the 86.8% result.
 
 ```bash
 uv run python verify_scripts.py && \
@@ -355,8 +386,8 @@ uv run python scripts/calibrate.py \
 **Expected summary:**
 ```
 Avg temperature:  ~0.28
-Avg ECE:          0.665 → 0.115
-Avg Coverage@0.7: 80.5%  (avg accuracy on covered: 90.7%)
+Avg ECE:          0.666 → 0.073
+Avg Coverage@0.7: 86.9%  (avg accuracy on covered: 95.8%)
 ```
 
 If ECE gets **worse** after calibration, the classifier heads did not converge
@@ -383,12 +414,12 @@ uv run python scripts/evaluate.py \
 
 **Expected results:**
 ```
-📈 Stage-1 (chapter) accuracy: 0.987
-📈 Stage-2 (within-chapter):   0.850
-📈 End-to-end accuracy:        0.839
-📈 Macro F1:                   0.762
-📈 ECE:                        0.034
-📈 Coverage@τ=0.7:             82.1% (accuracy=0.952)
+📈 Stage-1 (chapter) accuracy: 0.970
+📈 Stage-2 (within-chapter):   0.895
+📈 End-to-end accuracy:        0.868
+📈 Macro F1:                   0.799
+📈 ECE:                        0.021
+📈 Coverage@τ=0.7:             85.6% (accuracy=0.956)
 ```
 
 **Register results:**
@@ -397,12 +428,12 @@ uv run python -c "
 from src.experiment_logger import ExperimentLogger, status
 el = ExperimentLogger('E-010_40ep_E002Init', script='scripts/train.py')
 el.log_results({
-    'e2e_accuracy':    0.839,
-    'macro_f1':        0.762,
-    'stage1_accuracy': 0.987,
-    'within_chapter':  0.850,
-    'ece':             0.034,
-    'coverage_07':     0.821,
+    'e2e_accuracy':    0.868,
+    'macro_f1':        0.799,
+    'stage1_accuracy': 0.970,
+    'within_chapter':  0.895,
+    'ece':             0.021,
+    'coverage_07':     0.856,
 })
 status()
 "
@@ -535,14 +566,14 @@ Reduce `--batch-size` to 8 or 4.
 
 | Rank | Experiment | Stage-1 | E2E | F1 | ECE | Cov@0.7 | Cov Acc |
 |---|---|---|---|---|---|---|---|
-| 🥇 | **E-010_40ep_E002Init** | **98.7%** | **83.9%** | **0.762** | **0.034** | **82.1%** | **95.2%** |
-| 🥈 | E-009_Balanced_E002Init | 96.4% | 79.8% | 0.711 | — | — | — |
+| 🥇 | **E-010_40ep_E002Init** | **97.0%** | **86.8%** | **0.799** | **0.021** | **85.6%** | **95.6%** |
+| 🥈 | E-009_Balanced_E002Init | 96.3% | 77.2% | 0.679 | — | — | — |
 | 🥉 | E-005c + Graph + Override | 97.0% | 77.4% | 0.679 | 0.027 | 68.5% | 93.6% |
-| 4th | E-002 flat | — | 73.3% | 0.634 | — | — | — |
+| 4th | E-002 flat | — | 73.0% | 0.626 | — | — | — |
 | 5th | E-008_Balanced | — | 34.2% | 0.249 | — | — | — |
 | 6th | E-006_Hierarchical_Clean | — | 23.8% | 0.160 | — | — | — |
 | 7th | E-004a_Hierarchical_E002Init | — | 20.9% | 0.141 | — | — | — |
-| 8th | E-003_Hierarchical_ICD10 | — | 11.1% | 0.075 | — | — | — |
+| 8th | E-003_Hierarchical_ICD10 | — | 12.7% | 0.083 | — | — | — |
 
 **The single most important architectural insights:**
 
@@ -554,5 +585,5 @@ Reduce `--batch-size` to 8 or 4.
 ---
 
 *Last updated: 6 May 2026*
-*Current best: E-010_40ep_E002Init — 83.9% E2E | 0.762 F1 | 0.034 ECE*
+*Current best: E-010_40ep_E002Init — 86.8% E2E | 0.799 F1 | 0.021 ECE*
 *Data: HF-locked + DVC (commit 6dda8ac)*
