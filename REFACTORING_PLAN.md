@@ -4,8 +4,8 @@
 Written as a handoff document — a new conversation with Claude should be
 able to pick this up and proceed without needing the full project history.
 
-**Date:** 6 May 2026
-**Current best result:** E-010_40ep_E002Init — 83.9% E2E | 0.763 F1 | 0.033 ECE | 82.1% Coverage@0.7 (95.2% acc)
+**Date:** 9 May 2026
+**Current best result:** E-010_40ep_E002Init — 86.8% E2E | 0.799 F1 | 0.021 ECE | 85.6% Coverage@0.7 (95.6% acc)
 **Data status:** Phase 1b locked — HF canonical + DVC + SHA256 manifest (commit 6dda8ac)
 
 ---
@@ -27,6 +27,8 @@ Key files:
 - `scripts/prepare_data.py` — HF-locked ingestion + CDC validation (Phase 1b)
 - `scripts/generate_manifest.py` — Phase 4 SHA256 manifest generator
 - `verify_scripts.py` — pre-flight checks (run before every training session)
+- `scripts/build_graph.py` — builds ICD-10 knowledge graph (required before evaluate.py)
+- `scripts/cleanup.py` — removes training checkpoints to reclaim disk space (~150-270GB)
 - `Run notes.md` — step-by-step reproduction guide
 - `Prj_Overview.md` — full project history and architectural decisions
 - `notebooks/utils/nb_setup.py` — shared notebook utilities (R-002)
@@ -52,7 +54,7 @@ As of 5 May 2026, `prepare_data.py` pulls exclusively from Hugging Face Hub
 (`SidneyBishop/notes-to-icd10`). This eliminates data drift, ensures reproducible
 SHA256 hashes, and enables fresh clones to rebuild without external dependencies.
 The canonical gold dataset is locked at 10,240 rows with validation split
-9,660/495/60/25 (billable/invalid/noisy_111/placeholder_x).
+9,660/60/25/495 (billable/noisy_111/placeholder_x/invalid_or_malformed).
 
 ---
 
@@ -60,11 +62,11 @@ The canonical gold dataset is locked at 10,240 rows with validation split
 
 | Experiment | E2E | F1 | ECE | Coverage@0.7 |
 |---|---|---|---|---|
-| E-001_Baseline_ICD3 | 86.9% | 0.843 | — | — |
-| E-002_FullICD10_ClinicalBERT | 76.2% | 0.661 | — | — |
-| E-003_Hierarchical_ICD10 | 11.1% | 0.075 | — | — |
-| E-009_Balanced_E002Init | 79.8% | 0.711 | — | — |
-| **E-010_40ep_E002Init** | **83.9%** | **0.763** | **0.033** | **82.1%** |
+| E-001_Baseline_ICD3 | 87.6% | 0.8456 | — | — |
+| E-002_FullICD10_ClinicalBERT | 73.0% | 0.626 | — | — |
+| E-003_Hierarchical_ICD10 | 12.7% | 0.083 | — | — |
+| E-009_Balanced_E002Init | 77.2% | 0.679 | — | — |
+| **E-010_40ep_E002Init** | **86.8%** | **0.799** | **0.021** | **85.6%** |
 
 ---
 
@@ -108,10 +110,10 @@ All four training notebooks (02-05) updated and re-run to verify reproducibility
 
 | Notebook | Experiment | Previous | This run | Status |
 |---|---|---|---|---|
-| 02 | E-001 ICD-3 | 87.2% / 0.841 | 88.0% / 0.853 | ✅ |
-| 03 | E-002 flat ICD-10 | 73.3% / 0.634 | 73.0% / 0.629 | ✅ |
-| 04 | E-003 cold start | 11.1% / 0.075 | 11.3% / 0.075 | ✅ |
-| 05 | E-009 E-002 init | 79.8% / 0.711 | 79.2% / 0.699 | ✅ |
+| 02 | E-001 ICD-3 | 87.6% / 0.8456 | 87.6% / 0.8456 | ✅ |
+| 03 | E-002 flat ICD-10 | 73.0% / 0.626 | 75.4% / 0.655 | ✅ |
+| 04 | E-003 cold start | 12.7% / 0.083 | 12.7% / 0.083 | ✅ |
+| 05 | E-009 E-002 init | 77.2% / 0.679 | 77.2% / 0.679 | ✅ |
 
 **Note on cost:** Full notebook re-runs required ~12 hours of GPU compute.
 For future refactoring verification, use a single smoke test rather than
@@ -179,11 +181,11 @@ Official comparison table (all results on same original gold test set):
 
 | Approach | Accuracy | F1 | Notes |
 |---|---|---|---|
-| Flat ICD-3 (E-001) | 87.2% | 0.841 | 675 classes, 30 epochs |
-| Flat ICD-10 (E-002) | 73.3% | 0.634 | 1,926 classes, 40 epochs |
-| Hierarchical cold start (E-003) | 11.1% | 0.075 | Fresh Stage-2 init |
-| Hierarchical E-002 init 20ep (E-009) | 79.8% | 0.711 | Original gold |
-| **Hierarchical E-002 init 40ep (E-010)** | **83.9%** | **0.763** | **Current best** |
+| Flat ICD-3 (E-001) | 87.6% | 0.8456 | 675 classes, 30 epochs |
+| Flat ICD-10 (E-002) | 73.0% | 0.626 | 1,926 classes, 40 epochs |
+| Hierarchical cold start (E-003) | 12.7% | 0.083 | Fresh Stage-2 init |
+| Hierarchical E-002 init 20ep (E-009) | 77.2% | 0.679 | Original gold |
+| **Hierarchical E-002 init 40ep (E-010)** | **86.8%** | **0.799** | **Current best** |
 
 ---
 
@@ -281,7 +283,7 @@ Eliminated CDC FTP dependency by locking all canonical datasets to Hugging Face 
 **E-011 finding:** E-010 + GraphReranker = 83.9% / F1 0.763 — identical to
 E-010 alone. The graph reranker has minimal impact on E-010's well-calibrated
 resolvers (most predictions already exceed the 0.7 confidence threshold).
-Z-chapter improved marginally from 62.1% → 62.9%.
+Z-chapter improved marginally from 47.1% → ~48%.
 
 ---
 
@@ -291,7 +293,7 @@ Z-chapter improved marginally from 62.1% → 62.9%.
 |---|---|
 | Chapter Z contrastive fine-tuning | Research task, not refactoring |
 | MIMIC-IV validation | Blocked on PhysioNet access |
-| Stage-1 router retraining | E-003 Stage-1 at 98.7% routing is sufficient |
+| Stage-1 router retraining | E-003 Stage-1 at 96.3-97.0% routing is sufficient |
 | Augmented gold pipeline | E-010 on original gold beats E-005c+graph on augmented |
 
 ---
@@ -301,10 +303,10 @@ Z-chapter improved marginally from 62.1% → 62.9%.
 | Notebook | Experiment | Status | Key result |
 |---|---|---|---|
 | 01-EDA_SOAP | EDA | ✅ Complete | Gold layer exported |
-| 02-Model_ClinicalBERT_Baseline_ICD3 | E-001 | ✅ Complete | 88.0% / F1 0.853 |
-| 03-Model_ClinicalBERT_Surgical_ICD10 | E-002 | ✅ Complete | 73.0% / F1 0.629 (40 epochs) |
-| 04-Model_Hierarchical_ICD10 | E-003 | ✅ Complete | 11.3% / F1 0.075 (cold start) |
-| 05-Model_Hierarchical_ICD10_E002Init | E-009 | ✅ Complete | 79.2% / F1 0.699 |
+| 02-Model_ClinicalBERT_Baseline_ICD3 | E-001 | ✅ Complete | 87.6% / F1 0.8456 |
+| 03-Model_ClinicalBERT_Surgical_ICD10 | E-002 | ✅ Complete | 75.4% / F1 0.655 (40 epochs) |
+| 04-Model_Hierarchical_ICD10 | E-003 | ✅ Complete | 12.7% / F1 0.083 (cold start) |
+| 05-Model_Hierarchical_ICD10_E002Init | E-009 | ✅ Complete | 77.2% / F1 0.679 |
 
 ---
 
@@ -313,17 +315,20 @@ Z-chapter improved marginally from 62.1% → 62.9%.
 If starting fresh, give Claude this context:
 
 > "I am working on the Notes-to-ICD10 project. Please read REFACTORING_PLAN.md
-> in the project root. The current best model is E-010_40ep_E002Init at 83.9%
-> E2E, 0.763 F1, 0.033 ECE, 82.1% Coverage@0.7. All scripts pass
-> `uv run python verify_scripts.py`. All refactoring requirements are complete
-> except R-004 (low priority). **Phase 1b data is locked to HF Hub
-> (SidneyBishop/notes-to-icd10) with DVC + SHA256 manifests (commit 6dda8ac).**
-> The unit test suite is at `tests/` — run with `uv run pytest tests/ -v`.
-> To reproduce: `git clone` → `dvc pull` → `python scripts/generate_manifest.py`.
+> in the project root. The current best model is E-010_40ep_E002Init at 86.8%
+> E2E, 0.799 F1, 0.021 ECE, 85.6% Coverage@0.7 (script pipeline validated
+> on fresh clone, 9 May 2026). All scripts pass `uv run python verify_scripts.py`.
+> All refactoring requirements are complete except R-004 (low priority).
+> **Phase 1b data is locked to HF Hub (SidneyBishop/notes-to-icd10) with
+> DVC + SHA256 manifests (commit 6dda8ac).** The unit test suite is at
+> `tests/` — run with `uv run pytest tests/ -v` (116 tests).
+> To reproduce: `git clone` → `uv run python scripts/prepare_data.py` →
+> `uv run python scripts/build_graph.py` → run script pipeline per Run_notes.md.
+> After training, reclaim disk space with `uv run python scripts/cleanup.py`.
 > The next research priority is Z-chapter contrastive fine-tuning or MIMIC-IV
-> validation (blocked on PhysioNet access)."
+> validation (MIMIC-IV-Note access approved on PhysioNet — validation pending)."
 
 ---
 
-*Last updated: 6 May 2026*
-*Author: Refactoring session with Claude Sonnet 4.6 + Data Locking (R-010)*
+*Last updated: 9 May 2026*
+*Author: Refactoring session with Claude Sonnet 4.6 + Cold Clone Validation (notebooks + scripts)*
