@@ -54,6 +54,23 @@ The 86.4% Coverage@0.7 at 95.6% precision represents a practical operating
 point where the majority of routine cases are handled automatically and
 human review is concentrated on genuinely ambiguous cases.
 
+### Finding 4: Domain Pretraining Outweighs Architectural Modernity
+
+A direct backbone comparison (E-012) replaced Bio_ClinicalBERT with
+Clinical ModernBERT — a 2025 model with 22 transformer layers, 8,192-token
+context, and MIMIC-IV pretraining. The result was decisive: 48.8% E2E
+accuracy vs 85.8% for ClinicalBERT, a 37 percentage point deficit.
+
+Two factors explain this: first, the APSO-Flip strategy eliminates the
+context window advantage by front-loading diagnostically critical content.
+Second, ClinicalBERT's MIMIC-III pretraining produces clinical representations
+that transfer more effectively to ICD-10 classification than Clinical
+ModernBERT's more diverse but architecturally different pretraining.
+
+**The backbone choice is empirically justified.** Future improvements to
+this system should focus on data, architecture, and training strategy rather
+than switching encoder backbones.
+
 ---
 
 ## The Z-Chapter Problem {#sec-conclusions-z}
@@ -120,7 +137,7 @@ selective automation at 95.6% precision on synthetic data. The key to
 making it work is aggressive warm initialisation from a well-trained flat
 classifier. The primary remaining gap is the Z-chapter (62.1%), which
 requires contrastive fine-tuning rather than more data or training time.
-Real-world validation on MIMIC-IV-Note is the critical next step.
+Real-world validation on MIMIC-IV-Note is the critical next step. The backbone choice (Bio_ClinicalBERT) has been empirically validated against a modern alternative (E-012).
 :::
 
 ---

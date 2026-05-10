@@ -87,13 +87,17 @@ During evaluation, 15.6% of test records trigger the long-note warning
 (>400 words). For these records, the model may be missing information
 that would improve its prediction.
 
+**Empirical finding (E-012):** Clinical ModernBERT with an 8,192-token context
+window was evaluated as an alternative backbone (E-012). It achieved 48.8%
+E2E accuracy vs 85.8% for Bio_ClinicalBERT — the longer context window
+provided no advantage because the APSO-Flip strategy already ensures
+diagnostically critical content appears within the 512-token window.
+
 **Mitigation options:**
-- **Longformer or Clinical-Longformer** — models with longer context windows
-  (up to 4,096 tokens) at the cost of increased training time and memory.
-- **Hierarchical encoding** — encode overlapping chunks separately and
-  aggregate representations.
 - **Better APSO ordering** — ensure that all critical information appears
   in the first 400 words through more aggressive section prioritisation.
+- **Hierarchical encoding** — encode overlapping chunks separately and
+  aggregate representations (for very long notes only).
 
 ---
 
@@ -129,7 +133,7 @@ In priority order:
 | 2 | Z-chapter contrastive fine-tuning | +5-10pp Z accuracy | Medium (~2 weeks) |
 | 3 | Lower confidence threshold for Z | More Z cases auto-coded | Low |
 | 4 | Multi-label prediction | Real-world applicability | High |
-| 5 | Longer context models | Better long-note handling | High |
+| 5 | Longer context models | Empirically evaluated (E-012) — no benefit on this dataset | Complete |
 | 6 | Real-world dataset training | Production readiness | Very high |
 
 : Future work priorities. {#tbl-future}

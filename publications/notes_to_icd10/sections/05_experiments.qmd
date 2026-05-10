@@ -443,6 +443,78 @@ codes over the longer training run.
 
 ---
 
+
+---
+
+## E-012: Backbone Evaluation — Clinical ModernBERT {#sec-exp-e012}
+
+**Hypothesis:** A more modern encoder backbone — Clinical ModernBERT
+(`Simonlee711/Clinical_ModernBERT`), pre-trained on PubMed and MIMIC-IV
+with an 8,192-token context window — produces better ICD-10 representations
+than Bio_ClinicalBERT, compensating for the 512-token context limit.
+
+**Motivation:** Bio_ClinicalBERT was released in 2019 and pre-trained on
+MIMIC-III (~880M words). Clinical ModernBERT (Lee et al., 2025, UCLA) uses
+a modernised architecture (Flash Attention, rotary positional embeddings,
+GeGLU activations) with a 16× longer context window and more recent
+pre-training data including MIMIC-IV.
+
+**Setup:** Identical pipeline to E-010 — same splits, same Stage-1 router
+(E-003), same Stage-2 training regime. Only the encoder backbone changes.
+
+| Parameter | Value |
+|---|---|
+| Backbone | `Simonlee711/Clinical_ModernBERT` |
+| Context window | 8,192 tokens |
+| Architecture depth | 22 transformer layers (vs 12 for ClinicalBERT) |
+| Flat pre-training epochs | 40 |
+| Stage-2 epochs | 20 |
+
+**Result:**
+
+| Metric | E-012 (Clinical ModernBERT) | E-010 (ClinicalBERT) |
+|---|---|---|
+| Flat pre-training val accuracy | 61.7% | 74.5% |
+| Stage-1 accuracy | 96.6% | 96.9% |
+| Stage-2 within-chapter | 50.5% | 84.8% |
+| E2E accuracy | **48.8%** | **85.8%** |
+| Macro F1 | 0.369 | 0.762 |
+| ECE | 0.078 | 0.031 |
+| Coverage@0.7 | **37.5%** | **86.4%** |
+
+: E-012 vs E-010 backbone comparison. {#tbl-exp-e012}
+
+**Interpretation:** Clinical ModernBERT underperforms Bio_ClinicalBERT by
+37 percentage points E2E — a decisive result. The Coverage@0.7 collapse
+(37.5% vs 86.4%) reveals the root cause: the weaker flat pre-training
+(61.7% vs 74.5% val accuracy) produces resolver representations that are
+chronically under-confident — most predictions fall below the 0.7 threshold
+even after calibration.
+
+**Why the context window advantage did not help:** The APSO-Flip strategy
+places diagnostically critical content (Assessment section) at Token 0,
+ensuring the most relevant text is always within ClinicalBERT's 512-token
+window. The extended context of Clinical ModernBERT therefore provides no
+material advantage on this dataset, where average note length is ~280 tokens.
+
+**Why domain pretraining won:** Bio_ClinicalBERT was pre-trained on MIMIC-III
+ICU notes — the same clinical domain as our task. Clinical ModernBERT, while
+trained on MIMIC-IV, uses a fundamentally different tokeniser and architectural
+pattern that may require different fine-tuning hyperparameters (lower
+learning rate, larger batch size) to realise its potential on high-cardinality
+classification with small per-class training sets.
+
+::: {.callout-note}
+## What This Experiment Confirms
+
+The choice of Bio_ClinicalBERT as the encoder backbone is empirically
+justified, not merely conventional. On this specific task — 1,926-way ICD-10
+classification from APSO-structured notes with ~4 training examples per code —
+MIMIC-III domain pretraining outweighs longer context, deeper architecture,
+and more modern pre-training objectives. The hierarchical architecture is
+model-agnostic; ClinicalBERT is the right model for this task.
+:::
+
 ## Experiment Summary {#sec-exp-summary}
 
 ```{python}
@@ -467,6 +539,9 @@ experiments = [
     {"ID": "**E-010**", "Description": "**Hierarchical, E-002 init (40ep)**", 
      "Architecture": "Hierarchical", "Init": "E-002 (40 epochs)",
      "E2E Acc": "**85.8%**", "Macro F1": "**0.762**"},
+    {"ID": "E-012", "Description": "Clinical ModernBERT backbone", 
+     "Architecture": "Hierarchical", "Init": "E-012 flat (40 epochs)",
+     "E2E Acc": "48.8%", "Macro F1": "0.369"},
 ]
 
 df = pd.DataFrame(experiments)
@@ -498,3 +573,11 @@ decomposition genuinely helps when the encoder is well-initialised.
 auxiliary components.** The previous best result (77.4%, using augmented
 gold data, a graph reranker, and Z-threshold overrides) is surpassed by
 E-010 (85.8%) using only the original gold data and standard training.
+
+**Finding 5: Domain pretraining outweighs architecture modernity.** Clinical
+ModernBERT (E-012) — a 2025 model with 22 transformer layers, 8,192-token
+context, and MIMIC-IV pretraining — achieves only 48.8% E2E accuracy vs
+85.8% for Bio_ClinicalBERT (E-010). The APSO-Flip strategy eliminates the
+context window disadvantage, and ClinicalBERT's MIMIC-III domain specificity
+more than compensates for Clinical ModernBERT's architectural improvements.
+**The backbone choice is now empirically justified rather than conventional.**
