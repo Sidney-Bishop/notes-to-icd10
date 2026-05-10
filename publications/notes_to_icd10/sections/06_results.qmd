@@ -9,25 +9,26 @@ title: "Results"
 This section presents the final evaluated performance of the best model
 (E-010) in detail — overall accuracy, per-chapter breakdown, calibration
 quality, and the selective automation analysis. The headline numbers are
-83.9% top-1 accuracy and 82.1% of cases auto-coded at 95.2% precision.
+85.8% top-1 accuracy and 86.4% of cases auto-coded at 95.6% precision.
 :::
 
 ---
 
 ## Overall Performance {#sec-results-overall}
 
-The best model (E-010_40ep_E002Init) is evaluated on the 966-record held-out
-test set. All metrics are computed after temperature scaling calibration.
+The best model (E-010_40ep_E002Init) is evaluated on the 972-record held-out
+test set (billable codes only). All metrics are computed after temperature scaling
+calibration and represent the mean of four independent training runs.
 
 | Metric | Value | Interpretation |
 |---|---|---|
-| Top-1 accuracy | **83.9%** | 811 of 966 test records correctly coded |
+| Top-1 accuracy | **85.8%** | ~834 of 972 test records correctly coded (mean) |
 | Macro F1 | **0.762** | Unweighted average F1 across all 1,926 codes |
-| Stage-1 routing accuracy | **98.7%** | 953 of 966 records routed to correct chapter |
+| Stage-1 routing accuracy | **96.9%** | ~942 of 972 records routed to correct chapter (mean) |
 | Within-chapter accuracy | **84.8%** | Among correctly routed records |
-| ECE (post-calibration) | **0.034** | Expected Calibration Error — lower is better |
-| Coverage@0.7 | **82.1%** | Fraction of records auto-coded at τ=0.7 |
-| Accuracy on auto-coded | **95.2%** | Precision on the 82.1% that are auto-coded |
+| ECE (post-calibration) | **0.031** | Expected Calibration Error — lower is better |
+| Coverage@0.7 | **86.4%** | Fraction of records auto-coded at τ=0.7 |
+| Accuracy on auto-coded | **95.6%** | Precision on the 86.4% that are auto-coded |
 
 : E-010 final evaluation results. {#tbl-results-overall}
 
@@ -43,7 +44,7 @@ Of the 155 incorrectly coded records:
 
 This error decomposition suggests that improvements to Stage-2 within-chapter
 resolution would have a larger impact than further improving Stage-1 routing
-(which is already at 98.7%).
+(which is already at 96.9%).
 
 ---
 
@@ -51,7 +52,7 @@ resolution would have a larger impact than further improving Stage-1 routing
 
 ```{python}
 #| label: tbl-results-chapter
-#| tbl-cap: "Per-chapter E2E accuracy for E-010 on the 966-record test set."
+#| tbl-cap: "Per-chapter E2E accuracy for E-010 on the 972-record test set."
 
 import pandas as pd
 
@@ -114,7 +115,7 @@ Calibration quality is critical for the confidence-gating strategy: if the
 model's confidence scores do not reflect actual accuracy, the τ=0.7 threshold
 cannot be trusted.
 
-**ECE of 0.034** means that on average, the gap between the model's stated
+**ECE of 0.031** means that on average, the gap between the model's stated
 confidence and its actual accuracy is 3.4 percentage points — a level of
 calibration that supports reliable confidence thresholding.
 
@@ -125,7 +126,7 @@ The temperature scaling calibration results vary significantly by chapter:
 | Chapter | Temperature (T) | ECE before | ECE after | Coverage@0.7 | Acc on covered |
 |---|---|---|---|---|---|
 | I (circulatory) | 0.378 | 0.626 | 0.042 | 97.0% | 98.4% |
-| N (genitourinary) | 0.247 | 0.774 | 0.034 | 94.3% | 98.0% |
+| N (genitourinary) | 0.247 | 0.774 | 0.031 | 94.3% | 98.0% |
 | D (blood) | 0.200 | 0.790 | 0.049 | 92.1% | 100% |
 | C (neoplasms) | 0.263 | 0.801 | 0.080 | 90.2% | 93.5% |
 | Z (administrative) | 0.323 | 0.558 | 0.076 | 47.0% | 88.7% |
@@ -155,8 +156,8 @@ thresholds = [
      "Routed to review": "8.7%"},
     {"Threshold (τ)": 0.6, "Auto-coded": "87.4%", "Accuracy on auto-coded": "92.8%",
      "Routed to review": "12.6%"},
-    {"Threshold (τ)": "**0.7**", "Auto-coded": "**82.1%**", 
-     "Accuracy on auto-coded": "**95.2%**", "Routed to review": "**17.9%**"},
+    {"Threshold (τ)": "**0.7**", "Auto-coded": "**86.4%**", 
+     "Accuracy on auto-coded": "**95.6%**", "Routed to review": "**17.9%**"},
     {"Threshold (τ)": 0.8, "Auto-coded": "73.2%", "Accuracy on auto-coded": "97.1%",
      "Routed to review": "26.8%"},
     {"Threshold (τ)": 0.9, "Auto-coded": "58.6%", "Accuracy on auto-coded": "98.8%",
@@ -170,9 +171,9 @@ display(Markdown(df.to_markdown(index=False)))
 
 The τ=0.7 threshold represents a practical operating point where:
 
-- The majority of routine, unambiguous cases (82.1%) are handled without
+- The majority of routine, unambiguous cases (86.4%) are handled without
   human involvement.
-- The precision on auto-coded cases (95.2%) meets or exceeds typical
+- The precision on auto-coded cases (95.6%) meets or exceeds typical
   human coding accuracy for common codes.
 - Human review is reserved for genuinely ambiguous cases (17.9%) where
   clinical judgement adds the most value.
@@ -182,7 +183,7 @@ The τ=0.7 threshold represents a practical operating point where:
 
 At τ=0.7, a coding department processing 1,000 notes per day would:
 
-- **Auto-code 821 notes** at 95.2% precision — approximately 40 errors
+- **Auto-code 821 notes** at 95.6% precision — approximately 40 errors
   among these (requiring retrospective correction).
 - **Route 179 notes** to human coders for review — these are the
   genuinely difficult cases where the model is uncertain.
@@ -201,7 +202,7 @@ attention regardless of difficulty.
 | E-002 flat (current work) | 73.3% | 0.634 | — | — |
 | E-005c + Graph + Override (prev best) | 77.4% | 0.679 | 0.027 | 68.5% |
 | E-009 hierarchical (current work) | 79.8% | 0.711 | — | — |
-| **E-010 hierarchical (current best)** | **83.9%** | **0.762** | **0.034** | **82.1%** |
+| **E-010 hierarchical (current best)** | **85.8%** | **0.762** | **0.031** | **86.4%** |
 
 : Comparison across approaches. {#tbl-results-comparison}
 

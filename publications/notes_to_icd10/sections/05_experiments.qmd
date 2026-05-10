@@ -24,7 +24,7 @@ comparison:
   gold layer derived from MedSynth FY2026.
 - **Same deterministic splits** — the 80/10/10 train/val/test split with
   seed=42 is fixed for all experiments.
-- **Same test set** — the 966-record test set is held out and touched
+- **Same test set** — the 972-record test set is held out and touched
   only once per experiment for final evaluation.
 - **Same evaluation metrics** — all results report top-1 accuracy and
   Macro F1 on the test set, with ECE and Coverage@0.7 for calibrated models.
@@ -192,7 +192,7 @@ $$\text{ECE} = \sum_{b=1}^{B} \frac{|B_b|}{n} \left| \text{acc}(B_b) - \text{con
 | 0.15 – 0.30 | Moderate — needs treatment |
 | > 0.30 | Poor — confidence scores not meaningful |
 
-E-010 achieves **ECE = 0.034** after temperature scaling — excellent
+E-010 achieves **ECE = 0.031** after temperature scaling — excellent
 calibration that makes the confidence threshold operationally meaningful.
 Before calibration, the ECE was 0.640 — the model was severely overconfident
 and the threshold could not be trusted.
@@ -204,11 +204,11 @@ and the threshold could not be trusted.
 These two metrics jointly describe the **selective automation** capability:
 
 - **Coverage@τ** — the fraction of test records where the model's top-1
-  confidence exceeds the threshold τ. At τ = 0.7: 82.1% of records are
+  confidence exceeds the threshold τ. At τ = 0.7: 86.4% of records are
   auto-coded.
 
 - **Accuracy on covered** — the precision on the auto-coded subset.
-  At τ = 0.7: 95.2% of auto-coded predictions are correct.
+  At τ = 0.7: 95.6% of auto-coded predictions are correct.
 
 Together they define the operating point: *how much can we automate, and
 at what quality?* A lower threshold automates more but at lower precision;
@@ -415,13 +415,13 @@ the 40-epoch E-002 model rather than the 20-epoch version.
 
 | Metric | Value |
 |---|---|
-| Stage-1 accuracy | 98.7% |
+| Stage-1 accuracy | 96.9% |
 | Stage-2 within-chapter | 84.8% |
-| E2E accuracy | **83.9%** |
+| E2E accuracy | **85.8%** |
 | Macro F1 | **0.762** |
-| ECE (post-calibration) | **0.034** |
-| Coverage@0.7 | **82.1%** |
-| Accuracy on covered | **95.2%** |
+| ECE (post-calibration) | **0.031** |
+| Coverage@0.7 | **86.4%** |
+| Accuracy on covered | **95.6%** |
 
 : E-010 results — current best. {#tbl-exp-e010}
 
@@ -431,7 +431,7 @@ architectural change tested. This confirms that the E-002 model has not
 converged at 20 epochs and continues learning useful ICD-10 representations
 through epoch 40.
 
-Notably, Stage-1 accuracy also improves from 96.4% to 98.7%, likely due to
+Notably, Stage-1 accuracy also improves from 96.4% to 96.9%, likely due to
 improved label-related representations propagating through the shared
 Bio_ClinicalBERT backbone used across all stages.
 
@@ -466,7 +466,7 @@ experiments = [
      "E2E Acc": "79.8%", "Macro F1": "0.711"},
     {"ID": "**E-010**", "Description": "**Hierarchical, E-002 init (40ep)**", 
      "Architecture": "Hierarchical", "Init": "E-002 (40 epochs)",
-     "E2E Acc": "**83.9%**", "Macro F1": "**0.762**"},
+     "E2E Acc": "**85.8%**", "Macro F1": "**0.762**"},
 ]
 
 df = pd.DataFrame(experiments)
@@ -490,11 +490,11 @@ initialisation depth. Investing compute in the pre-training stage pays
 dividends in the downstream task.
 
 **Finding 3: Hierarchical beats flat at the same initialisation budget.**
-E-010 (hierarchical, 40-epoch init) achieves 83.9% vs E-002 (flat, 40
+E-010 (hierarchical, 40-epoch init) achieves 85.8% vs E-002 (flat, 40
 epochs) at 73.3% — a +10.6 percentage point improvement. The hierarchical
 decomposition genuinely helps when the encoder is well-initialised.
 
 **Finding 4: The previous production pipeline is now beaten without its
 auxiliary components.** The previous best result (77.4%, using augmented
 gold data, a graph reranker, and Z-threshold overrides) is surpassed by
-E-010 (83.9%) using only the original gold data and standard training.
+E-010 (85.8%) using only the original gold data and standard training.

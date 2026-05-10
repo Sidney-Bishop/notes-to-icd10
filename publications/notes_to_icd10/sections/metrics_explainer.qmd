@@ -157,7 +157,7 @@ $$\text{ECE} = \sum_{b=1}^{B} \frac{|B_b|}{n} \left| \text{acc}(B_b) - \text{con
 | 0.15 – 0.30 | Moderate — needs treatment |
 | > 0.30 | Poor — confidence scores not meaningful |
 
-E-010 achieves **ECE = 0.034** after temperature scaling — excellent
+E-010 achieves **ECE = 0.031** after temperature scaling — excellent
 calibration that makes the confidence threshold operationally meaningful.
 Before calibration, the ECE was 0.640 — the model was severely overconfident
 and the threshold could not be trusted.
@@ -169,11 +169,11 @@ and the threshold could not be trusted.
 These two metrics jointly describe the **selective automation** capability:
 
 - **Coverage@τ** — the fraction of test records where the model's top-1
-  confidence exceeds the threshold τ. At τ = 0.7: 82.1% of records are
+  confidence exceeds the threshold τ. At τ = 0.7: 86.4% of records are
   auto-coded.
 
 - **Accuracy on covered** — the precision on the auto-coded subset.
-  At τ = 0.7: 95.2% of auto-coded predictions are correct.
+  At τ = 0.7: 95.6% of auto-coded predictions are correct.
 
 Together they define the operating point: *how much can we automate, and
 at what quality?* A lower threshold automates more but at lower precision;

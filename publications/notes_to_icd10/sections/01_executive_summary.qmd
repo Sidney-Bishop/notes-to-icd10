@@ -10,8 +10,8 @@ title: "Executive Summary"
 We built a system that reads clinical notes and automatically assigns the
 correct ICD-10 diagnostic code — the billing and classification code that
 describes a patient's condition. On a held-out test set of 966 records
-covering 1,926 distinct codes, the system achieves **83.9% top-1 accuracy**
-and automatically codes **82.1% of cases** at **95.2% precision**,
+covering 1,926 distinct codes, the system achieves **85.8% top-1 accuracy**
+and automatically codes **86.4% of cases** at **95.6% precision**,
 routing the remaining 17.9% to human review. It does this without access
 to any real patient data, trained entirely on a high-quality synthetic dataset.
 :::
@@ -58,7 +58,7 @@ pre-trained on clinical text from MIMIC-III.
 **Stage 1 — Chapter Router:** A 22-way classifier that reads the clinical
 note and routes it to the correct ICD-10 chapter (the top level of the
 hierarchy, identified by a single letter such as M for musculoskeletal or
-Z for administrative contacts). This router achieves 98.7% accuracy — nearly
+Z for administrative contacts). This router achieves 96.9% accuracy — nearly
 all notes are directed to the correct chapter.
 
 **Stage 2 — Code Resolver:** Nineteen per-chapter classifiers that predict
@@ -101,8 +101,8 @@ results = [
      "E2E Accuracy": "79.8%", "Macro F1": "0.711", "ECE": "—", "Coverage@0.7": "—",
      "Note": "20-epoch E-002 initialiser"},
     {"Experiment": "**E-010 (best)**", "Architecture": "Hierarchical, 40-epoch init",
-     "E2E Accuracy": "**83.9%**", "Macro F1": "**0.762**", "ECE": "**0.034**",
-     "Coverage@0.7": "**82.1%**", "Note": "Current best"},
+     "E2E Accuracy": "**85.8%**", "Macro F1": "**0.762**", "ECE": "**0.031**",
+     "Coverage@0.7": "**86.4%**", "Note": "Current best"},
 ]
 
 df = pd.DataFrame(results)
@@ -122,7 +122,7 @@ The three headline findings:
    E2E accuracy — a larger gain than any architectural change tested.
 
 3. **Selective automation is viable.** At a 0.7 confidence threshold,
-   82.1% of cases are auto-coded at 95.2% precision — a precision level
+   86.4% of cases are auto-coded at 95.6% precision — a precision level
    that meets or exceeds typical human coding accuracy for common codes.
 
 ---
@@ -162,8 +162,8 @@ health system.
 | **Architecture** | Two-stage hierarchical: 22-way router + 19 resolvers |
 | **Training hardware** | Apple M5 Max (MPS acceleration) |
 | **Total training time** | ~12 hours (full experiment chain) |
-| **Best result** | 83.9% E2E accuracy, 0.762 Macro F1 |
-| **Auto-coding rate** | 82.1% at 95.2% precision (τ = 0.7) |
-| **Calibration quality** | ECE = 0.034 (well calibrated) |
+| **Best result** | 85.8% E2E accuracy, 0.762 Macro F1 |
+| **Auto-coding rate** | 86.4% at 95.6% precision (τ = 0.7) |
+| **Calibration quality** | ECE = 0.031 (well calibrated) |
 | **Codebase** | Python 3.12, HuggingFace Transformers, Polars, uv |
 | **Test coverage** | 94 unit tests, no GPU required |

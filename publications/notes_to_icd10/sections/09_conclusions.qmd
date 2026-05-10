@@ -10,8 +10,8 @@ title: "Conclusions"
 
 This project demonstrates that **hierarchical ICD-10 code prediction from
 free-text clinical notes is viable** on a synthetic dataset at the scale of
-1,926 billable codes, achieving 83.9% top-1 accuracy and 82.1% selective
-automation rate at 95.2% precision.
+1,926 billable codes, achieving 85.8% top-1 accuracy and 86.4% selective
+automation rate at 95.6% precision.
 
 The experimental progression from flat baseline to hierarchical best result
 yielded three findings that have implications beyond this specific task:
@@ -19,7 +19,7 @@ yielded three findings that have implications beyond this specific task:
 ### Finding 1: Hierarchical Architecture Requires Warm Initialisation
 
 The hierarchical two-stage architecture produces dramatically better results
-than flat ICD-10 classification (83.9% vs 73.3%) — but **only when Stage-2
+than flat ICD-10 classification (85.8% vs 73.3%) — but **only when Stage-2
 resolvers are properly initialised**. Without warm initialisation from a
 flat ICD-10 pre-trained model, the architecture collapses (11.1% — worse
 than random on many chapters).
@@ -44,13 +44,13 @@ performance than the compute saved.
 
 ### Finding 3: Calibrated Confidence Scores Enable Reliable Selective Automation
 
-Temperature scaling calibration reduced the E-010 ECE from 0.640 to 0.034
+Temperature scaling calibration reduced the E-010 ECE from 0.640 to 0.031
 — a dramatic improvement that makes confidence scores operationally useful.
-At ECE = 0.034, the system's stated 70% confidence corresponds to actual
+At ECE = 0.031, the system's stated 70% confidence corresponds to actual
 accuracy close to 70%, enabling the confidence threshold to be set
 based on operational requirements rather than empirical tuning.
 
-The 82.1% Coverage@0.7 at 95.2% precision represents a practical operating
+The 86.4% Coverage@0.7 at 95.6% precision represents a practical operating
 point where the majority of routine cases are handled automatically and
 human review is concentrated on genuinely ambiguous cases.
 
@@ -106,7 +106,7 @@ ICD-10 coding from synthetic clinical notes. It is not a production system
 and makes no claim of clinical utility without real-world validation.
 
 The most important next step — MIMIC-IV-Note validation — will determine
-whether the 83.9% synthetic accuracy holds on real clinical language, or
+whether the 85.8% synthetic accuracy holds on real clinical language, or
 whether the synthetic-to-real gap requires substantial additional work.
 Either outcome is scientifically valuable: a small gap validates the approach
 for further development; a large gap identifies the key bottleneck.
@@ -115,8 +115,8 @@ for further development; a large gap identifies the key bottleneck.
 ## 🎯 The Bottom Line
 
 Hierarchical ICD-10 coding from free-text clinical notes is technically
-feasible at the scale of 1,926 codes, with 83.9% accuracy and 82.1%
-selective automation at 95.2% precision on synthetic data. The key to
+feasible at the scale of 1,926 codes, with 85.8% accuracy and 86.4%
+selective automation at 95.6% precision on synthetic data. The key to
 making it work is aggressive warm initialisation from a well-trained flat
 classifier. The primary remaining gap is the Z-chapter (62.1%), which
 requires contrastive fine-tuning rather than more data or training time.
