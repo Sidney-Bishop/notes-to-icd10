@@ -247,7 +247,7 @@ def phase_4(df, dry=False):
     if dry:
         print(" (dry-run, skipping write)")
         return
-    p = config.resolve_path("data", "gold") / f"medsynth_gold_apso_{datetime.now().strftime('%Y%m%d_%H%M%S')}.parquet"
+    p = config.resolve_path("data", "gold") / "medsynth_gold_apso.parquet"
     p.parent.mkdir(parents=True, exist_ok=True)
     df.write_parquet(p, compression="snappy")
     print(f" ✅ {p.name}")

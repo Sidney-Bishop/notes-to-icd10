@@ -23,7 +23,7 @@ which python
 
 # 3. Confirm gold data exists (DVC or rebuild)
 ls data/gold/
-# Expected: medsynth_gold_apso_*.parquet  MANIFEST_*.json
+# Expected: medsynth_gold_apso.parquet  MANIFEST_*.json
 # If missing: run `dvc pull` or `python scripts/generate_manifest.py`
 
 # 4. Confirm the experiment registry is accessible
@@ -51,8 +51,8 @@ If any of the above fail, **stop and fix before proceeding**.
 
 | File | Records | Description | Source |
 |------|---------|-------------|--------|
-| `data/gold/medsynth_gold_apso_*.parquet` | 10,240 | Original gold layer — APSO-flipped, ICD-10 redacted, CDC FY2026 validated (9,660 billable + 580 non-billable) | Built from HF Hub |
-| `data/gold/medsynth_gold_apso_*.parquet.dvc` | — | DVC pointer file (tracked in git) | — |
+| `data/gold/medsynth_gold_apso.parquet` | 10,240 | Original gold layer — APSO-flipped, ICD-10 redacted, CDC FY2026 validated (9,660 billable + 580 non-billable) | Built from HF Hub |
+| `data/gold/medsynth_gold_apso.parquet.dvc` | — | DVC pointer file (tracked in git) | — |
 | `data/gold/MANIFEST_*.json` | — | SHA256 manifest with validation split | Generated |
 | `data/gold/medsynth_gold_augmented.parquet` | 11,214 | Above + 974 synthetic records for chapters O and Z | Historic |
 
@@ -152,7 +152,7 @@ python scripts/generate_manifest.py
 ```bash
 uv run python scripts/prepare_splits.py \
     --experiment E-010_40ep_E002Init \
-    --gold-path data/gold/medsynth_gold_apso_*.parquet
+    --gold-path data/gold/medsynth_gold_apso.parquet
 ```
 
 **Expected output:**
@@ -356,7 +356,7 @@ import polars as pl
 from pathlib import Path
 from sklearn.model_selection import train_test_split
 
-gold_path = sorted(Path('data/gold').glob('medsynth_gold_apso_*.parquet'))[-1]
+gold_path = Path('data/gold') / 'medsynth_gold_apso.parquet'
 df = pl.read_parquet(gold_path).filter(pl.col('code_status') == 'billable')
 df = df.with_columns(pl.col('standard_icd10').str.slice(0, 1).alias('chapter_label'))
 chapters = sorted(df['chapter_label'].unique().to_list())
@@ -581,7 +581,7 @@ Step 3 is optional — run after any training to reclaim disk space.
 **"No module named src.paths"**
 Not in project root. Run `cd .../Notes_to_ICD10_prj`.
 
-**"FileNotFoundError: data/gold/medsynth_gold_apso_*.parquet"**
+**"FileNotFoundError: data/gold/medsynth_gold_apso.parquet"**
 Gold data not pulled. Run `dvc pull` or `python scripts/generate_manifest.py` to rebuild from HF Hub.
 
 **"Could not find artifacts.yaml"**

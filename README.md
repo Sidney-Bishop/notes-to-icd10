@@ -177,7 +177,7 @@ Initial versions pulled ICD-10 codes directly from CDC FTP and CMS sources at ru
 
 **Layer 2 — DVC (Derived Artifacts)**
 - Large binary artifacts (gold Parquet ~63MB, model weights ~1.5GB) are tracked by DVC, not git
-- Workflow: `dvc add data/gold/medsynth_gold_apso_*.parquet` → creates lightweight `.dvc` pointer file
+- Workflow: `dvc add data/gold/medsynth_gold_apso.parquet` → creates lightweight `.dvc` pointer file
 - `dvc push` uploads to remote storage; `dvc pull` restores exact bytes
 - Git tracks only `.dvc` files and manifests, keeping repository <50MB
 
@@ -288,7 +288,7 @@ uv run python scripts/prepare_data.py
 # 2. Deterministic splits
 uv run python scripts/prepare_splits.py \
     --experiment E-010_40ep_E002Init \
-    --gold-path data/gold/medsynth_gold_apso_*.parquet
+    --gold-path data/gold/medsynth_gold_apso.parquet
 
 # 3. Build knowledge graph (~5 min)
 #    Required before evaluate.py — builds the ICD-10 knowledge graph
