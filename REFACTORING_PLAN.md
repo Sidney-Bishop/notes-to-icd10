@@ -254,6 +254,58 @@ Eliminated CDC FTP dependency by locking all canonical datasets to Hugging Face 
 
 ---
 
+
+---
+
+### R-011 — Alternative Encoder Backbone Evaluation
+**Priority: Medium**
+**Status: ⏳ PENDING**
+
+**Background:** The current pipeline uses `emilyalsentzer/Bio_ClinicalBERT` as the
+encoder backbone for all experiments (E-002 through E-010). A legitimate scientific
+question is whether a different pre-trained encoder would produce better
+representations for ICD-10 code prediction from clinical notes.
+
+**Literature context:**
+- Pascual et al. (2021) and Ji et al. (2021) show that standard BERT variants
+  struggle to outperform CNN-based models for full ICD-10 coding, primarily due
+  to the 512-token context limit. Clinical notes in MIMIC-III run up to 8,500 tokens.
+- Our APSO-flip strategy mitigates the truncation problem by placing the Assessment
+  section at Token 0, but does not eliminate it for very long notes.
+- Clinical ModernBERT (Lee et al., 2025, UCLA) was released after this project began.
+  It is pretrained on PubMed abstracts, MIMIC-IV clinical notes, and medical
+  ontologies, with context length up to 8,192 tokens via Flash Attention and
+  rotary positional embeddings (RoPE). This is the most compelling alternative
+  identified to date.
+
+**Candidate models to evaluate:**
+
+| Model | Context | Domain | Rationale |
+|-------|---------|--------|-----------|
+| `simonlee711/Clinical-ModernBERT` | 8,192 tokens | Clinical (MIMIC-IV + PubMed) | **Primary candidate** — clinical domain + long context |
+| `microsoft/BiomedNLP-BiomedBERT-base-uncased-abstract` | 512 tokens | Biomedical (PubMed) | Domain-matched alternative to ClinicalBERT |
+| `allenai/biomed_roberta_base` | 512 tokens | Biomedical | RoBERTa-style training on biomedical text |
+
+**Models NOT worth trying:**
+- General Longformer/BigBird — not domain-adapted for clinical text
+- GPT-based decoders — unsuitable for classification head fine-tuning at this scale
+- BioBERT — older and consistently outperformed by ClinicalBERT on clinical tasks
+
+**Planned experiment:**
+1. Replace `emilyalsentzer/Bio_ClinicalBERT` with `simonlee711/Clinical-ModernBERT`
+   in `scripts/train.py` — this is a one-line config change
+2. Run E-002 equivalent (40 epochs, flat ICD-10) → E-003 → E-010 pipeline
+3. Name experiments E-012/E-013/E-014 to distinguish from ClinicalBERT baseline
+4. Compare E2E accuracy, F1, ECE, Coverage@0.7 against E-010 mean (85.8%)
+5. If Clinical ModernBERT outperforms: update publication and promote as new best
+6. If it does not: document empirically that ClinicalBERT's MIMIC-III pretraining
+   advantage outweighs the longer context window on this dataset
+
+**Expected runtime:** ~6 hours for a single full pipeline run on M5 Max.
+
+**Decision gate:** If Clinical ModernBERT E2E > 87% (beats ClinicalBERT best single
+run), adopt as new backbone. Otherwise retain ClinicalBERT with empirical justification.
+
 ## Implementation Order
 
 | Order | Requirement | Status |
@@ -268,6 +320,7 @@ Eliminated CDC FTP dependency by locking all canonical datasets to Hugging Face 
 | 8 | R-009 (dependency audit) | ✅ Complete |
 | 9 | **R-010 (HF-locked data + DVC)** | **✅ Complete (5 May 2026)** |
 | 10 | R-004 (MLflow querying) | ⏳ Pending (low priority) |
+| 11 | **R-011 (alternative backbone evaluation)** | **⏳ Pending (medium priority)** |
 
 ---
 
@@ -275,10 +328,11 @@ Eliminated CDC FTP dependency by locking all canonical datasets to Hugging Face 
 
 | Priority | Experiment | Expected gain | Effort |
 |---|---|---|---|
-| 1 | **Z-chapter contrastive fine-tuning** | +5-10pp Z | Medium — 2 weeks |
-| 2 | **Lower Z threshold to 0.5** | More Z coverage at ~85% precision | Low |
-| 3 | **MIMIC-IV validation** | Reveals synthetic→real gap | Blocked on PhysioNet |
-| 4 | **DVC remote setup for models** | Enable `dvc pull` for E-010 weights | Low — 1 day |
+| 1 | **Clinical ModernBERT backbone** | Unknown — empirical test required | Medium — 1 day compute |
+| 2 | **Z-chapter contrastive fine-tuning** | +5-10pp Z | Medium — 2 weeks |
+| 3 | **Lower Z threshold to 0.5** | More Z coverage at ~85% precision | Low |
+| 4 | **MIMIC-IV validation** | Reveals synthetic→real gap | Blocked on PhysioNet |
+| 5 | **DVC remote setup for models** | Enable `dvc pull` for E-010 weights | Low — 1 day |
 
 **E-011 finding:** E-010 + GraphReranker = ~85.8% / F1 ~0.790 — identical to
 E-010 alone. The graph reranker has minimal impact on E-010's well-calibrated
@@ -331,4 +385,4 @@ If starting fresh, give Claude this context:
 ---
 
 *Last updated: 10 May 2026*
-*Author: Refactoring session with Claude Sonnet 4.6 + 4-Run Mean Validation*
+*Author: Refactoring session with Claude Sonnet 4.6 + 4-Run Mean Validation + R-011 backbone evaluation plan*
