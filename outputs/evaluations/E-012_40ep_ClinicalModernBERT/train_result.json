@@ -1,0 +1,188 @@
+{
+  "experiment_name": "E-012_40ep_ClinicalModernBERT",
+  "best_epoch": 22,
+  "best_val_accuracy": 0.6169772256728778,
+  "best_val_f1": 0.4955298993487271,
+  "elapsed_seconds": 8534.56777891703,
+  "training_history": [
+    {
+      "epoch": 1.0,
+      "eval_loss": 7.569070339202881,
+      "eval_macro_f1": 0.0,
+      "eval_accuracy": 0.0,
+      "train_loss": null
+    },
+    {
+      "epoch": 2.0,
+      "eval_loss": 7.533517360687256,
+      "eval_macro_f1": 7.1571714858288e-05,
+      "eval_accuracy": 0.0010351966873706005,
+      "train_loss": null
+    },
+    {
+      "epoch": 3.0,
+      "eval_loss": 7.160982131958008,
+      "eval_macro_f1": 0.01148096046462359,
+      "eval_accuracy": 0.031055900621118012,
+      "train_loss": null
+    },
+    {
+      "epoch": 4.0,
+      "eval_loss": 6.675699234008789,
+      "eval_macro_f1": 0.08101940457203614,
+      "eval_accuracy": 0.13561076604554864,
+      "train_loss": null
+    },
+    {
+      "epoch": 5.0,
+      "eval_loss": 6.197254657745361,
+      "eval_macro_f1": 0.2016298452505349,
+      "eval_accuracy": 0.2981366459627329,
+      "train_loss": null
+    },
+    {
+      "epoch": 6.0,
+      "eval_loss": 5.7822265625,
+      "eval_macro_f1": 0.28473137349541844,
+      "eval_accuracy": 0.39648033126293997,
+      "train_loss": null
+    },
+    {
+      "epoch": 7.0,
+      "eval_loss": 5.421201705932617,
+      "eval_macro_f1": 0.3182396866201493,
+      "eval_accuracy": 0.432712215320911,
+      "train_loss": null
+    },
+    {
+      "epoch": 8.0,
+      "eval_loss": 5.0878777503967285,
+      "eval_macro_f1": 0.3576856649395509,
+      "eval_accuracy": 0.4782608695652174,
+      "train_loss": null
+    },
+    {
+      "epoch": 9.0,
+      "eval_loss": 4.7801361083984375,
+      "eval_macro_f1": 0.3922085530169888,
+      "eval_accuracy": 0.5124223602484472,
+      "train_loss": null
+    },
+    {
+      "epoch": 10.0,
+      "eval_loss": 4.505329608917236,
+      "eval_macro_f1": 0.41539556895757423,
+      "eval_accuracy": 0.5362318840579711,
+      "train_loss": null
+    },
+    {
+      "epoch": 11.0,
+      "eval_loss": 4.251402854919434,
+      "eval_macro_f1": 0.4132334736320871,
+      "eval_accuracy": 0.5372670807453416,
+      "train_loss": null
+    },
+    {
+      "epoch": 12.0,
+      "eval_loss": 4.021416664123535,
+      "eval_macro_f1": 0.4389865260691271,
+      "eval_accuracy": 0.5600414078674948,
+      "train_loss": null
+    },
+    {
+      "epoch": 13.0,
+      "eval_loss": 3.7908711433410645,
+      "eval_macro_f1": 0.4512030516431924,
+      "eval_accuracy": 0.5755693581780539,
+      "train_loss": null
+    },
+    {
+      "epoch": 14.0,
+      "eval_loss": 3.600071907043457,
+      "eval_macro_f1": 0.45056867891513563,
+      "eval_accuracy": 0.5745341614906833,
+      "train_loss": null
+    },
+    {
+      "epoch": 15.0,
+      "eval_loss": 3.421092987060547,
+      "eval_macro_f1": 0.4620386643233743,
+      "eval_accuracy": 0.587991718426501,
+      "train_loss": null
+    },
+    {
+      "epoch": 16.0,
+      "eval_loss": 3.268888473510742,
+      "eval_macro_f1": 0.475022143489814,
+      "eval_accuracy": 0.5962732919254659,
+      "train_loss": null
+    },
+    {
+      "epoch": 17.0,
+      "eval_loss": 3.1072020530700684,
+      "eval_macro_f1": 0.4683994126284875,
+      "eval_accuracy": 0.5921325051759835,
+      "train_loss": null
+    },
+    {
+      "epoch": 18.0,
+      "eval_loss": 2.9758927822113037,
+      "eval_macro_f1": 0.4847148736037625,
+      "eval_accuracy": 0.6066252587991718,
+      "train_loss": null
+    },
+    {
+      "epoch": 19.0,
+      "eval_loss": 2.853548049926758,
+      "eval_macro_f1": 0.4776699029126213,
+      "eval_accuracy": 0.6014492753623188,
+      "train_loss": null
+    },
+    {
+      "epoch": 20.0,
+      "eval_loss": 2.746236562728882,
+      "eval_macro_f1": 0.4863421828908554,
+      "eval_accuracy": 0.6066252587991718,
+      "train_loss": null
+    },
+    {
+      "epoch": 21.0,
+      "eval_loss": 2.674800395965576,
+      "eval_macro_f1": 0.49048888888888886,
+      "eval_accuracy": 0.6107660455486542,
+      "train_loss": null
+    },
+    {
+      "epoch": 22.0,
+      "eval_loss": 2.6186695098876953,
+      "eval_macro_f1": 0.4955298993487271,
+      "eval_accuracy": 0.6169772256728778,
+      "train_loss": null
+    },
+    {
+      "epoch": 23.0,
+      "eval_loss": 2.581589460372925,
+      "eval_macro_f1": 0.49069973427812225,
+      "eval_accuracy": 0.6118012422360248,
+      "train_loss": null
+    },
+    {
+      "epoch": 24.0,
+      "eval_loss": 2.550191879272461,
+      "eval_macro_f1": 0.4878948922350162,
+      "eval_accuracy": 0.6097308488612836,
+      "train_loss": null
+    },
+    {
+      "epoch": 25.0,
+      "eval_loss": 2.519260883331299,
+      "eval_macro_f1": 0.48861283643892334,
+      "eval_accuracy": 0.6097308488612836,
+      "train_loss": null
+    }
+  ],
+  "num_classes": 1926,
+  "label_scheme": "icd10",
+  "model": "Simonlee711/Clinical_ModernBERT",
+  "timestamp": "2026-05-10T11:57:14.035244"
+}

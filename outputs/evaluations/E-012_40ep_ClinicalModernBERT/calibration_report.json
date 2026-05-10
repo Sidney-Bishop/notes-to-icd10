@@ -1,0 +1,232 @@
+{
+  "stage1": {
+    "temperature": 1.395171,
+    "n_samples": 966,
+    "n_classes": 22,
+    "ece_before": 0.0612,
+    "ece_after": 0.0181,
+    "coverage_before": 0.9731,
+    "coverage_after": 0.9482,
+    "accuracy_on_covered_before": 0.9298,
+    "accuracy_on_covered_after": 0.9389
+  },
+  "stage2": {
+    "A": {
+      "temperature": 0.734399,
+      "n_samples": 6,
+      "n_classes": 12,
+      "ece_before": 0.085,
+      "ece_after": 0.039,
+      "coverage_before": 0.0,
+      "coverage_after": 0.0,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.0
+    },
+    "B": {
+      "temperature": 0.193765,
+      "n_samples": 16,
+      "n_classes": 31,
+      "ece_before": 0.5113,
+      "ece_after": 0.0913,
+      "coverage_before": 0.0625,
+      "coverage_after": 0.8125,
+      "accuracy_on_covered_before": 1.0,
+      "accuracy_on_covered_after": 0.8462
+    },
+    "C": {
+      "temperature": 0.348851,
+      "n_samples": 51,
+      "n_classes": 101,
+      "ece_before": 0.3727,
+      "ece_after": 0.1308,
+      "coverage_before": 0.0,
+      "coverage_after": 0.2941,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.8
+    },
+    "D": {
+      "temperature": 0.328616,
+      "n_samples": 38,
+      "n_classes": 76,
+      "ece_before": 0.4549,
+      "ece_after": 0.1386,
+      "coverage_before": 0.0,
+      "coverage_after": 0.4737,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.9444
+    },
+    "E": {
+      "temperature": 0.470292,
+      "n_samples": 39,
+      "n_classes": 76,
+      "ece_before": 0.2247,
+      "ece_after": 0.1738,
+      "coverage_before": 0.0,
+      "coverage_after": 0.2821,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.6364
+    },
+    "F": {
+      "temperature": 0.367316,
+      "n_samples": 48,
+      "n_classes": 95,
+      "ece_before": 0.3553,
+      "ece_after": 0.1325,
+      "coverage_before": 0.0,
+      "coverage_after": 0.2708,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.6923
+    },
+    "G": {
+      "temperature": 0.05,
+      "n_samples": 34,
+      "n_classes": 68,
+      "ece_before": 0.3644,
+      "ece_after": 0.4565,
+      "coverage_before": 0.0,
+      "coverage_after": 0.9706,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.5455
+    },
+    "H": {
+      "temperature": 0.265916,
+      "n_samples": 42,
+      "n_classes": 83,
+      "ece_before": 0.3467,
+      "ece_after": 0.1641,
+      "coverage_before": 0.0,
+      "coverage_after": 0.2143,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.6667
+    },
+    "I": {
+      "temperature": 0.292118,
+      "n_samples": 66,
+      "n_classes": 131,
+      "ece_before": 0.3897,
+      "ece_after": 0.1312,
+      "coverage_before": 0.0,
+      "coverage_after": 0.303,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.8
+    },
+    "J": {
+      "temperature": 0.417641,
+      "n_samples": 50,
+      "n_classes": 100,
+      "ece_before": 0.3796,
+      "ece_after": 0.1778,
+      "coverage_before": 0.02,
+      "coverage_after": 0.4,
+      "accuracy_on_covered_before": 1.0,
+      "accuracy_on_covered_after": 0.75
+    },
+    "K": {
+      "temperature": 0.378184,
+      "n_samples": 58,
+      "n_classes": 116,
+      "ece_before": 0.3539,
+      "ece_after": 0.1531,
+      "coverage_before": 0.0,
+      "coverage_after": 0.3448,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.75
+    },
+    "L": {
+      "temperature": 0.324784,
+      "n_samples": 38,
+      "n_classes": 76,
+      "ece_before": 0.5289,
+      "ece_after": 0.1546,
+      "coverage_before": 0.0,
+      "coverage_after": 0.5,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.7895
+    },
+    "M": {
+      "temperature": 0.367854,
+      "n_samples": 111,
+      "n_classes": 222,
+      "ece_before": 0.4226,
+      "ece_after": 0.0867,
+      "coverage_before": 0.0,
+      "coverage_after": 0.3694,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.878
+    },
+    "N": {
+      "temperature": 0.287631,
+      "n_samples": 53,
+      "n_classes": 105,
+      "ece_before": 0.4957,
+      "ece_after": 0.1229,
+      "coverage_before": 0.0189,
+      "coverage_after": 0.4151,
+      "accuracy_on_covered_before": 1.0,
+      "accuracy_on_covered_after": 0.8636
+    },
+    "O": {
+      "temperature": 0.353686,
+      "n_samples": 32,
+      "n_classes": 63,
+      "ece_before": 0.3961,
+      "ece_after": 0.2252,
+      "coverage_before": 0.0,
+      "coverage_after": 0.0312,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 1.0
+    },
+    "R": {
+      "temperature": 0.317529,
+      "n_samples": 100,
+      "n_classes": 196,
+      "ece_before": 0.4934,
+      "ece_after": 0.1191,
+      "coverage_before": 0.0,
+      "coverage_after": 0.33,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.9394
+    },
+    "S": {
+      "temperature": 0.05,
+      "n_samples": 44,
+      "n_classes": 87,
+      "ece_before": 0.3904,
+      "ece_after": 0.3954,
+      "coverage_before": 0.0,
+      "coverage_after": 0.9091,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.575
+    },
+    "T": {
+      "temperature": 0.275011,
+      "n_samples": 8,
+      "n_classes": 15,
+      "ece_before": 0.4397,
+      "ece_after": 0.2343,
+      "coverage_before": 0.0,
+      "coverage_after": 0.75,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.8333
+    },
+    "Z": {
+      "temperature": 0.417243,
+      "n_samples": 132,
+      "n_classes": 263,
+      "ece_before": 0.2214,
+      "ece_after": 0.0791,
+      "coverage_before": 0.0,
+      "coverage_after": 0.0682,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.7778
+    }
+  },
+  "meta": {
+    "experiment": "E-012_40ep_ClinicalModernBERT",
+    "stage1_experiment": "E-003_Hierarchical_ICD10",
+    "threshold": 0.7,
+    "device": "mps",
+    "elapsed_s": 29.6,
+    "started": "2026-05-10 19:36:16"
+  }
+}
