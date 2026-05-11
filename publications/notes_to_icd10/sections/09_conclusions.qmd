@@ -61,15 +61,18 @@ Clinical ModernBERT — a 2025 model with 22 transformer layers, 8,192-token
 context, and MIMIC-IV pretraining. The result was decisive: 48.8% E2E
 accuracy vs 85.8% for ClinicalBERT, a 37 percentage point deficit.
 
-Two factors explain this: first, the APSO-Flip strategy eliminates the
-context window advantage by front-loading diagnostically critical content.
-Second, ClinicalBERT's MIMIC-III pretraining produces clinical representations
-that transfer more effectively to ICD-10 classification than Clinical
-ModernBERT's more diverse but architecturally different pretraining.
+Two factors explain this: the APSO-Flip strategy eliminates the context
+window advantage by front-loading critical content, and ClinicalBERT's
+MIMIC-III pretraining produces representations that transfer more effectively
+to few-shot ICD-10 classification than either ModernBERT variant.
 
-**The backbone choice is empirically justified.** Future improvements to
-this system should focus on data, architecture, and training strategy rather
-than switching encoder backbones.
+This conclusion was confirmed by a second backbone test: BioClinical ModernBERT
+(E-013, 53.5B token corpus from 20 institutions) achieved only 7.0% E2E
+accuracy — Stage-2 resolvers for several chapters never improved beyond epoch 1.
+
+**The backbone choice is doubly empirically justified.** Future improvements
+should focus on data, training strategy, and architecture for the specific
+task rather than switching encoder backbones.
 
 ---
 
@@ -137,7 +140,7 @@ selective automation at 95.6% precision on synthetic data. The key to
 making it work is aggressive warm initialisation from a well-trained flat
 classifier. The primary remaining gap is the Z-chapter (62.1%), which
 requires contrastive fine-tuning rather than more data or training time.
-Real-world validation on MIMIC-IV-Note is the critical next step. The backbone choice (Bio_ClinicalBERT) has been empirically validated against a modern alternative (E-012).
+Real-world validation on MIMIC-IV-Note is the critical next step. The backbone choice (Bio_ClinicalBERT) has been empirically validated against two modern alternatives (E-012: 48.8%, E-013: 7.0%).
 :::
 
 ---

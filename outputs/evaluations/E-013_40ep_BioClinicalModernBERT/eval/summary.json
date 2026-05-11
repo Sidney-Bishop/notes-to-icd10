@@ -1,0 +1,100 @@
+{
+  "experiment_name": "E-013_40ep_BioClinicalModernBERT",
+  "stage1_experiment": "E-003_Hierarchical_ICD10",
+  "n_test": 972,
+  "stage1_accuracy": 0.9681,
+  "within_chapter_accuracy": 0.0723,
+  "e2e_accuracy": 0.07,
+  "macro_f1": 0.0461,
+  "ece": 0.0129,
+  "threshold": 0.7,
+  "coverage_at_threshold": 0.0165,
+  "accuracy_at_threshold": 0.625,
+  "chapter_accuracy": {
+    "A": {
+      "accuracy": 0.0,
+      "n": 6
+    },
+    "B": {
+      "accuracy": 0.0625,
+      "n": 16
+    },
+    "C": {
+      "accuracy": 0.0,
+      "n": 51
+    },
+    "D": {
+      "accuracy": 0.0,
+      "n": 38
+    },
+    "E": {
+      "accuracy": 0.0256,
+      "n": 39
+    },
+    "F": {
+      "accuracy": 0.1458,
+      "n": 48
+    },
+    "G": {
+      "accuracy": 0.0,
+      "n": 34
+    },
+    "H": {
+      "accuracy": 0.0238,
+      "n": 42
+    },
+    "I": {
+      "accuracy": 0.0,
+      "n": 66
+    },
+    "J": {
+      "accuracy": 0.04,
+      "n": 50
+    },
+    "K": {
+      "accuracy": 0.0172,
+      "n": 58
+    },
+    "L": {
+      "accuracy": 0.0263,
+      "n": 38
+    },
+    "M": {
+      "accuracy": 0.2523,
+      "n": 111
+    },
+    "N": {
+      "accuracy": 0.0189,
+      "n": 53
+    },
+    "O": {
+      "accuracy": 0.0312,
+      "n": 32
+    },
+    "P": {
+      "accuracy": 0.3333,
+      "n": 3
+    },
+    "Q": {
+      "accuracy": 0.0,
+      "n": 3
+    },
+    "R": {
+      "accuracy": 0.16,
+      "n": 100
+    },
+    "S": {
+      "accuracy": 0.0227,
+      "n": 44
+    },
+    "T": {
+      "accuracy": 0.25,
+      "n": 8
+    },
+    "Z": {
+      "accuracy": 0.0303,
+      "n": 132
+    }
+  },
+  "timestamp": "2026-05-11T09:14:09.744854"
+}

@@ -1,0 +1,232 @@
+{
+  "stage1": {
+    "temperature": 1.371967,
+    "n_samples": 966,
+    "n_classes": 22,
+    "ece_before": 0.0548,
+    "ece_after": 0.0153,
+    "coverage_before": 0.9845,
+    "coverage_after": 0.9689,
+    "accuracy_on_covered_before": 0.9369,
+    "accuracy_on_covered_after": 0.9444
+  },
+  "stage2": {
+    "A": {
+      "temperature": 5.411088,
+      "n_samples": 6,
+      "n_classes": 12,
+      "ece_before": 0.1264,
+      "ece_after": 0.0904,
+      "coverage_before": 0.0,
+      "coverage_after": 0.0,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.0
+    },
+    "B": {
+      "temperature": 7.18605,
+      "n_samples": 16,
+      "n_classes": 31,
+      "ece_before": 0.0138,
+      "ece_after": 0.0282,
+      "coverage_before": 0.0,
+      "coverage_after": 0.0,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.0
+    },
+    "C": {
+      "temperature": 2.298039,
+      "n_samples": 51,
+      "n_classes": 101,
+      "ece_before": 0.0247,
+      "ece_after": 0.0149,
+      "coverage_before": 0.0,
+      "coverage_after": 0.0,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.0
+    },
+    "D": {
+      "temperature": 2.089237,
+      "n_samples": 38,
+      "n_classes": 76,
+      "ece_before": 0.1573,
+      "ece_after": 0.0557,
+      "coverage_before": 0.0,
+      "coverage_after": 0.0,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.0
+    },
+    "E": {
+      "temperature": 6.711037,
+      "n_samples": 39,
+      "n_classes": 76,
+      "ece_before": 0.0257,
+      "ece_after": 0.0366,
+      "coverage_before": 0.0,
+      "coverage_after": 0.0,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.0
+    },
+    "F": {
+      "temperature": 1.895191,
+      "n_samples": 48,
+      "n_classes": 95,
+      "ece_before": 0.2303,
+      "ece_after": 0.0804,
+      "coverage_before": 0.0833,
+      "coverage_after": 0.0,
+      "accuracy_on_covered_before": 0.5,
+      "accuracy_on_covered_after": 0.0
+    },
+    "G": {
+      "temperature": 5.677251,
+      "n_samples": 34,
+      "n_classes": 68,
+      "ece_before": 0.0299,
+      "ece_after": 0.0167,
+      "coverage_before": 0.0,
+      "coverage_after": 0.0,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.0
+    },
+    "H": {
+      "temperature": 1.492905,
+      "n_samples": 42,
+      "n_classes": 83,
+      "ece_before": 0.0635,
+      "ece_after": 0.0301,
+      "coverage_before": 0.0,
+      "coverage_after": 0.0,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.0
+    },
+    "I": {
+      "temperature": 2.339985,
+      "n_samples": 66,
+      "n_classes": 131,
+      "ece_before": 0.0121,
+      "ece_after": 0.0093,
+      "coverage_before": 0.0,
+      "coverage_after": 0.0,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.0
+    },
+    "J": {
+      "temperature": 5.391179,
+      "n_samples": 50,
+      "n_classes": 100,
+      "ece_before": 0.0188,
+      "ece_after": 0.0284,
+      "coverage_before": 0.0,
+      "coverage_after": 0.0,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.0
+    },
+    "K": {
+      "temperature": 5.446883,
+      "n_samples": 58,
+      "n_classes": 116,
+      "ece_before": 0.0022,
+      "ece_after": 0.0072,
+      "coverage_before": 0.0,
+      "coverage_after": 0.0,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.0
+    },
+    "L": {
+      "temperature": 3.483053,
+      "n_samples": 38,
+      "n_classes": 76,
+      "ece_before": 0.0035,
+      "ece_after": 0.0094,
+      "coverage_before": 0.0,
+      "coverage_after": 0.0,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.0
+    },
+    "M": {
+      "temperature": 1.232312,
+      "n_samples": 111,
+      "n_classes": 222,
+      "ece_before": 0.1211,
+      "ece_after": 0.0639,
+      "coverage_before": 0.1532,
+      "coverage_after": 0.0631,
+      "accuracy_on_covered_before": 0.7647,
+      "accuracy_on_covered_after": 0.8571
+    },
+    "N": {
+      "temperature": 6.801603,
+      "n_samples": 53,
+      "n_classes": 105,
+      "ece_before": 0.001,
+      "ece_after": 0.0082,
+      "coverage_before": 0.0,
+      "coverage_after": 0.0,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.0
+    },
+    "O": {
+      "temperature": 0.853134,
+      "n_samples": 32,
+      "n_classes": 63,
+      "ece_before": 0.0091,
+      "ece_after": 0.0079,
+      "coverage_before": 0.0,
+      "coverage_after": 0.0,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.0
+    },
+    "R": {
+      "temperature": 1.525617,
+      "n_samples": 100,
+      "n_classes": 196,
+      "ece_before": 0.0825,
+      "ece_after": 0.0789,
+      "coverage_before": 0.04,
+      "coverage_after": 0.0,
+      "accuracy_on_covered_before": 0.25,
+      "accuracy_on_covered_after": 0.0
+    },
+    "S": {
+      "temperature": 1.529175,
+      "n_samples": 44,
+      "n_classes": 87,
+      "ece_before": 0.0013,
+      "ece_after": 0.0053,
+      "coverage_before": 0.0,
+      "coverage_after": 0.0,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.0
+    },
+    "T": {
+      "temperature": 0.560748,
+      "n_samples": 8,
+      "n_classes": 15,
+      "ece_before": 0.1529,
+      "ece_after": 0.1257,
+      "coverage_before": 0.0,
+      "coverage_after": 0.0,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.0
+    },
+    "Z": {
+      "temperature": 6.074536,
+      "n_samples": 132,
+      "n_classes": 263,
+      "ece_before": 0.0078,
+      "ece_after": 0.0043,
+      "coverage_before": 0.0,
+      "coverage_after": 0.0,
+      "accuracy_on_covered_before": 0.0,
+      "accuracy_on_covered_after": 0.0
+    }
+  },
+  "meta": {
+    "experiment": "E-013_40ep_BioClinicalModernBERT",
+    "stage1_experiment": "E-003_Hierarchical_ICD10",
+    "threshold": 0.7,
+    "device": "mps",
+    "elapsed_s": 36.5,
+    "started": "2026-05-11 09:11:56"
+  }
+}

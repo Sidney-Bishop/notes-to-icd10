@@ -515,6 +515,72 @@ and more modern pre-training objectives. The hierarchical architecture is
 model-agnostic; ClinicalBERT is the right model for this task.
 :::
 
+
+---
+
+## E-013: Backbone Evaluation — BioClinical ModernBERT {#sec-exp-e013}
+
+**Hypothesis:** BioClinical ModernBERT (`thomas-sounack/BioClinical-ModernBERT-base`),
+trained on 53.5B tokens from 20 diverse clinical institutions, produces better
+ICD-10 representations than Clinical ModernBERT (E-012) due to its larger and
+more diverse pretraining corpus.
+
+**Motivation:** E-012 used Clinical ModernBERT trained primarily on PubMed and
+MIMIC-IV. BioClinical ModernBERT expands coverage to 20 institutions, potentially
+providing broader clinical language representation.
+
+**Setup:** Identical pipeline to E-012. Only the encoder backbone changes.
+
+| Parameter | Value |
+|---|---|
+| Backbone | `thomas-sounack/BioClinical-ModernBERT-base` |
+| Architecture | ModernBERT (12 layers, hidden_size=768, max_pos=8192) |
+| Pretraining corpus | 53.5B tokens, 20 clinical institutions |
+| Flat pre-training epochs | 40 |
+| Stage-2 epochs | 20 |
+
+**Result:**
+
+| Metric | E-013 (BioClinical ModernBERT) | E-012 (Clinical ModernBERT) | E-010 (ClinicalBERT) |
+|---|---|---|---|
+| Flat val accuracy | 66.1% | 61.7% | 74.5% |
+| E2E accuracy | **7.0%** | 48.8% | **85.8%** |
+| Macro F1 | 0.046 | 0.369 | 0.762 |
+| ECE | 0.013 | 0.078 | 0.031 |
+| Coverage@0.7 | **1.7%** | 37.5% | **86.4%** |
+
+: E-013 three-way backbone comparison. {#tbl-exp-e013}
+
+**Interpretation:** BioClinical ModernBERT is worse than Clinical ModernBERT
+and catastrophically worse than ClinicalBERT. At 7.0% E2E accuracy and 1.7%
+Coverage@0.7, the model has essentially failed — Stage-2 resolvers for several
+chapters (N, S, Z) achieved best epoch 1, meaning they never improved beyond
+the first checkpoint. The model is effectively random on this task.
+
+**Why the larger corpus did not help:** Both ModernBERT variants share the
+same fundamental architectural departure from Bio_ClinicalBERT — different
+tokeniser, attention mechanism (Flash Attention vs standard), and positional
+encoding (RoPE vs absolute). These differences appear to make Stage-2 transfer
+learning much harder under the 20-epoch budget with ~4 training examples per class,
+regardless of pretraining corpus size.
+
+::: {.callout-important}
+## R-011 Conclusion: ClinicalBERT is the Right Backbone
+
+Both ModernBERT variants fail decisively:
+
+| Backbone | E2E | vs ClinicalBERT |
+|---|---|---|
+| Bio_ClinicalBERT | **85.8%** | baseline |
+| Clinical ModernBERT | 48.8% | −37pp |
+| BioClinical ModernBERT | **7.0%** | **−79pp** |
+
+The APSO-Flip strategy neutralises the context window advantage. MIMIC-III
+domain pretraining with standard BERT architecture transfers better to this
+high-cardinality, few-shot classification task than either ModernBERT variant.
+The backbone choice is empirically justified.
+:::
+
 ## Experiment Summary {#sec-exp-summary}
 
 ```{python}
@@ -542,6 +608,9 @@ experiments = [
     {"ID": "E-012", "Description": "Clinical ModernBERT backbone", 
      "Architecture": "Hierarchical", "Init": "E-012 flat (40 epochs)",
      "E2E Acc": "48.8%", "Macro F1": "0.369"},
+    {"ID": "E-013", "Description": "BioClinical ModernBERT backbone", 
+     "Architecture": "Hierarchical", "Init": "E-013 flat (40 epochs)",
+     "E2E Acc": "7.0%", "Macro F1": "0.046"},
 ]
 
 df = pd.DataFrame(experiments)

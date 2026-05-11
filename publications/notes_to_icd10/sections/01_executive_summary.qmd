@@ -106,6 +106,9 @@ results = [
     {"Experiment": "E-012 (backbone eval)", "Architecture": "Hierarchical, Clinical ModernBERT",
      "E2E Accuracy": "48.8%", "Macro F1": "0.369", "ECE": "0.078",
      "Coverage@0.7": "37.5%", "Note": "ModernBERT backbone — ClinicalBERT wins"},
+    {"Experiment": "E-013 (backbone eval)", "Architecture": "Hierarchical, BioClinical ModernBERT",
+     "E2E Accuracy": "7.0%", "Macro F1": "0.046", "ECE": "0.013",
+     "Coverage@0.7": "1.7%", "Note": "ModernBERT backbone — catastrophic failure"},
 ]
 
 df = pd.DataFrame(results)
@@ -128,10 +131,7 @@ The three headline findings:
    86.4% of cases are auto-coded at 95.6% precision — a precision level
    that meets or exceeds typical human coding accuracy for common codes.
 
-4. **Domain pretraining beats architectural modernity.** Replacing ClinicalBERT
-   with Clinical ModernBERT (a 2025 model with 8,192-token context, 22 layers,
-   MIMIC-IV pretraining) reduced E2E accuracy from 85.8% to 48.8%. The
-   ClinicalBERT backbone choice is empirically validated, not merely conventional.
+4. **Domain pretraining beats architectural modernity — confirmed twice.** Both Clinical ModernBERT (E-012: 48.8%) and BioClinical ModernBERT (E-013: 7.0%) were tested and rejected. ClinicalBERT leads by 37–79 percentage points. The backbone choice is doubly empirically validated.
 
 ---
 
@@ -175,4 +175,4 @@ health system.
 | **Calibration quality** | ECE = 0.031 (well calibrated) |
 | **Codebase** | Python 3.12, HuggingFace Transformers, Polars, uv |
 | **Test coverage** | 94 unit tests, no GPU required |
-| **Backbone evaluation** | E-012: Clinical ModernBERT tested and rejected (48.8% E2E) |
+| **Backbone evaluation** | E-012: 48.8% E2E, E-013: 7.0% E2E — ClinicalBERT wins decisively |

@@ -1,0 +1,146 @@
+{
+  "experiment_name": "E-013_40ep_BioClinicalModernBERT",
+  "best_epoch": 16,
+  "best_val_accuracy": 0.6614906832298136,
+  "best_val_f1": 0.5414518518518517,
+  "elapsed_seconds": 8574.632946874946,
+  "training_history": [
+    {
+      "epoch": 1.0,
+      "eval_loss": 7.578493118286133,
+      "eval_macro_f1": 0.0,
+      "eval_accuracy": 0.0,
+      "train_loss": null
+    },
+    {
+      "epoch": 2.0,
+      "eval_loss": 7.553952693939209,
+      "eval_macro_f1": 0.0,
+      "eval_accuracy": 0.0,
+      "train_loss": null
+    },
+    {
+      "epoch": 3.0,
+      "eval_loss": 6.713690280914307,
+      "eval_macro_f1": 0.014335538460788114,
+      "eval_accuracy": 0.032091097308488616,
+      "train_loss": null
+    },
+    {
+      "epoch": 4.0,
+      "eval_loss": 4.764761447906494,
+      "eval_macro_f1": 0.13612114202566467,
+      "eval_accuracy": 0.21325051759834368,
+      "train_loss": null
+    },
+    {
+      "epoch": 5.0,
+      "eval_loss": 3.2507846355438232,
+      "eval_macro_f1": 0.29731358983695433,
+      "eval_accuracy": 0.4109730848861284,
+      "train_loss": null
+    },
+    {
+      "epoch": 6.0,
+      "eval_loss": 2.543700695037842,
+      "eval_macro_f1": 0.3835215754416449,
+      "eval_accuracy": 0.505175983436853,
+      "train_loss": null
+    },
+    {
+      "epoch": 7.0,
+      "eval_loss": 2.2389328479766846,
+      "eval_macro_f1": 0.4510837727006443,
+      "eval_accuracy": 0.5745341614906833,
+      "train_loss": null
+    },
+    {
+      "epoch": 8.0,
+      "eval_loss": 2.1559576988220215,
+      "eval_macro_f1": 0.47736296296296293,
+      "eval_accuracy": 0.5952380952380952,
+      "train_loss": null
+    },
+    {
+      "epoch": 9.0,
+      "eval_loss": 2.022976875305176,
+      "eval_macro_f1": 0.49945638432364103,
+      "eval_accuracy": 0.6200828157349897,
+      "train_loss": null
+    },
+    {
+      "epoch": 10.0,
+      "eval_loss": 1.980027437210083,
+      "eval_macro_f1": 0.5033747779751332,
+      "eval_accuracy": 0.6190476190476191,
+      "train_loss": null
+    },
+    {
+      "epoch": 11.0,
+      "eval_loss": 1.932999610900879,
+      "eval_macro_f1": 0.5177856301531213,
+      "eval_accuracy": 0.6387163561076604,
+      "train_loss": null
+    },
+    {
+      "epoch": 12.0,
+      "eval_loss": 1.838080644607544,
+      "eval_macro_f1": 0.5335689045936396,
+      "eval_accuracy": 0.6563146997929606,
+      "train_loss": null
+    },
+    {
+      "epoch": 13.0,
+      "eval_loss": 1.8406033515930176,
+      "eval_macro_f1": 0.5380866965620329,
+      "eval_accuracy": 0.6542443064182195,
+      "train_loss": null
+    },
+    {
+      "epoch": 14.0,
+      "eval_loss": 1.8324252367019653,
+      "eval_macro_f1": 0.5368920521945433,
+      "eval_accuracy": 0.6563146997929606,
+      "train_loss": null
+    },
+    {
+      "epoch": 15.0,
+      "eval_loss": 1.8289601802825928,
+      "eval_macro_f1": 0.5368920521945433,
+      "eval_accuracy": 0.6563146997929606,
+      "train_loss": null
+    },
+    {
+      "epoch": 16.0,
+      "eval_loss": 1.8353596925735474,
+      "eval_macro_f1": 0.5414518518518517,
+      "eval_accuracy": 0.6614906832298136,
+      "train_loss": null
+    },
+    {
+      "epoch": 17.0,
+      "eval_loss": 1.8343478441238403,
+      "eval_macro_f1": 0.5380572778269854,
+      "eval_accuracy": 0.6594202898550725,
+      "train_loss": null
+    },
+    {
+      "epoch": 18.0,
+      "eval_loss": 1.8391259908676147,
+      "eval_macro_f1": 0.5360742705570292,
+      "eval_accuracy": 0.6583850931677019,
+      "train_loss": null
+    },
+    {
+      "epoch": 19.0,
+      "eval_loss": 1.8414374589920044,
+      "eval_macro_f1": 0.5382387706855791,
+      "eval_accuracy": 0.6594202898550725,
+      "train_loss": null
+    }
+  ],
+  "num_classes": 1926,
+  "label_scheme": "icd10",
+  "model": "thomas-sounack/BioClinical-ModernBERT-base",
+  "timestamp": "2026-05-10T22:38:59.999413"
+}
