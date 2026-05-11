@@ -10,9 +10,9 @@ title: "Executive Summary"
 We built a system that reads clinical notes and automatically assigns the
 correct ICD-10 diagnostic code — the billing and classification code that
 describes a patient's condition. On a held-out test set of 966 records
-covering 1,926 distinct codes, the system achieves **85.8% top-1 accuracy**
-and automatically codes **86.4% of cases** at **95.6% precision**,
-routing the remaining 17.9% to human review. It does this without access
+covering 1,926 distinct codes, the system achieves **86.7% top-1 accuracy** (E-010 + SupCon Z hybrid)
+and automatically codes **88.2% of cases** at high precision,
+routing the remainder to human review. It does this without access
 to any real patient data, trained entirely on a high-quality synthetic dataset.
 :::
 
@@ -109,6 +109,9 @@ results = [
     {"Experiment": "E-013 (backbone eval)", "Architecture": "Hierarchical, BioClinical ModernBERT",
      "E2E Accuracy": "7.0%", "Macro F1": "0.046", "ECE": "0.013",
      "Coverage@0.7": "1.7%", "Note": "ModernBERT backbone — catastrophic failure"},
+    {"Experiment": "**E-014 + E-010 hybrid**", "Architecture": "Hierarchical + SupCon Z",
+     "E2E Accuracy": "**86.7%**", "Macro F1": "**—**", "ECE": "**0.027**",
+     "Coverage@0.7": "**88.2%**", "Note": "**Current best — SupCon Z resolver**"},
 ]
 
 df = pd.DataFrame(results)
@@ -131,7 +134,9 @@ The three headline findings:
    86.4% of cases are auto-coded at 95.6% precision — a precision level
    that meets or exceeds typical human coding accuracy for common codes.
 
-4. **Domain pretraining beats architectural modernity — confirmed twice.** Both Clinical ModernBERT (E-012: 48.8%) and BioClinical ModernBERT (E-013: 7.0%) were tested and rejected. ClinicalBERT leads by 37–79 percentage points. The backbone choice is doubly empirically validated.
+4. **Domain pretraining beats architectural modernity — confirmed twice.** Both Clinical ModernBERT (E-012: 48.8%) and BioClinical ModernBERT (E-013: 7.0%) were tested and rejected. ClinicalBERT leads by 37–79 percentage points.
+
+5. **SupCon fine-tuning closes the Z-chapter gap.** The Z-chapter (administrative codes) improved from 62.1% to 83.3% (+21.2pp) using Supervised Contrastive Learning (E-014). The full-system E2E accuracy rose to 86.7%. Feature-similarity problems require contrastive objectives — cross-entropy is insufficient.
 
 ---
 
@@ -176,3 +181,4 @@ health system.
 | **Codebase** | Python 3.12, HuggingFace Transformers, Polars, uv |
 | **Test coverage** | 94 unit tests, no GPU required |
 | **Backbone evaluation** | E-012: 48.8% E2E, E-013: 7.0% E2E — ClinicalBERT wins decisively |
+| **Z-chapter SupCon (E-014)** | 62.1% → 83.3% (+21.2pp) — feature similarity solved |

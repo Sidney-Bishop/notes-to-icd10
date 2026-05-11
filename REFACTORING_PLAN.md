@@ -5,7 +5,8 @@ Written as a handoff document — a new conversation with Claude should be
 able to pick this up and proceed without needing the full project history.
 
 **Date:** 9 May 2026
-**Current best result:** E-010_40ep_E002Init — 85.8% E2E (mean of 4 runs, range 84.2–86.8%) | 0.790 F1 | 0.031 ECE | 86.4% Coverage@0.7
+**Current best result:** E-010 + E-014 SupCon Z hybrid — 86.7% E2E | 0.027 ECE | 88.2% Coverage@0.7
+**Base model:** E-010_40ep_E002Init — 85.8% E2E (mean of 4 runs) | 0.790 F1 | 0.031 ECE | 86.4% Coverage@0.7
 **Data status:** Phase 1b locked — HF canonical + DVC + SHA256 manifest (commit 6dda8ac)
 
 ---
@@ -67,6 +68,9 @@ The canonical gold dataset is locked at 10,240 rows with validation split
 | E-003_Hierarchical_ICD10 | 12.7% | 0.083 | — | — |
 | E-009_Balanced_E002Init | 77.2% | 0.679 | — | — |
 | **E-010_40ep_E002Init** | **85.8%** (mean) | **0.790** | **0.031** | **86.4%** |
+| E-012_40ep_ClinicalModernBERT | 48.8% | 0.369 | 0.078 | 37.5% |
+| E-013_40ep_BioClinicalModernBERT | 7.0% | 0.046 | 0.013 | 1.7% |
+| **E-014_SupCon_Z (hybrid)** | **86.7%** | **—** | **0.027** | **88.2%** |
 | E-012_40ep_ClinicalModernBERT | 48.8% | 0.369 | 0.078 | 37.5% |
 
 ---
@@ -255,6 +259,53 @@ Eliminated CDC FTP dependency by locking all canonical datasets to Hugging Face 
 
 ---
 
+
+---
+
+### R-011 — Alternative Encoder Backbone Evaluation
+**Priority: Medium**
+**Status: ✅ COMPLETE (10–11 May 2026)**
+
+Evaluated two ModernBERT-based clinical encoder alternatives to Bio_ClinicalBERT.
+
+**E-012 — Clinical_ModernBERT (10 May 2026):** E2E 48.8% vs 85.8% (−37pp)
+**E-013 — BioClinical-ModernBERT-base (11 May 2026):** E2E 7.0% vs 85.8% (−79pp)
+
+**Decision: Retain Bio_ClinicalBERT.** Backbone choice is doubly empirically validated.
+MIMIC-III domain pretraining outweighs longer context, deeper architecture, and
+more recent pretraining on this high-cardinality few-shot classification task.
+
+---
+
+### R-012 — Z-Chapter Supervised Contrastive Fine-Tuning
+**Priority: High**
+**Status: ✅ COMPLETE (11 May 2026)**
+
+Addressed the Z-chapter performance gap (62.1% accuracy) using Supervised
+Contrastive Learning (SupCon).
+
+**Root cause:** Feature similarity — Z-chapter notes for different codes are
+nearly lexically identical. Standard cross-entropy cannot distinguish them.
+
+**Method:** Two-phase fine-tuning of the E-010 Z resolver:
+- Phase 1 (Contrastive): SupCon loss on [CLS] embeddings, τ=0.07, 10 epochs, LR=2e-5.
+  BalancedBatchSampler guarantees positive pairs in every batch.
+- Phase 2 (Head retraining): Frozen encoder, CE loss, 263-way head, 5 epochs, LR=1e-3.
+
+**Results (E-014_SupCon_Z + hybrid evaluation):**
+
+| Metric | E-010 baseline | E-014 hybrid | Delta |
+|---|---|---|---|
+| Z-chapter accuracy | 62.1% | **83.3%** | **+21.2pp** |
+| E2E accuracy | 85.8% | **86.7%** | **+0.9pp** |
+| Coverage@0.7 | 86.4% | **88.2%** | **+1.8pp** |
+| ECE | 0.031 | **0.027** | **−0.004** |
+| Within-chapter | 84.8% | **89.8%** | **+5.0pp** |
+
+**New scripts:**
+- `scripts/train_supcon_z.py` — SupCon fine-tuning for Z resolver
+- `scripts/evaluate_hybrid.py` — hybrid eval with per-chapter resolver overrides
+
 ## Implementation Order
 
 | Order | Requirement | Status |
@@ -269,6 +320,8 @@ Eliminated CDC FTP dependency by locking all canonical datasets to Hugging Face 
 | 8 | R-009 (dependency audit) | ✅ Complete |
 | 9 | **R-010 (HF-locked data + DVC)** | **✅ Complete (5 May 2026)** |
 | 10 | R-004 (MLflow querying) | ⏳ Pending (low priority) |
+| 11 | R-011 (backbone evaluation) | ✅ Complete (10–11 May 2026) |
+| 12 | R-012 (Z-chapter SupCon) | ✅ Complete (11 May 2026) |
 
 ---
 
@@ -276,7 +329,8 @@ Eliminated CDC FTP dependency by locking all canonical datasets to Hugging Face 
 
 | Priority | Experiment | Expected gain | Effort |
 |---|---|---|---|
-| 1 | **Z-chapter contrastive fine-tuning** | +5-10pp Z | Medium — 2 weeks |
+| 1 | ~~Z-chapter contrastive fine-tuning~~ | **✅ Done — +21.2pp Z, E2E 86.7%** | Complete |
+| 1b | **Extend SupCon to other weak chapters (E, H, O)** | +2-5pp E2E | Medium |
 | 2 | **Lower Z threshold to 0.5** | More Z coverage at ~85% precision | Low |
 | 3 | **MIMIC-IV validation** | Reveals synthetic→real gap | Blocked on PhysioNet |
 | 4 | **DVC remote setup for models** | Enable `dvc pull` for E-010 weights | Low — 1 day |
@@ -292,7 +346,7 @@ Z-chapter improved marginally from 47.1% → ~48%.
 
 | Item | Reason |
 |---|---|
-| Chapter Z contrastive fine-tuning | Research task, not refactoring |
+| ~~Chapter Z contrastive fine-tuning~~ | Complete — E-014 SupCon Z (+21.2pp) |
 | MIMIC-IV validation | Blocked on PhysioNet access |
 | Stage-1 router retraining | E-003 Stage-1 at 96.3-97.0% routing is sufficient |
 | Augmented gold pipeline | E-010 on original gold beats E-005c+graph on augmented |
@@ -326,10 +380,12 @@ If starting fresh, give Claude this context:
 > To reproduce: `git clone` → `uv run python scripts/prepare_data.py` (writes `data/gold/medsynth_gold_apso.parquet`) →
 > `uv run python scripts/build_graph.py` → run script pipeline per Run_notes.md.
 > After training, reclaim disk space with `uv run python scripts/cleanup.py`.
-> The next research priority is Z-chapter contrastive fine-tuning or MIMIC-IV
-> validation (MIMIC-IV-Note access approved on PhysioNet — validation pending)."
+> Z-chapter SupCon is complete (E-014: +21.2pp Z, E2E 86.7% hybrid).
+> Next priorities: (1) SupCon for other weak chapters (E: 74.4%, H: 83.3%)
+> (2) MIMIC-IV validation (PhysioNet access approved — pending).
+> New scripts: scripts/train_supcon_z.py and scripts/evaluate_hybrid.py."
 
 ---
 
-*Last updated: 10 May 2026*
-*Author: Refactoring session with Claude Sonnet 4.6 + 4-Run Mean Validation*
+*Last updated: 11 May 2026*
+*Author: Refactoring session with Claude Sonnet 4.6 + R-011 + R-012 SupCon Z complete*

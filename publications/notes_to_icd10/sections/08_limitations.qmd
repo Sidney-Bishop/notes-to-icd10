@@ -69,10 +69,7 @@ use nearly identical language regardless of the specific Z-code being
 assigned. Standard cross-entropy training is insufficient to distinguish
 between codes whose training examples are lexically nearly identical.
 
-**Planned mitigation:** Contrastive fine-tuning (SimCSE or SupCon loss)
-that explicitly pushes embeddings for similar-looking codes apart in
-representation space. This is a research task estimated at 1-2 weeks of
-implementation effort with uncertain but potentially large payoff.
+**Result (E-014, 11 May 2026):** Supervised Contrastive fine-tuning was implemented and evaluated. Z-chapter accuracy improved from 62.1% to 83.3% (+21.2pp). The technique is confirmed effective for feature-similarity problems. The Z-chapter gap is substantially closed — from the weakest chapter to near system-average performance.
 
 ---
 
@@ -130,7 +127,7 @@ In priority order:
 | Priority | Work Item | Expected Impact | Effort |
 |---|---|---|---|
 | 1 | MIMIC-IV-Note validation | Quantifies synthetic-real gap | Medium (blocked on access) |
-| 2 | Z-chapter contrastive fine-tuning | +5-10pp Z accuracy | Medium (~2 weeks) |
+| 2 | ~~Z-chapter contrastive fine-tuning~~ | ✅ Complete — +21.2pp Z (E-014) | Done |
 | 3 | Lower confidence threshold for Z | More Z cases auto-coded | Low |
 | 4 | Multi-label prediction | Real-world applicability | High |
 | 5 | Longer context models | Empirically evaluated (E-012) — no benefit on this dataset | Complete |

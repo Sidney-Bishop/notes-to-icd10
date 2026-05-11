@@ -92,11 +92,7 @@ and N (genitourinary, 94.3%) achieve near-perfect accuracy. These chapters
 tend to have distinctive clinical language that maps cleanly to specific codes —
 a patient with atrial fibrillation produces a note with unambiguous features.
 
-**Weakest chapter: Z (administrative, 62.1%).** The Z chapter contains 263
-codes covering preventive care, screening visits, follow-up encounters, and
-administrative contacts. The clinical language used in these notes is highly
-similar across codes — a screening visit note looks nearly identical regardless
-of what is being screened for. This is the primary remaining performance gap.
+**Z chapter (administrative): 62.1% baseline → 83.3% with SupCon (E-014).** The Z chapter contains 263 codes covering preventive care, screening visits, follow-up encounters, and administrative contacts. The clinical language used in these notes is highly similar across codes — a screening visit note looks nearly identical regardless of what is being screened for. Supervised Contrastive fine-tuning (E-014) addresses this directly, improving Z accuracy by +21.2pp and raising the full-system E2E accuracy to 86.7%.
 
 **Chapter A (infectious, 33.3%)** appears weak but should be interpreted
 cautiously — the test set contains only 6 records from this chapter. With
@@ -203,6 +199,7 @@ attention regardless of difficulty.
 | E-005c + Graph + Override (prev best) | 77.4% | 0.679 | 0.027 | 68.5% |
 | E-009 hierarchical (current work) | 79.8% | 0.711 | — | — |
 | **E-010 hierarchical (current best)** | **85.8%** | **0.762** | **0.031** | **86.4%** |
+| **E-010 + E-014 SupCon Z (hybrid)** | **86.7%** | **—** | **0.027** | **88.2%** |
 
 : Comparison across approaches. {#tbl-results-comparison}
 
