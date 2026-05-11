@@ -1,0 +1,107 @@
+[
+  {
+    "bin_lower": 0.0,
+    "bin_upper": 0.06666666666666667,
+    "accuracy": null,
+    "avg_confidence": null,
+    "count": 0
+  },
+  {
+    "bin_lower": 0.06666666666666667,
+    "bin_upper": 0.13333333333333333,
+    "accuracy": 0.0,
+    "avg_confidence": 0.1122,
+    "count": 1
+  },
+  {
+    "bin_lower": 0.13333333333333333,
+    "bin_upper": 0.2,
+    "accuracy": null,
+    "avg_confidence": null,
+    "count": 0
+  },
+  {
+    "bin_lower": 0.2,
+    "bin_upper": 0.26666666666666666,
+    "accuracy": null,
+    "avg_confidence": null,
+    "count": 0
+  },
+  {
+    "bin_lower": 0.26666666666666666,
+    "bin_upper": 0.3333333333333333,
+    "accuracy": 0.0,
+    "avg_confidence": 0.332,
+    "count": 1
+  },
+  {
+    "bin_lower": 0.3333333333333333,
+    "bin_upper": 0.4,
+    "accuracy": 1.0,
+    "avg_confidence": 0.36335,
+    "count": 2
+  },
+  {
+    "bin_lower": 0.4,
+    "bin_upper": 0.4666666666666667,
+    "accuracy": 0.0,
+    "avg_confidence": 0.46035000000000004,
+    "count": 2
+  },
+  {
+    "bin_lower": 0.4666666666666667,
+    "bin_upper": 0.5333333333333333,
+    "accuracy": 0.75,
+    "avg_confidence": 0.5061,
+    "count": 4
+  },
+  {
+    "bin_lower": 0.5333333333333333,
+    "bin_upper": 0.6,
+    "accuracy": 0.0,
+    "avg_confidence": 0.5752,
+    "count": 1
+  },
+  {
+    "bin_lower": 0.6,
+    "bin_upper": 0.6666666666666666,
+    "accuracy": 0.5,
+    "avg_confidence": 0.6401,
+    "count": 2
+  },
+  {
+    "bin_lower": 0.6666666666666666,
+    "bin_upper": 0.7333333333333333,
+    "accuracy": 0.75,
+    "avg_confidence": 0.6981999999999999,
+    "count": 4
+  },
+  {
+    "bin_lower": 0.7333333333333333,
+    "bin_upper": 0.8,
+    "accuracy": 0.25,
+    "avg_confidence": 0.76075,
+    "count": 4
+  },
+  {
+    "bin_lower": 0.8,
+    "bin_upper": 0.8666666666666667,
+    "accuracy": 0.8333333333333334,
+    "avg_confidence": 0.8411666666666667,
+    "count": 6
+  },
+  {
+    "bin_lower": 0.8666666666666667,
+    "bin_upper": 0.9333333333333333,
+    "accuracy": 0.9333333333333333,
+    "avg_confidence": 0.90702,
+    "count": 15
+  },
+  {
+    "bin_lower": 0.9333333333333333,
+    "bin_upper": 1.0,
+    "accuracy": 1.0,
+    "avg_confidence": 0.9718099384680028,
+    "count": 41
+  }
+]

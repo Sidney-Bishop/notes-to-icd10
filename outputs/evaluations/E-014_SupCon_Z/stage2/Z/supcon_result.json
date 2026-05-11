@@ -1,0 +1,22 @@
+{
+  "experiment": "E-014_SupCon_Z",
+  "source_experiment": "E-010_40ep_E002Init",
+  "baseline_val_acc": 0.9692307692307692,
+  "baseline_val_f1": 0.9589743589743589,
+  "best_val_acc": 0.9615384615384616,
+  "best_val_f1": 0.9440203562340966,
+  "delta_acc": -0.007692307692307665,
+  "delta_f1": -0.014954002740262262,
+  "cfg": {
+    "source_experiment": "E-010_40ep_E002Init",
+    "experiment": "E-014_SupCon_Z",
+    "contrastive_epochs": 10,
+    "head_epochs": 5,
+    "batch_size": 16,
+    "n_per_class": 2,
+    "temperature": 0.07,
+    "learning_rate": 2e-05,
+    "head_lr": 0.001
+  },
+  "elapsed_seconds": 479.64999070903286
+}

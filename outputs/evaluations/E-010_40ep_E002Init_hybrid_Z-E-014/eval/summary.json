@@ -1,0 +1,101 @@
+{
+  "experiment": "E-010_40ep_E002Init_hybrid_Z-E-014",
+  "base_experiment": "E-010_40ep_E002Init",
+  "stage1_experiment": "E-003_Hierarchical_ICD10",
+  "overrides": {
+    "Z": "E-014_SupCon_Z"
+  },
+  "n_records": 972,
+  "e2e_accuracy": 0.8673,
+  "chapter_accuracy": 0.966,
+  "within_chapter_accuracy": 0.8978,
+  "ece": 0.0268,
+  "coverage_at_0.7": 0.8817,
+  "accuracy_on_covered": 0.9347,
+  "chapter_accuracy_detail": {
+    "A": {
+      "accuracy": 0.6667,
+      "n": 6
+    },
+    "B": {
+      "accuracy": 1.0,
+      "n": 16
+    },
+    "C": {
+      "accuracy": 0.8824,
+      "n": 51
+    },
+    "D": {
+      "accuracy": 0.9211,
+      "n": 38
+    },
+    "E": {
+      "accuracy": 0.7692,
+      "n": 39
+    },
+    "F": {
+      "accuracy": 0.8958,
+      "n": 48
+    },
+    "G": {
+      "accuracy": 0.8824,
+      "n": 34
+    },
+    "H": {
+      "accuracy": 0.8571,
+      "n": 42
+    },
+    "I": {
+      "accuracy": 0.9242,
+      "n": 66
+    },
+    "J": {
+      "accuracy": 0.88,
+      "n": 50
+    },
+    "K": {
+      "accuracy": 0.8793,
+      "n": 58
+    },
+    "L": {
+      "accuracy": 0.8684,
+      "n": 38
+    },
+    "M": {
+      "accuracy": 0.8919,
+      "n": 111
+    },
+    "N": {
+      "accuracy": 0.8868,
+      "n": 53
+    },
+    "O": {
+      "accuracy": 0.6875,
+      "n": 32
+    },
+    "P": {
+      "accuracy": 0.0,
+      "n": 3
+    },
+    "Q": {
+      "accuracy": 0.0,
+      "n": 3
+    },
+    "R": {
+      "accuracy": 0.89,
+      "n": 100
+    },
+    "S": {
+      "accuracy": 0.9318,
+      "n": 44
+    },
+    "T": {
+      "accuracy": 0.875,
+      "n": 8
+    },
+    "Z": {
+      "accuracy": 0.8333,
+      "n": 132
+    }
+  }
+}

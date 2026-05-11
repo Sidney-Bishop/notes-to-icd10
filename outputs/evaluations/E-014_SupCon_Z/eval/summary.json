@@ -1,0 +1,20 @@
+{
+  "experiment_name": "E-014_SupCon_Z",
+  "stage1_experiment": "E-003_Hierarchical_ICD10",
+  "n_test": 132,
+  "stage1_accuracy": 0.9394,
+  "within_chapter_accuracy": 0.8871,
+  "e2e_accuracy": 0.8333,
+  "macro_f1": 0.7859,
+  "ece": 0.063,
+  "threshold": 0.7,
+  "coverage_at_threshold": 0.8864,
+  "accuracy_at_threshold": 0.8803,
+  "chapter_accuracy": {
+    "Z": {
+      "accuracy": 0.8333,
+      "n": 132
+    }
+  },
+  "timestamp": "2026-05-11T12:57:01.150257"
+}
