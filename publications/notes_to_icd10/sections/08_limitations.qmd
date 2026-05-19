@@ -46,11 +46,40 @@ real clinical notes include:
 - **Temporal context.** Real notes reference prior encounters, ongoing
   conditions, and evolving treatment plans. MedSynth notes are isolated.
 
-**Planned mitigation:** Validation on MIMIC-IV-Note (331,794 deidentified
-discharge summaries from Beth Israel Deaconess Medical Center) is planned
-but currently blocked pending PhysioNet data access approval. This validation
-will quantify the synthetic-to-real gap and identify which chapters and code
-types are most affected.
+**MIMIC-IV Validation Results (19 May 2026):** Validation on MIMIC-IV-Note
+v2.2 (331,794 deidentified discharge summaries from Beth Israel Deaconess
+Medical Center) was completed. The synthetic-to-real gap is substantial:
+
+| Metric | MedSynth (synthetic) | MIMIC-IV (real) | Gap |
+|---|---|---|---|
+| E2E Accuracy | 85.8% | **12.0%** | −73.8pp |
+| Macro F1 | 0.790 | 0.069 | −0.721 |
+| ECE | 0.031 | 0.298 | +0.267 |
+| Coverage@0.7 | 86.4% | 22.7% | −63.7pp |
+
+: MIMIC-IV validation results (n=4,877 stratified sample). {#tbl-mimic-validation}
+
+**Root cause analysis:** The gap is attributable to **domain shift**, not
+token truncation. Key evidence:
+
+1. **APSO-Flip works correctly** — 91.8% of MIMIC notes place `Discharge
+   Diagnosis:` first, within the 512-token window.
+2. **The diagnosis section is short** — median 47 tokens, fits comfortably
+   in 512 tokens (99.8% of notes).
+3. **Despite seeing the correct section, predictions are wrong** — real
+   clinical discharge diagnoses use abbreviations, shorthand, and
+   institution-specific terminology that the model was never trained on.
+
+**What this means:** MedSynth's GPT-4o-generated notes are structurally
+clean, complete, and precisely aligned with ICD-10 codes. Real clinical
+language is fundamentally different. The model has learned to associate
+GPT-4o's synthetic prose style with ICD-10 codes, not the underlying
+clinical concepts.
+
+**Path forward:** Fine-tuning on a real clinical dataset (with or without
+MIMIC-IV as training data) is the primary requirement for production use.
+The hierarchical architecture, APSO-Flip strategy, and SupCon techniques
+are all transferable — the bottleneck is training data.
 
 ---
 
@@ -126,7 +155,7 @@ In priority order:
 
 | Priority | Work Item | Expected Impact | Effort |
 |---|---|---|---|
-| 1 | MIMIC-IV-Note validation | Quantifies synthetic-real gap | Medium (blocked on access) |
+| 1 | ~~MIMIC-IV-Note validation~~ | ✅ Complete — 12.0% E2E (−73.8pp gap vs synthetic) | Done |
 | 2 | ~~Z-chapter contrastive fine-tuning~~ | ✅ Complete — +21.2pp Z (E-014) | Done |
 | 3 | Lower confidence threshold for Z | More Z cases auto-coded | Low |
 | 4 | Multi-label prediction | Real-world applicability | High |
