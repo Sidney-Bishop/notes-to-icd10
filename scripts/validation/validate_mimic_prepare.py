@@ -419,17 +419,15 @@ def run_gold(
     if not full_run:
         n_chapters = silver_df["icd_chapter"].n_unique()
         per_chapter = max(1, sample_size // n_chapters)
-        silver_df = (
-            silver_df
-            .with_columns(pl.lit(1).alias("_row"))
-            .sort("_row")
-            .group_by("icd_chapter")
-            .agg(pl.all().sample(n=per_chapter, seed=seed, with_replacement=False))
-            .explode(pl.all().exclude("icd_chapter"))
-            .drop("_row")
-            .sample(fraction=1.0, shuffle=True, seed=seed)  # shuffle
+        # Sample per chapter — cap at chapter size to avoid ShapeError
+        sampled_chapters = []
+        for chapter, ch_df in silver_df.group_by("icd_chapter"):
+            n_take = min(per_chapter, len(ch_df))
+            sampled_chapters.append(ch_df.sample(n=n_take, seed=seed, shuffle=True))
+        silver_df = pl.concat(sampled_chapters).sample(
+            fraction=1.0, shuffle=True, seed=seed
         )
-        print(f" Stratified sample: {len(silver_df):,} records ({per_chapter} per chapter)")
+        print(f" Stratified sample: {len(silver_df):,} records (up to {per_chapter} per chapter)")
 
     # Apply APSO-Flip to raw MIMIC text
     print(f" Applying APSO-Flip to {len(silver_df):,} notes...", flush=True)

@@ -1,0 +1,103 @@
+{
+  "experiment": "E-010_40ep_E002Init",
+  "validation_dataset": "MIMIC-IV-Note v2.2 + MIMIC-IV clinical v2.2",
+  "threshold": 0.7,
+  "mimic_results": {
+    "n_records": 4877,
+    "e2e_accuracy": 0.12,
+    "macro_f1": 0.0691,
+    "ece": 0.2978,
+    "coverage_at_0.7": 0.2268,
+    "accuracy_on_covered": 0.3038,
+    "inference_seconds": 291.3
+  },
+  "medsynth_reference": {
+    "experiment": "E-010_40ep_E002Init",
+    "e2e_accuracy": 0.858,
+    "macro_f1": 0.79,
+    "ece": 0.031,
+    "coverage_at_0.7": 0.864,
+    "n_records": 972,
+    "note": "4-run mean, MedSynth synthetic test set"
+  },
+  "chapter_accuracy": {
+    "A": {
+      "accuracy": 0.0228,
+      "n": 263
+    },
+    "B": {
+      "accuracy": 0.0951,
+      "n": 263
+    },
+    "C": {
+      "accuracy": 0.0456,
+      "n": 263
+    },
+    "D": {
+      "accuracy": 0.0722,
+      "n": 263
+    },
+    "E": {
+      "accuracy": 0.1217,
+      "n": 263
+    },
+    "F": {
+      "accuracy": 0.2243,
+      "n": 263
+    },
+    "G": {
+      "accuracy": 0.0875,
+      "n": 263
+    },
+    "H": {
+      "accuracy": 0.1538,
+      "n": 143
+    },
+    "I": {
+      "accuracy": 0.1407,
+      "n": 263
+    },
+    "J": {
+      "accuracy": 0.0837,
+      "n": 263
+    },
+    "K": {
+      "accuracy": 0.1787,
+      "n": 263
+    },
+    "L": {
+      "accuracy": 0.0418,
+      "n": 263
+    },
+    "M": {
+      "accuracy": 0.1445,
+      "n": 263
+    },
+    "N": {
+      "accuracy": 0.0951,
+      "n": 263
+    },
+    "O": {
+      "accuracy": 0.1331,
+      "n": 263
+    },
+    "R": {
+      "accuracy": 0.1939,
+      "n": 263
+    },
+    "S": {
+      "accuracy": 0.308,
+      "n": 263
+    },
+    "T": {
+      "accuracy": 0.0304,
+      "n": 263
+    },
+    "Z": {
+      "accuracy": 0.1217,
+      "n": 263
+    }
+  },
+  "data_access": "PhysioNet credentialed \u2014 DUA v1.5.0 signed",
+  "note": "Aggregate statistics only \u2014 no patient-level data"
+}
