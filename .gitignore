@@ -314,3 +314,5 @@ data/mimic/gold/*
 publications/*/_output/
 publications/*/_freeze/
 publications/*/.quarto/
+interview.md
+BOOTSTRAP_AUDIT.md
