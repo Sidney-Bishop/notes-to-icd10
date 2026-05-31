@@ -90,3 +90,32 @@ domain-adaptation/fine-tuning on real data is in scope (per charter, training on
 real data is currently out of scope).
 
 **Status:** OPEN.
+
+---
+
+## Q7 — **BLOCKING:** E-003 stage-1 model is unloadable and unbacked
+
+The Stage-1 chapter router (experiment E-003) cannot be loaded as it sits on
+disk, which blocks ALL hierarchical evaluation (every hierarchical run needs the
+stage-1 router).
+
+**State (verified 2026-05-31):**
+- Weights at `stage1/model.safetensors`; config + tokenizer at `stage1/model/` —
+  split across two directories, so no single directory is a complete model.
+- `_find_model_dir` returns the top-level dir (has weights, no tokenizer) →
+  `AutoTokenizer.from_pretrained` fails.
+- Weights are gitignored (`.gitignore:78`) and NOT in DVC — they exist only on
+  this one disk, backed up nowhere.
+
+**Decided path (see D004):** do not force a load by moving files. **Retrain
+stage-1 cleanly**, then back it up (DVC) before relying on it. A freshly retrained
+stage-1 with a known-good, single-directory layout is the trustworthy fix;
+file-shuffling an unbacked artifact of uncertain provenance is not.
+
+**Also worth fixing** (secondary, not the blocker): `_find_model_dir` accepts a
+directory as "the model" on `model.safetensors` alone, without requiring
+`config.json` + tokenizer in the same dir. Even after retraining, hardening this
+to require a *complete* model directory would prevent a future split-layout from
+silently mis-resolving. Track separately if pursued.
+
+**Status:** OPEN — BLOCKING. Blocks the 971-regime evaluation (status #0).

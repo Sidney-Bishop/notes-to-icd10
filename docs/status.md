@@ -25,6 +25,12 @@ Live "where are we" view. **State file — overwrite freely** as reality changes
 
 ## Blocked
 
+- **#0 (was top Next): re-run evaluate on the 971 split — BLOCKED on Q7.** The
+  E-003 stage-1 model on disk is unloadable (weights split from config/tokenizer)
+  and unbacked (gitignored, not in DVC). Hierarchical eval cannot run until
+  stage-1 is retrained and backed up. Decided not to force a load (D004). So:
+  971 is the current split regime, 966/83.9% is the last evaluated regime, and no
+  971 number can be produced until Q7 is resolved.
 - Full fresh-clone reproduction — blocked on Q2 (no portable DVC remote) and Q3
   (orphaned/missing ontology artifact). The data can be assembled manually from
   the original working directory in the meantime.
@@ -32,10 +38,10 @@ Live "where are we" view. **State file — overwrite freely** as reality changes
 
 ## Next (suggested order)
 
-0. **Reconcile split vs eval.** The 971 split exists but `evaluate.py` has not run
-   on it; on-disk E-010 `summary.json` is still the 966/83.9% historical run. Re-run
-   evaluate on the 971 split so a 971-regime accuracy number exists. Until then, do
-   NOT quote 83.9% as belonging to the 971 regime (see architecture.md, journal).
+0. **Retrain stage-1 cleanly and back it up (Q7, D004).** This is the new
+   prerequisite for everything downstream — hierarchical eval is blocked until a
+   loadable, backed-up stage-1 router exists. Retrain → verify single-directory
+   layout loads → DVC-track the weights. Only then can the 971-regime evaluate run.
 1. Reconcile dataset counts (Q1) — cheap, removes a visible inconsistency.
 2. Freeze the canonical 971 split into version control / DVC so it can't drift.
 3. Decide environment pinning (Q4) and run a single gated reproduction seed;

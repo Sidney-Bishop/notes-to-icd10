@@ -91,3 +91,43 @@ predate this record. They can be promoted to formal D-entries later *if* re-made
 or re-affirmed during the refactor.
 
 **When to revisit.** Never rescinds; amend the convention via a new D-ID.
+
+---
+
+## D004 — Do not manufacture a number from the broken stage-1 model; stop and document
+
+**Date:** 2026-05-31
+
+**Context.** While attempting the "re-run evaluate.py on the 971 split" step
+(status #0), `evaluate.py` failed loading the Stage-1 tokenizer. Investigation
+showed the E-003 stage-1 model on disk is in a broken, unbacked state:
+- weights (`stage1/model.safetensors`, 433 MB) sit at the `stage1/` top level;
+- config + tokenizer (`config.json`, `tokenizer.json`, `tokenizer_config.json`)
+  sit one level down in `stage1/model/`;
+- so neither directory is a complete loadable model, and `_find_model_dir`
+  (which returns the first dir containing `model.safetensors`) returns the
+  top-level dir that has weights but no tokenizer → tokenizer load fails;
+- the weights are gitignored (`.gitignore:78`, `*.safetensors`) AND not in DVC
+  (no `.dvc` pointer) → the file exists only on this disk, tracked by nothing.
+
+(En route, `sentencepiece` was installed as a candidate fix; it was a red
+herring — the error message named it but the real cause was the split layout.)
+
+**Decision.** Do not shuffle files to force `evaluate.py` to load this model.
+Stop, and document the finding. A 971-regime number obtained from a model whose
+provenance is this uncertain would be a liability, not progress — it is exactly
+the kind of untrustworthy artifact this refactor exists to eliminate.
+
+**Rationale.** The goal of the reproducibility work is numbers whose origin is
+known and defensible. Manufacturing a figure from a broken, unbacked,
+murky-provenance model contradicts that goal even if the file-shuffle made eval
+run. Better to record the truth (eval is blocked on a broken artifact) and fix
+the artifact properly.
+
+**Trade-offs.** No 971-regime accuracy number exists yet, and won't until
+stage-1 is rebuilt. Accepted — a delayed honest number beats an immediate
+untrustworthy one.
+
+**When to revisit.** Resolved when stage-1 is cleanly retrained and backed up
+(see open_questions.md Q7); at that point a real evaluation on the 971 split can
+run and the number can be recorded.
