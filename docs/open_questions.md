@@ -116,26 +116,25 @@ real data is currently out of scope).
 
 ---
 
-## Q7 — **BLOCKING (root cause found, fix identified — D007):** stage-1 model unloadable
+## Q7 — RESOLVED (2026-05-31, via D007): stage-1 model now loadable
 
-The Stage-1 chapter router (E-003) cannot be loaded: weights at `stage1/`,
-config+tokenizer at `stage1/model/` — split across dirs, so no single directory is
-a complete model. Blocks all hierarchical evaluation.
+**Status: RESOLVED — see D007.**
 
-**Root cause (verified 2026-05-31, D007):** NOT after-the-fact damage —
-`train.py` produces this split itself. All three training paths call
-`adapter.save(<parent>)` while training into `<parent>/model`, on the wrong
-assumption that `save()` appends `/model`. It writes flat, so weights land in the
-parent and config/tokenizer (via `_finalize_model_dir`) land in `model/`.
+Root cause was `train.py` calling `adapter.save(<parent>)` in all three training
+paths, splitting weights from config/tokenizer. Fixed (D007) to
+`adapter.save(model_dir)`. Verified by gate run (stage-1 only, ~31 min):
 
-**Fix (D007):** change the three `adapter.save(<parent>)` calls to
-`adapter.save(model_dir)`. Pending code edit to `train.py` on a branch.
+- On disk: NO `model.safetensors` stranded at `stage1/` top level; `stage1/model/`
+  contains config.json + tokenizer.json + tokenizer_config.json + model.safetensors
+  + label_map.json — one complete model directory.
+- Load test: `AutoTokenizer.from_pretrained` + `AutoModelForSequenceClassification
+  .from_pretrained` on `stage1/model/` both succeed, 22 labels. This is the exact
+  operation that previously threw "Couldn't instantiate the backend tokenizer."
 
-**Then:** retrain stage-1 → verify it writes a single complete `stage1/model/` →
-confirm it loads → DVC-track it. Only then can the 971-regime evaluate run.
-
-**Status:** OPEN — fix identified (D007), not yet applied. Unblocks once the
-`train.py` edit lands and a clean retrain produces a loadable model.
+Stage-1 router trained healthily from base Bio_ClinicalBERT: best epoch 3,
+val_acc 0.920, macro_f1 0.933 (final epoch 6: val_acc 0.935). Note: trained from
+base, not E-001-initialised, so routing is slightly below the historical ~96%
+(expected; E-001 init can be added for the full run if desired).
 
 ---
 

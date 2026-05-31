@@ -221,3 +221,51 @@ another unloadable model. Reading beats launching-and-hoping, again.
 
 **Sequence now:** apply D007 edit to train.py (on branch) → retrain stage-1 →
 verify single complete model/ dir → then stage-2 + evaluate.
+
+## 2026-05-31 (cont.) — D007 verified; Q7 RESOLVED; stage-1 retrained clean
+
+Gate run (stage-1 only, billable, from base Bio_ClinicalBERT) — passed on all counts:
+
+- **Layout fixed (D007 works):** `stage1/model/` now holds config + tokenizer +
+  model.safetensors + label_map together; NO weights stranded at `stage1/` top
+  level. The exact split that caused Q7 is gone.
+- **Loads clean:** AutoTokenizer + AutoModelForSequenceClassification both load
+  `stage1/model/` (22 labels) — the operation that previously threw the tokenizer
+  error. Q7 definitively closed.
+- **Trained healthily:** ~31 min, best epoch 3 (val_acc 0.920, macro_f1 0.933),
+  final epoch 6 val_acc 0.935, top-5 0.983. Loss 3.15 → ~0.06. Trained from BASE
+  (not E-001-init), so routing slightly below historical ~96% — expected.
+
+**Two benign warnings logged (not chased):**
+- `cls.predictions.* UNEXPECTED / classifier.* MISSING` on load — normal when
+  loading a base MLM checkpoint into a sequence-classification head; the classifier
+  head is newly initialised by design.
+- `LayerNorm.beta/gamma` missing/unexpected keys — legacy BERT key naming
+  (pre-2020 `gamma/beta` vs modern `weight/bias`). Something in the chain carries a
+  legacy-format checkpoint. Didn't break anything; worth knowing if it recurs.
+
+**Gate-first discipline paid off again:** proved the fix on a 31-min stage-1 run
+before committing to the multi-hour stage-2. Had D007 been wrong, we'd have found
+out in 31 min, not 3 hours.
+
+**Cleared for:** full stage-2 retrain (per-chapter resolvers, warm-started from
+E-002) → calibrate → evaluate on the 971 split → PROVISIONAL number (D005).
+
+## 2026-05-31 (cont.) — E-002 also has the D007 split layout; retrain order established
+
+Checked E-002 (the 40-epoch flat model that stage-2 resolvers warm-start from)
+before launching stage-2. It has the SAME D007 split bug: `model.safetensors`
+stranded at the `E-002_FullICD10_ClinicalBERT/` top level, NO `model/` subdir,
+not even a config/tokenizer present — just the weights blob + a test_split.
+So E-002 cannot be loaded, and stage-2's `--stage2-init` would fail on it.
+
+**Remaining run order (now known, so next session need not rediscover):**
+1. Retrain E-002 — `train.py --experiment E-002_FullICD10_ClinicalBERT --mode flat
+   --code-filter billable` (40 epochs, the big run — hours on M5). Writes correct
+   `model/` layout now (D007 fix applies to the flat path, train.py line ~381).
+2. Retrain stage-2 resolvers, `--stage2-init` from the freshly-retrained E-002.
+3. Calibrate.
+4. Evaluate on the 971 split → PROVISIONAL number (D005).
+
+Stage-1 is already done and verified (Q7 resolved). The blockers are fixed; what
+remains is compute on an unblocked pipeline.
