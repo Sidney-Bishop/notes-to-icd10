@@ -55,6 +55,7 @@ dependencies = [
     "tabulate>=0.10.0",
     "pyopenssl>=26.1.0",
     "huggingface-hub>=1.7.1",
+    "sentencepiece>=0.2.1",
 ]
 
 [dependency-groups]
