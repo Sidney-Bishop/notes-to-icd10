@@ -19,34 +19,57 @@ explicitly rather than leaving two numbers.
 
 ---
 
-## Q2 — DVC remote is not portable; fresh clone cannot pull data
+## Q2 — DVC remote plumbing is broken (but the raw data IS reproducible from HF)
 
-The committed DVC default remote is a placeholder (`.dvc/CONFIGURE_LOCAL`); the
-real remote is a local-filesystem store recorded only in gitignored
-`.dvc/config.local`. A fresh clone therefore cannot reproduce the data without
-manual reconfiguration — which contradicts the README's "clone → dvc pull →
-byte-identical" reproducibility claim.
+**Refined 2026-05-31.** Earlier framing ("fresh clone cannot reproduce the data")
+was too broad. The accurate picture:
 
-**Decide:** stand up a genuinely shareable DVC remote (e.g. backed by the HF
-storage already used for the canonical dataset) and push all tracked artifacts,
-so a clean clone can pull everything. Then replace the `CONFIGURE_LOCAL`
-placeholder with documented setup steps.
+- The **raw canonical inputs ARE published and reproducible**: the HF dataset
+  `SidneyBishop/notes-to-icd10` holds `data/medsynth/icd10_notes.parquet` (19.8 MB)
+  and `data/reference/cdc_fy2026_icd10.parquet` (1.4 MB). Both verified locally
+  against `prepare_data.py`'s pinned SHA256s — byte-for-byte canonical.
+- Gold is NOT published (by design — D006); it's regenerated from the raw.
+- The actual gap is the **DVC remote configuration**: the committed default remote
+  is the placeholder `.dvc/CONFIGURE_LOCAL`; the real remote lives in gitignored
+  `.dvc/config.local`, which a fresh clone doesn't get. So `dvc pull` fails on a
+  clean clone until manually reconfigured — but `prepare_data.py` falls back to
+  `hf_hub_download`, so the data is still obtainable without DVC.
 
-**Status:** OPEN. (Found 2026-05-31, see journal.)
+**Decide:** stand up a portable DVC remote (or document the HF-direct path as the
+primary route, since `prepare_data.py` already supports it) and replace the
+`CONFIGURE_LOCAL` placeholder with real setup steps, so a clean clone reproduces
+without manual DVC surgery.
+
+**Status:** OPEN — but narrower than first thought. Data reproducibility is intact
+via HF + `prepare_data.py`; only the DVC convenience layer needs fixing.
 
 ---
 
-## Q3 — Orphaned DVC artifact `data/ontology/icd10cm_2026.parquet`
+## Q3 — `data/ontology/icd10cm_2026.parquet` missing from DVC remote; no confirmed consumer
 
-This file is DVC-tracked (pointer committed) but its bytes were never pushed to
-the remote, and no code in `scripts/` or `src/` references it. It may be a leftover
-from a refactored-out validation step.
+`dvc status` reports this file "not in cache" — DVC-tracked (pointer committed)
+but bytes never pushed to the remote. It still exists in the original working dir.
 
-**Decide:** either push it to the remote (if it should exist) or `dvc remove` the
-pointer (if it's genuinely dead). Don't leave a tracked file that breaks
-`dvc pull` and has no consumer.
+**Verified 2026-05-31 (do not re-confuse with the file below):**
+- The reference file the pipeline actually READS for ICD-10/CDC validation is
+  **`cdc_fy2026_icd10.parquet`** (loaded in EDA notebook Phase 1b:
+  `config.resolve_path("data","gold") / "cdc_fy2026_icd10.parquet"`). That file is
+  DVC-tracked, present, and pulls fine — no problem.
+- **`icd10cm_2026.parquet`** (the missing one) is NOT referenced by name in the EDA
+  notebook or in any script under `scripts/` or `src/` (grep verified). It has no
+  confirmed code consumer in what has been searched. (Notebooks 02–05 not yet
+  searched — see caveat.)
+- The two files have near-identical names and were conflated earlier in this
+  session; they are different artifacts. `cdc_fy2026_icd10` = the live reference;
+  `icd10cm_2026` = the missing, unreferenced one.
 
-**Status:** OPEN.
+**Decide:** confirm whether `icd10cm_2026.parquet` is read by notebooks 02–05 or
+any path not yet searched. If a real consumer exists → push it to the DVC remote.
+If genuinely unreferenced → `dvc remove` the pointer so it stops breaking
+`dvc pull`. Do not assume it is dead until 02–05 are checked.
+
+**Status:** OPEN. (Mislabelled "orphan", then over-corrected to "is read"; this is
+the verified middle: no consumer found in searched files, unconfirmed in 02–05.)
 
 ---
 
@@ -93,29 +116,42 @@ real data is currently out of scope).
 
 ---
 
-## Q7 — **BLOCKING:** E-003 stage-1 model is unloadable and unbacked
+## Q7 — **BLOCKING (root cause found, fix identified — D007):** stage-1 model unloadable
 
-The Stage-1 chapter router (experiment E-003) cannot be loaded as it sits on
-disk, which blocks ALL hierarchical evaluation (every hierarchical run needs the
-stage-1 router).
+The Stage-1 chapter router (E-003) cannot be loaded: weights at `stage1/`,
+config+tokenizer at `stage1/model/` — split across dirs, so no single directory is
+a complete model. Blocks all hierarchical evaluation.
 
-**State (verified 2026-05-31):**
-- Weights at `stage1/model.safetensors`; config + tokenizer at `stage1/model/` —
-  split across two directories, so no single directory is a complete model.
-- `_find_model_dir` returns the top-level dir (has weights, no tokenizer) →
-  `AutoTokenizer.from_pretrained` fails.
-- Weights are gitignored (`.gitignore:78`) and NOT in DVC — they exist only on
-  this one disk, backed up nowhere.
+**Root cause (verified 2026-05-31, D007):** NOT after-the-fact damage —
+`train.py` produces this split itself. All three training paths call
+`adapter.save(<parent>)` while training into `<parent>/model`, on the wrong
+assumption that `save()` appends `/model`. It writes flat, so weights land in the
+parent and config/tokenizer (via `_finalize_model_dir`) land in `model/`.
 
-**Decided path (see D004):** do not force a load by moving files. **Retrain
-stage-1 cleanly**, then back it up (DVC) before relying on it. A freshly retrained
-stage-1 with a known-good, single-directory layout is the trustworthy fix;
-file-shuffling an unbacked artifact of uncertain provenance is not.
+**Fix (D007):** change the three `adapter.save(<parent>)` calls to
+`adapter.save(model_dir)`. Pending code edit to `train.py` on a branch.
 
-**Also worth fixing** (secondary, not the blocker): `_find_model_dir` accepts a
-directory as "the model" on `model.safetensors` alone, without requiring
-`config.json` + tokenizer in the same dir. Even after retraining, hardening this
-to require a *complete* model directory would prevent a future split-layout from
-silently mis-resolving. Track separately if pursued.
+**Then:** retrain stage-1 → verify it writes a single complete `stage1/model/` →
+confirm it loads → DVC-track it. Only then can the 971-regime evaluate run.
 
-**Status:** OPEN — BLOCKING. Blocks the 971-regime evaluation (status #0).
+**Status:** OPEN — fix identified (D007), not yet applied. Unblocks once the
+`train.py` edit lands and a clean retrain produces a loadable model.
+
+---
+
+## Q8 — Implement semantic-label redaction (the unimplemented cell-52 proposal)
+
+The EDA notebook advocates redacting semantic diagnosis labels from the note text
+but never implements it (see D005). The current canonical gold retains labels like
+"pain in left knee" in the model input — residual label leakage that inflates
+accuracy and would not exist in real clinical notes (a likely contributor to the
+synthetic→real gap, Q6).
+
+**Decide / do:** implement semantic-label redaction in `preprocessing.py` (strip
+the diagnosis description and the `ICD-10:` / `Description:` / `Diagnosis:`
+scaffolding, and ideally the `[REDACTED]` markers), regenerate gold, re-run the
+full pipeline, and report the accuracy **delta** vs the code-only regime (D005).
+That delta quantifies how much retained labels were inflating results.
+
+**Status:** OPEN. Gates the first *publishable* number (the D005 retrain is only a
+provisional reproducibility check).

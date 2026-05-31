@@ -373,8 +373,12 @@ def train_flat(
     model_dir = output_base / "model"
     result = adapter.train(train_hf, val_hf, cfg, model_dir)
 
-    # Save best model - FIXED: save to parent, adapter adds /model
-    adapter.save(output_base)
+    # Save best model into model_dir. NOTE: EncoderAdapter.save() writes a FLAT
+    # layout into the dir it is given (it does NOT append '/model'). Passing
+    # model_dir keeps weights, tokenizer, and label_map together with the
+    # config/tokenizer that _finalize_model_dir writes — a single complete model
+    # dir. (Prior code passed the parent, splitting weights from config — see D007.)
+    adapter.save(model_dir)
     _finalize_model_dir(model_dir, tokenizer, adapter.model)
 
     # Persist result
@@ -468,7 +472,7 @@ def train_hierarchical_stage1(
     s1_cfg["experiment_name"] = f"{cfg['experiment_name']}_Stage1"
     model_dir = s1_dir / "model"
     result = adapter.train(train_hf, val_hf, s1_cfg, model_dir)
-    adapter.save(s1_dir) # FIXED
+    adapter.save(model_dir)  # save into model_dir (save() writes FLAT, no '/model' appended) — D007
     _finalize_model_dir(model_dir, tokenizer, adapter.model)
 
     with open(s1_dir / "train_result.json", "w") as f:
@@ -632,7 +636,7 @@ def train_hierarchical_stage2(
         ch_cfg["experiment_name"] = f"{cfg['experiment_name']}_Stage2_{chapter}"
         model_dir = ch_dir / "model"
         result = adapter.train(train_hf, val_hf, ch_cfg, model_dir)
-        adapter.save(ch_dir) # FIXED: save to parent, creates ch_dir/model
+        adapter.save(model_dir)  # save into model_dir (save() writes FLAT, no '/model' appended) — D007
         _finalize_model_dir(model_dir, tokenizer, adapter.model)
 
         results[chapter] = result

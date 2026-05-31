@@ -12,7 +12,12 @@ Live "where are we" view. **State file — overwrite freely** as reality changes
 - Canonical regime fixed: billable-only, seed 42, **test N = 971**, deterministic.
 - Old eval regime (972/85.4%) preserved at branch `snapshot/2026-05-10-eval`
   (`9a73669`). Fix committed on `fix/splits-billable-filter` (`a990306`,`df3a4d4`).
-- Fresh-clone reproducibility tested; two infra gaps found and logged (Q2, Q3).
+- Fresh-clone reproducibility tested; gaps found and logged (Q2, Q3).
+- **Gold REGENERATED from verified-canonical HF raw (D006):** raw SHA256s match
+  pinned values; regenerated gold is clean (0 code leaks, 9,660 billable) and
+  reproduces the May-10 regime deterministically (delta vs May-5 = exactly the
+  redaction fix). 971 split regenerated identically. Foundation for the retrain
+  is verified end-to-end.
 
 ## In progress
 
@@ -42,6 +47,14 @@ Live "where are we" view. **State file — overwrite freely** as reality changes
    prerequisite for everything downstream — hierarchical eval is blocked until a
    loadable, backed-up stage-1 router exists. Retrain → verify single-directory
    layout loads → DVC-track the weights. Only then can the 971-regime evaluate run.
+
+   **Sequence agreed 2026-05-31 (D005/D006):**
+   a. ~~Re-track May-10 gold~~ → SUPERSEDED by D006: regenerate gold from HF raw. ✅ DONE.
+   b. Regenerate the 971 splits from canonical gold. ✅ DONE (971 confirmed).
+   c. **← NEXT: Retrain.** Stage-1 first as a gate (verify it writes `stage1/model/`
+      in a loadable single-dir layout, resolving Q7), THEN stage-2 + calibrate.
+   d. Evaluate on the 971 split → PROVISIONAL number (D005: code-only redaction,
+      not publishable; reproducibility check vs historical 83.9/85.8/77.2%).
 1. Reconcile dataset counts (Q1) — cheap, removes a visible inconsistency.
 2. Freeze the canonical 971 split into version control / DVC so it can't drift.
 3. Decide environment pinning (Q4) and run a single gated reproduction seed;

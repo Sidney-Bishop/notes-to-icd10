@@ -119,3 +119,105 @@ document, retrain stage-1 cleanly later (Q7, marked BLOCKING).
 
 **Net:** the documentation system did its job — the goal was "get the 971 number"
 and instead we found the stage-1 artifact can't be trusted. Better found now.
+
+## 2026-05-31 (cont.) — Read notebooks; redaction + gold findings before retrain
+
+Read the EDA notebook (01) and the pipeline overview properly (not second-hand).
+Key findings, all verified against the files:
+
+**Redaction advocates-but-doesn't-implement.** EDA cell 52 ("Forensic Alert")
+argues forcefully that BOTH ICD-10 codes AND semantic diagnosis labels must be
+redacted — "a prerequisite for a valid training run." But the redaction code cells
+(53/56/57) are EMPTY, and the gold data still contains the semantic labels. So the
+notebook's stated design and its actual output diverge. What ships is code-only
+redaction; descriptions like "pain in left knee" remain in the model input. This
+is residual label leakage, now documented as a known caveat (D005) with the fix
+deferred (Q8). Decided to retrain on the code-only data anyway, as a
+reproducibility check against historical numbers — NOT for a publishable figure.
+
+**Two gold files reconciled.** `medsynth_gold_apso.parquet` (May-10) vs
+`..._20260505_194721.parquet` (May-5): same 10,240 records, but ~1,539 rows differ
+in `apso_note`/`assessment`. Cause: the revised redaction regex (commits
+e46d089/502198f) was applied to May-10 but not May-5. The DVC-tracked file is the
+OLDER leakier May-5; the corrected May-10 is untracked. Decided May-10 canonical,
+to be re-tracked in DVC (D006).
+
+**Q3 corrected twice.** The "orphaned ontology file" `icd10cm_2026.parquet`: first
+called orphan, then over-corrected to "is read." Verified truth: the file the
+pipeline actually reads for CDC/ICD-10 validation is `cdc_fy2026_icd10.parquet`
+(EDA Phase 1b), a DIFFERENT, near-identically-named file that is tracked and
+present. `icd10cm_2026.parquet` has NO confirmed consumer in the notebook or any
+script searched (notebooks 02-05 not yet checked). Lesson: two similarly-named
+reference files were conflated; verify the exact filename, don't pattern-match.
+
+**Method note:** caught myself (twice, on user challenge) confirming claims I
+hadn't verified. Re-grepped each before writing. The docs now state only what was
+checked against files, with "unconfirmed" where 02-05 weren't available.
+
+## 2026-05-31 (cont.) — Regenerated gold from verified raw; deterministic, clean
+
+Acted on the "regenerate gold from HF raw rather than retrain on a stored file"
+decision (D006). Results — a run of POSITIVE findings after a day of problems:
+
+**Raw inputs verified canonical.** `shasum -a 256` on both local raw files matched
+`prepare_data.py`'s pinned SHA256s exactly:
+- `icd10_notes.parquet` → 7fa03f...5ac8 ✓
+- `cdc_fy2026_icd10.parquet` → 2433ad...b93d ✓
+So local raw == HF-published canonical raw, byte-for-byte. (HF dataset confirmed
+via screenshots: `data/medsynth/icd10_notes.parquet` 19.8 MB +
+`data/reference/cdc_fy2026_icd10.parquet` 1.4 MB; gold not published, by design.)
+
+**Regeneration succeeded and is clean.** `prepare_data.py` rebuilt gold:
+10,240 records, 9,660 billable (60 noisy_111 / 25 placeholder_x / 495 invalid),
+0 bare ICD-10 codes in `apso_note`, 355 `[REDACTED]` markers.
+
+**Deterministic reproduction confirmed.** Regenerated gold vs the May-5 baseline
+differs ONLY in redaction-touched columns — `assessment` 1,530, `apso_note` 1,539,
++ minor subjective/objective/plan (39/34/51) — the exact fingerprint of the
+revised-regex fix, no other drift, no schema change. So current code + verified
+raw reproduces the May-10 (corrected) regime. The 971 split regenerated
+identically from the fresh gold. → raw→gold→split is demonstrably deterministic.
+This is the reproducibility claim holding, shown not asserted.
+
+**Operational facts:**
+- `prepare_data.py` runs redaction (Phase 3c) SILENTLY — no phase header printed,
+  which made it look skipped. Verified it ran via the 355 [REDACTED] markers + 0
+  bare codes. Don't infer "phase didn't run" from a missing header.
+- `code_status` label is `invalid` in the regenerated gold, vs
+  `invalid_or_malformed` in older outputs/notebook. Cosmetic relabel; billable
+  count unaffected. Noted to avoid a future "which is it" confusion.
+- The gold regeneration OVERWROTE the May-10 working file (same path). May-10 is
+  gone (gitignored, never committed); only the May-5 timestamped file remains for
+  comparison. Not a loss — May-10 is reproducible by re-running, which is the point.
+
+**Reminder still standing:** the gold is code-only-redacted (D005). The retrain
+about to run produces a PROVISIONAL number (reproducibility check vs historical
+83.9/85.8/77.2%), not a publishable one. Semantic-label redaction is Q8.
+
+## 2026-05-31 (cont.) — Root cause of Q7 found in train.py (the save-path bug)
+
+Before launching the retrain, read train.py's save logic (gate-check) — and found
+the actual cause of the broken stage-1 layout. It is NOT damage; train.py produces
+it. All three training paths (flat ~378, stage-1 ~472, stage-2 ~636) do:
+
+    model_dir = <parent> / "model"
+    adapter.train(..., model_dir)      # weights → model_dir  ✓
+    adapter.save(<parent>)             # writes FLAT into <parent>  ✗
+    _finalize_model_dir(model_dir, …)  # config/tokenizer → model_dir
+
+Inline comments say "save to parent, adapter adds /model" — but EncoderAdapter.save
+does NOT append /model (its docstring: "FLAT — no nested model/ folder"). So save
+dumps weights in the parent while config+tokenizer end up in model/ → split,
+unloadable. Every model this trainer produced has the same flaw; explains why
+_find_model_dir needs FLAT/SINGLE/NESTED auto-detection.
+
+Fix (D007): change the three `adapter.save(<parent>)` → `adapter.save(model_dir)`.
+One conceptual error, three sites. This is the keystone finding — the real thing
+behind Q7 and the layout chaos.
+
+**Lesson reinforced:** the gate-check (read the save path before a multi-hour run)
+caught a bug that would have wasted the entire retrain — it would have produced
+another unloadable model. Reading beats launching-and-hoping, again.
+
+**Sequence now:** apply D007 edit to train.py (on branch) → retrain stage-1 →
+verify single complete model/ dir → then stage-2 + evaluate.
