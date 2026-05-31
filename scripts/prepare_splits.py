@@ -49,6 +49,7 @@ def prepare_splits(
     seed: int = 42,
     test_size: float = 0.2,
     val_size: float = 0.5,  # 0.5 of the 0.2 = 0.1 overall
+    code_filter: str = "billable",
 ) -> None:
     """
     Create deterministic per-chapter train/val/test splits.
@@ -68,6 +69,10 @@ def prepare_splits(
         Fraction for test+val combined. Default 0.2 gives 80/20 train/rest
     val_size : float
         Fraction of test_size to use for val. Default 0.5 gives 80/10/10 overall
+    code_filter : str
+        'billable' (default) filters gold to code_status == "billable" before
+        splitting — the regime used by all reported experiments (9,660 records,
+        ~966 test). 'all' splits the full gold (10,240 records, ~1,030 test).
     """
     print(f"\n{'='*70}")
     print(f" prepare_splits.py — Deterministic Split Generation")
@@ -86,6 +91,31 @@ def prepare_splits(
     print(f"\n📥 Loading gold layer...")
     df = pl.read_parquet(gold_path)
     print(f" Total records: {len(df):,}")
+
+    # --- Code filter (mirrors train.py:_filter_gold) -----------------------
+    # The billable filter historically lived ONLY in train.py, so splitting
+    # unfiltered gold here produced a test set over all 10,240 records (1,030
+    # test) while training ran on the 9,660 billable subset (966 test). The two
+    # stages disagreed, which is the mechanical root of the 966 / 972 / 1,030
+    # test-size drift across the repo's artifacts.
+    #
+    # We filter at split time (filter-then-split): the resulting test set is an
+    # honest stratified 10% of the 9,660 billable records — the regime every
+    # reported experiment uses. See docs/DECISIONS.md (2026-05-31).
+    if code_filter == "billable":
+        if "code_status" not in df.columns:
+            raise ValueError(
+                "Gold layer has no 'code_status' column — cannot apply the "
+                "billable filter. Regenerate gold via scripts/prepare_data.py."
+            )
+        before = len(df)
+        df = df.filter(pl.col("code_status") == "billable")
+        print(f" Billable filter: {before:,} → {len(df):,} records")
+    elif code_filter != "all":
+        raise ValueError(
+            f"Unknown code_filter: '{code_filter}'. Use 'all' or 'billable'."
+        )
+    # -----------------------------------------------------------------------
 
     # Extract chapter for stratification
     df = df.with_columns(
@@ -191,13 +221,17 @@ def prepare_splits(
     )
     print(f"{'='*70}")
 
-    # Verify test count matches expectation
+    # Verify test count against the FILTERED population actually used downstream.
+    # NOTE: this check uses len(df) AFTER the code_filter above. Before that fix
+    # it validated against the unfiltered 10,240 and silently printed "matches"
+    # at 1,030 test — a green check on the wrong population. See docs/DECISIONS.md.
     expected_test = int(len(df) * test_size * val_size)
     if abs(total_test - expected_test) > len(chapters):  # allow ±1 per chapter due to rounding
         print(f"\n⚠️  Warning: Test count {total_test} differs from expected ~{expected_test}")
         print(f" This is normal due to per-chapter stratification and small-n chapters.")
     else:
-        print(f"\n✅ Test set size {total_test:,} matches expected distribution.")
+        print(f"\n✅ Test set size {total_test:,} matches expected distribution "
+              f"(filter={code_filter}).")
 
     print(f"\n💾 Splits written to: {base_dir}")
     print(f" Next: uv run python scripts/train.py --experiment {experiment_name} --mode hierarchical")
@@ -220,6 +254,15 @@ def main():
         type=int,
         default=42,
         help="Random seed for reproducibility",
+    )
+    parser.add_argument(
+        "--code-filter",
+        choices=["all", "billable"],
+        default="billable",
+        help="Filter gold by code_status BEFORE splitting. 'billable' (9,660 "
+             "records, ~966 test) is the regime used by every reported "
+             "experiment (matches train.py --code-filter). 'all' splits the "
+             "full 10,240 records (~1,030 test). Default: billable.",
     )
     args = parser.parse_args()
 
@@ -246,6 +289,7 @@ def main():
         gold_path=args.gold_path,
         experiment_name=args.experiment,
         seed=args.seed,
+        code_filter=args.code_filter,
     )
 
 if __name__ == "__main__":
