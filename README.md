@@ -330,6 +330,106 @@ uv run python scripts/evaluate.py \
 
 **Expected results:** E2E accuracy 83.9%, Macro F1 0.763, ECE 0.034, Coverage@0.7 82.1%.
 
+> **⚠️ Reconciliation note (2026-06-01 verified run).** The recipe above is the
+> *originally documented* regime. A full reproduction run on 2026-06-01 was executed
+> and verified end-to-end, and it differs in three ways worth reconciling before
+> treating either as canonical:
+> 1. **Stage-1 experiment name.** The verified run trained Stage-1 *under* the
+>    `E-010_40ep_E002Init` experiment, so `--stage1-experiment` in calibrate/evaluate
+>    must be `E-010_40ep_E002Init`. The default (`E-003_Hierarchical_ICD10`) points at
+>    an on-disk Stage-1 left in a broken split layout (config/tokenizer present, no
+>    `model.safetensors`) — using it silently loads an unloadable/old model. If you
+>    train Stage-1 under E-003 as step 5 above, the E-003 path is correct; if you do
+>    not, point at where Stage-1 was actually trained.
+> 2. **E-002 epochs.** The verified run used `--epochs 30` and the model had
+>    converged (val plateaued by epoch 27). 40 is the historical value; 30 is
+>    sufficient. Either works — 40 is not required for convergence.
+> 3. **Headline is provisional.** The reproduced 0.838 matches 83.9%, but under the
+>    current redaction regime (ICD-10 codes redacted, semantic diagnosis labels
+>    retained) it is biased upward by residual label leakage and is **not yet a
+>    publishable number**. A leakage-free baseline requires semantic-label redaction
+>    (tracked as an open question).
+>
+> `build_graph.py` and `verify_scripts.py` (steps 0 and 3 above) were part of the
+> original recipe but were not re-run/verified in the 2026-06-01 session; they are
+> retained here as-is pending a read-through.
+
+#### Verified reproduction pipeline (2026-06-01)
+
+This is the exact invocation order run and verified end-to-end in the 2026-06-01
+session. Every argument below was confirmed against the scripts or run logs.
+
+```mermaid
+flowchart TD
+    A["prepare_data.py<br/><i>HF raw to SHA256-verified gold parquet</i>"]
+    B["prepare_splits.py<br/><i>--code-filter billable, 971 test split</i>"]
+    C["train.py --mode flat<br/><i>E-002 encoder, --epochs 30</i>"]
+    D["train.py --stage 1<br/><i>22-way chapter router</i>"]
+    E["train.py --stage 2<br/><i>--stage2-init E-002, --epochs 20</i>"]
+    F["calibrate.py<br/><i>--stage1-experiment E-010, temperatures</i>"]
+    G["evaluate.py --mode hierarchical<br/><i>971 split, E2E 0.838</i>"]
+    A --> B --> C --> D --> E --> F --> G
+```
+
+```bash
+# 1. Gold layer — pulls raw from HF, SHA256-verifies, writes data/gold/medsynth_gold_apso.parquet
+#    Optional flags: --no-duckdb, --offline, --dry-run. No other arguments.
+uv run python scripts/prepare_data.py
+
+# 2. Splits — filter-then-split on billable codes; writes the 971-record test split
+uv run python scripts/prepare_splits.py \
+    --experiment E-010_40ep_E002Init \
+    --gold-path data/gold/medsynth_gold_apso.parquet \
+    --code-filter billable
+
+# 3. Flat encoder (E-002) — warm-start base for the Stage-2 resolvers
+#    NOTE: --epochs is REQUIRED. The CLI default is 10, which undertrains badly.
+uv run python scripts/train.py \
+    --experiment E-002_FullICD10_ClinicalBERT \
+    --mode flat --code-filter billable --epochs 30
+
+# 4. Stage-1 router (22-way chapter classifier), trained UNDER E-010
+uv run python scripts/train.py \
+    --experiment E-010_40ep_E002Init \
+    --mode hierarchical --stage 1 --code-filter billable
+
+# 5. Stage-2 resolvers — 19 per-chapter heads, warm-started from E-002 (skips P/Q/U)
+#    Hyperparameters from notebook 05: epochs 20, lr 2e-5, batch 16, warmup 0.1.
+uv run python scripts/train.py \
+    --experiment E-010_40ep_E002Init \
+    --mode hierarchical --stage 2 \
+    --stage2-init outputs/evaluations/E-002_FullICD10_ClinicalBERT \
+    --code-filter billable --epochs 20
+
+# 6. Temperature calibration (Stage-1 + 19 resolvers)
+#    CRITICAL: --stage1-experiment must match where Stage-1 was TRAINED (E-010),
+#    NOT the script default (E-003_Hierarchical_ICD10).
+uv run python scripts/calibrate.py \
+    --experiment E-010_40ep_E002Init \
+    --stage1-experiment E-010_40ep_E002Init \
+    --threshold 0.7
+
+# 7. End-to-end evaluation on the 971 test split
+#    Same --stage1-experiment caveat as calibrate.
+uv run python scripts/evaluate.py \
+    --experiment E-010_40ep_E002Init \
+    --mode hierarchical \
+    --stage1-experiment E-010_40ep_E002Init \
+    --threshold 0.7
+```
+
+**Verified result (provisional, D005 regime):** E2E accuracy 0.838, Macro F1 0.766,
+ECE 0.049, Coverage@0.7 86.0%. Stage-1 chapter accuracy 0.952, Stage-2 within-chapter
+0.881. Reproduces the historical 83.9% headline; see the reconciliation note above for
+why it is provisional.
+
+> Scope: this diagram covers the **core reproduction path only**. Sibling/optional
+> entry points — graph reranker fit, SupCon/hybrid variants (E-014), ModernBERT
+> trials (E-012/E-013), MIMIC-IV validation, `serve.py` — exist in the repo but were
+> not traced this session and are intentionally omitted rather than drawn from
+> assumption.
+
+
 ### Disk Management
 
 Training checkpoints accumulate during the pipeline (~3.6GB per resolver).
