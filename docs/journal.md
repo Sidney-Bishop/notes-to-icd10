@@ -269,3 +269,52 @@ So E-002 cannot be loaded, and stage-2's `--stage2-init` would fail on it.
 
 Stage-1 is already done and verified (Q7 resolved). The blockers are fixed; what
 remains is compute on an unblocked pipeline.
+
+## 2026-05-31 (cont.) — E-002 retrained clean (30ep, converged); stage-2 hyperparams verified; stage-2 launched
+
+**E-002 retrains.** First retrain accidentally ran at the CLI-default 10 epochs
+(--epochs not passed) → val_acc 0.316, badly undertrained, still climbing at
+cutoff. ~52 min wasted. Rerun at --epochs 30 → val_acc 0.841 / macro_f1 0.759,
+best epoch 27, PLATEAUED (flat 0.839 across ep28/29/30). Layout verified correct
+(D007): config + tokenizer + model.safetensors (1926 labels) together in model/.
+
+**Decision: do NOT rerun E-002 at 40.** Historical was 40 epochs (notebook 05:
+E002_ACCURACY=0.7329, "40-epoch flat ICD-10, test set"), but our 30-epoch run is
+converged — the extra 10 epochs would gain ~nothing on a plateaued model. Treating
+30 as sufficient; if a reviewer asks, the answer is "converged by epoch 27."
+
+**Stage-2 hyperparameters verified from notebook 05** (the experiment-defining
+notebook), NOT guessed:
+- stage2_num_epochs: 20   ← "20 epochs with E-002 init is near-optimal"
+- stage2_learning_rate: 2e-5
+- stage2_batch_size: 16
+- warmup_ratio: 0.1
+- skip_chapters: [U, P, Q]
+- stage2_init_model: E-002_FullICD10_ClinicalBERT
+(lr/batch/warmup/skip are already train.py defaults; only --epochs 20 and
+--stage2-init must be passed explicitly.)
+
+**Stage-2 epoch CONFLICT found + resolved.** notebook 05 says 20; Prj_Overview.md:986
+says epochs_stage2: 10. Resolved to 20 — the experiment-defining notebook and the
+publication ("20-epoch version", 05_experiments.qmd:365) both say 20; Prj_Overview
+is a summary doc and is treated as stale on this point.
+
+**Stage-2 launched:** train.py --experiment E-010_40ep_E002Init --mode hierarchical
+--stage 2 --stage2-init outputs/evaluations/E-002_FullICD10_ClinicalBERT
+--code-filter billable --epochs 20. Warm-starts 19 resolvers from E-002; skips P/Q/U.
+
+**Known caveat carried into the final number:** stage-1 router was trained from
+BASE Bio_ClinicalBERT (val 0.935), not E-001-init (historical stage1_accuracy=0.9640).
+~3% router gap WILL propagate. The forthcoming hierarchical number is therefore
+expected to land somewhat below historical 83.9/85.8 for this reason alone, on top
+of the D005 leakage caveat. Decision deferred: accept the gap (proceed) vs retrain
+stage-1 from E-001 (needs a loadable E-001, which likely has its own D007 split).
+
+**Operational lesson (logged honestly).** Hyperparameters must be read from the
+authoritative source (notebook 05) before proposing any command — never inferred
+from memory or experiment names. The CLI default (--epochs 10) silently overrides
+artifacts.yaml (3) and does NOT match any historical regime. Two misses today traced
+to not reading first: the wasted 10-epoch E-002 run (~52 min real cost), and an
+initial "stage-2 = 10 epochs" suggestion (caught at command-confirmation, zero
+compute cost). Standing rule going forward: cite the source line for every
+hyperparameter.

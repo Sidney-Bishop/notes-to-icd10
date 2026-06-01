@@ -28,14 +28,23 @@ Live "where are we" view. **State file — overwrite freely** as reality changes
   (01–05), `serve.py`, `augment.py`, `train_supcon_z.py` internals, MIMIC-IV
   validation scripts.
 
-## Blocked
+## Retrain progress (Q7 resolved — pipeline unblocked)
 
-- **#0 (was top Next): re-run evaluate on the 971 split — BLOCKED on Q7.** The
-  E-003 stage-1 model on disk is unloadable (weights split from config/tokenizer)
-  and unbacked (gitignored, not in DVC). Hierarchical eval cannot run until
-  stage-1 is retrained and backed up. Decided not to force a load (D004). So:
-  971 is the current split regime, 966/83.9% is the last evaluated regime, and no
-  971 number can be produced until Q7 is resolved.
+- **D007 fixed + Q7 RESOLVED.** train.py save-path bug fixed; stage-1 retrained,
+  verified loadable (val 0.935, base-init). E-002 retrained clean at 30 epochs
+  (val 0.841, converged/plateaued ep27; layout verified). Both write correct
+  `model/` layout.
+- **Stage-2 RUNNING** (--epochs 20, verified from notebook 05; warm-start from
+  E-002; skips P/Q/U). Hyperparams: lr 2e-5, batch 16, warmup 0.1.
+- **Next after stage-2:** gate-check chapter `model/` layouts → calibrate →
+  evaluate on 971 split → PROVISIONAL number (D005). Expect somewhat below
+  historical 83.9/85.8 due to base-init stage-1 (~3% router gap) + D005 leakage.
+
+## Still blocked / deferred
+
+- **Stage-1 init gap (open decision):** base-init (0.935) vs historical E-001-init
+  (0.964). Accept and proceed, or retrain stage-1 from E-001 (needs a loadable
+  E-001, likely has its own D007 split). Currently proceeding with base-init.
 - Full fresh-clone reproduction — blocked on Q2 (no portable DVC remote) and Q3
   (orphaned/missing ontology artifact). The data can be assembled manually from
   the original working directory in the meantime.
