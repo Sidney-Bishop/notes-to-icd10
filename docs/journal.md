@@ -343,3 +343,17 @@ lands on the number the project always claimed. Reproducibility check: PASS.
 - Env drift touched the graph reranker: sklearn TfidfVectorizer/TfidfTransformer
   unpickled from 1.1.2 under 1.8.0 ("use at your own risk" warnings). Ran, but the
   reranker's contribution may be subtly off under new sklearn. New open question.
+
+## 2026-06-01 (cont.) — pipeline diagram drafted (core path only)
+
+Drafted a README pipeline section (docs/pipeline_readme_section.md): Mermaid
+diagram + the 7 verified commands (prepare_data → prepare_splits →
+train flat/stage1/stage2 → calibrate → evaluate) + a gotchas list baking in the
+--epochs and --stage1-experiment traps we hit. Every argument verified by running
+or reading code this session — NOT inferred.
+
+Deliberately scoped to the CORE reproduction path. Sibling/optional entry points
+(graph reranker fit, E-014 SupCon/hybrid, E-012/E-013 ModernBERT, MIMIC-IV
+validation, serve.py) are NOT in the diagram — they exist in the repo but weren't
+run/read this session, so drawing them would be guesswork. Logged to backlog with
+the explicit rule: verify argparse + I/O before adding any of them.

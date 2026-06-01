@@ -62,3 +62,25 @@ the rationale lives elsewhere. Promote to `status.md` "Next" when work starts.
 - [ ] Note: today's run outputs were deliberately NOT committed (docs commit
       76f6dc0 stands alone). The 0.838 result is durably recorded in journal.md +
       decisions.md (D008), so the uncommitted output churn loses nothing.
+
+## Pipeline README — scope boundary (surfaced 2026-06-01)
+
+- [ ] **Create root `README.md`** from `docs/pipeline_readme_section.md` (Mermaid
+      diagram + the 7 verified commands + gotchas). Ready to drop in; just needs
+      placing + committing.
+- [ ] **The pipeline diagram covers the CORE reproduction path ONLY** — the
+      train→eval chain we ran and verified end to end this session:
+      prepare_data → prepare_splits → train(flat/stage1/stage2) → calibrate →
+      evaluate. Every argument in it is verified.
+- [ ] **NOT yet in the diagram (need verification before drawing — don't guess):**
+      - graph reranker fit/build step (it ran during evaluate but its own
+        fit/train invocation wasn't traced this session; see Q9 sklearn drift)
+      - hybrid / SupCon variants — E-014_SupCon_Z, E-010..._hybrid_Z-E-014
+        (sibling experiment dirs; produce the 86.7 number behind Q5)
+      - ModernBERT trials — E-012, E-013
+      - MIMIC-IV validation scripts (Q6)
+      - serve.py (FastAPI serving — confirm whether current/used)
+      These are real entry points that exist in the repo but were NOT run or
+      read deeply this session. Verify each (read argparse + trace I/O) BEFORE
+      adding to the diagram. Until then the README should label its diagram
+      "core reproduction pipeline," with these noted as "advanced / see docs."
