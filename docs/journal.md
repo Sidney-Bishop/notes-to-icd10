@@ -404,3 +404,34 @@ Also moved two D007 stranded top-level safetensors aside (E-002/, E-003/stage1/)
 to /tmp/d007_stranded so the re-run writes clean dirs with no load ambiguity.
 
 Chain is now fully certified. Ready to launch the canonical E-009 re-run.
+
+## 2026-06-01 (cont.) — data+graph gate PASSED; two hazards caught & cleared
+
+Ran steps 0–3 of the canonical pipeline (verify_scripts → prepare_data →
+prepare_splits → build_graph). All clean:
+- prepare_data: both raw SHA256 verified; 10,240 records; billable 9,660.
+- prepare_splits (E-009, billable): 7,728/961/971 — canonical regime reproduced
+  exactly. Written to E-009_Balanced_E002Init/stage2/{chapter}/.
+- build_graph (explicit --gold-path): 9,660 records, 1,926 codes, 4,889 UMLS
+  concepts → 6,837 nodes / 258,954 edges. icd10_knowledge_graph.pkl + indices written.
+
+Two hazards caught and resolved at this gate:
+1. **Q9 (sklearn version warning) — VERIFIED BENIGN.** scispacy 0.5.5 declares
+   scikit-learn with NO version pin; runtime warns because the UMLS linker's
+   TF-IDF artifacts were pickled under sklearn 1.1.2 (now 1.8.0). A --dry-run
+   behavioural check showed the linker produces correct output (e.g. M25.562 →
+   C0030193 "Pain" @ 0.97 — valid CUIs, sensible names/scores). Conclusion: the
+   InconsistentVersionWarning is precautionary, not actual breakage. The graph is
+   sound. Q9 can be downgraded to "verified benign; warning is cosmetic."
+2. **STALE GOLD LANDMINE — cleared.** data/gold/ held TWO files: the canonical
+   medsynth_gold_apso.parquet (Jun 1, regenerated this session) AND a stale
+   medsynth_gold_apso_20260505_194721.parquet (May 5, ~29KB larger = different
+   data). build_graph.py's default resolution (sorted glob [-1]) and train.py's
+   --gold-path default (auto-detect latest) BOTH grab the stale timestamped file —
+   the --dry-run proved it (loaded the May-5 file). Any bare command would train
+   on 3-week-old gold. FIX: moved the stale file to /tmp/stale_gold/ (recoverable)
+   so only the canonical gold remains; ALSO adding explicit --gold-path to every
+   train.py command (steps 4–7). Belt and suspenders. This is a real reproducibility
+   hazard — bare auto-detect must not be trusted when timestamped golds linger.
+
+Gate 1 (data+graph) PASSED. Next: E-001 (30ep) → gate model/ layout → E-002 (40ep).

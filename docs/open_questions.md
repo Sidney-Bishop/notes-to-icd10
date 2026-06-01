@@ -167,4 +167,4 @@ version mismatch. This is a concrete instance of the env drift flagged in Q4.
 sklearn to a version compatible with the stored pickles, then re-run evaluate and
 confirm the number is stable. Cheap to check; matters for a publishable number.
 
-**Status:** OPEN, low-to-medium priority (didn't block the provisional number).
+**Status:** VERIFIED BENIGN (2026-06-01). scispacy 0.5.5 pins no sklearn version; a --dry-run behavioural check showed the UMLS linker produces correct concepts under sklearn 1.8.0 (M25.562 → C0030193 "Pain" @0.97). The InconsistentVersionWarning is precautionary/cosmetic, not breakage. Optional future tidy: pin sklearn to silence the warning, but no correctness issue. Downgraded from low-medium to cosmetic.
