@@ -357,3 +357,23 @@ Deliberately scoped to the CORE reproduction path. Sibling/optional entry points
 validation, serve.py) are NOT in the diagram — they exist in the repo but weren't
 run/read this session, so drawing them would be guesswork. Logged to backlog with
 the explicit rule: verify argparse + I/O before adding any of them.
+
+## 2026-06-01 (cont.) — all five notebooks read; canonical naming settled (E-009)
+
+Read notebooks 01–05 in full (cfg/path/training cells verbatim, not skimmed),
+plus the overview doc. Pinned the naming and transfer-learning chain from source:
+E-001 (30ep) → E-002 (40ep); E-003 trains Stage-1 once (init from E-001, 5ep) +
+cold-start Stage-2 (12.7% failure); E-009 (nb05) loads Stage-1 from E-003 and
+inits Stage-2 from E-002 (20ep).
+
+Key correction: **E-010 is not a real experiment** — no notebook defines it; it's
+drift in the README/run-dirs. Canonical hierarchical experiment = E-009 (nb05
+cfg). Stage-1 is owned by E-003 and reused, so --stage1-experiment =
+E-003_Hierarchical_ICD10 in calibrate/evaluate.
+
+Wrote docs/canonical_pipeline.md — the source-exact, sequential run order (incl.
+the required build_graph.py step and the E-001→E-002→E-003→E-009 chain) with
+every hyperparameter from the cfg dicts. Logged D009. This supersedes D008's
+naming (the session's E-010-throughout run was a deviation). Next: re-run the
+whole pipeline end-to-end under canonical E-009 naming, then reconcile README +
+supersede D008's number.

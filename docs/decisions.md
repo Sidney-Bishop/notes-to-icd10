@@ -281,3 +281,42 @@ caveat (~1pt router gap).
 
 **When to revisit.** Supersede once Q8 (semantic redaction) produces a leakage-free
 number; revisit the stage-1 init gap if strict E-001-init reproduction is needed.
+
+---
+
+## D009 — Canonicalize experiment naming on notebook source; E-009 over E-010 drift (2026-06-01)
+
+**Decision.** The canonical hierarchical experiment is **`E-009_Balanced_E002Init`**
+(notebook 05, `cfg["experiment_name"]`). `E-010_40ep_E002Init` is naming drift —
+no notebook defines it — and is to be deprecated and deleted. The full canonical
+pipeline is documented in `docs/canonical_pipeline.md`, derived directly from the
+notebook `cfg` dicts (02–05) and the scripts.
+
+**Context.** All five notebooks were read in full (cfg/path/training cells, not
+skimmed). The naming and init chain are now pinned from source:
+- E-001_Baseline_ICD3 (nb02): Bio_ClinicalBERT, 30ep, lr 2e-5, batch 16.
+- E-002_FullICD10_ClinicalBERT (nb03): Bio_ClinicalBERT, 40ep, lr 2e-5, batch 16.
+- E-003_Hierarchical_ICD10 (nb04): Stage-1 router init from E-001 (5ep); Stage-2
+  cold-start (the 12.7% failure). Stage-1 trained ONCE here.
+- E-009_Balanced_E002Init (nb05): loads Stage-1 from E-003 registry (no retrain),
+  Stage-2 init from E-002 (20ep). cfg stage1_source = E-003_Hierarchical_ICD10.
+
+**Rationale.** Names must match the authoritative source (the notebooks). E-010
+exists only in the README headline and run dirs — it was never defined by a
+notebook cfg, so it cannot be canonical. The designed architecture trains Stage-1
+once (E-003) and reuses it by reference; therefore `--stage1-experiment` is
+`E-003_Hierarchical_ICD10` in calibrate/evaluate, regardless of the stage-2
+experiment name. This also corrects this session's earlier error of training
+Stage-1 under E-010.
+
+**Consequences.**
+- The README headline (83.9%, "E-010") is unverified drift. Until a fresh
+  canonical run produces a number, the reference E-009 e2e is 0.798 (notebook's
+  logged value; overview cites 77.2% from an earlier measurement).
+- A clean end-to-end re-run under canonical names (canonical_pipeline.md §3) is
+  required to produce the authoritative number. This supersedes D008 (the 0.838
+  run, which used the E-010-throughout deviation and 30-epoch E-002).
+- The E-010 run directories and README recipe are to be reconciled to E-009.
+
+**When to revisit.** After the canonical re-run lands a verified number, update
+the reference figure and supersede D008.
