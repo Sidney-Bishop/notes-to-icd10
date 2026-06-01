@@ -254,3 +254,30 @@ clean. This is the prerequisite that unblocks the Q7 retrain.
 **When to revisit.** If `EncoderAdapter.save()`'s layout contract changes, re-check
 these call sites; ideally add a post-train assertion that `model_dir` contains
 config.json + tokenizer + weights together.
+
+---
+
+## D008 — Provisional E2E number accepted as reproducibility check (2026-06-01)
+
+**Decision.** Accept E2E 0.838 (macro F1 0.766, ECE 0.049) on the 971 split as the
+provisional number for the rebuilt pipeline, and treat it as a successful
+reproduction of the historical 83.9% — NOT as a publishable result.
+
+**Context.** First clean end-to-end run after the D007 fix and full retrain
+(stage-1 base-init 0.935; E-002 30-epoch converged; stage-2 19 resolvers @20 epochs
+warm-started from E-002; temperature-calibrated). Stage-1 chapter accuracy 0.952 vs
+historical 0.964.
+
+**Rationale.** The number reproduces history within ~0.1pt, from regenerated-from-HF
+gold through a verified-loadable model chain, on the canonical 971 split. That
+validates the rebuild: the contradictory-numbers problem that started this effort is
+resolved — we can now produce the project's headline number reproducibly.
+
+**Why provisional, not publishable.** D005 regime retains semantic diagnosis labels
+(code-only redaction), biasing the number upward via residual leakage. The first
+publishable number is gated on implementing semantic-label redaction (Q8) and will
+be lower. The base-init stage-1 (vs historical E-001-init) is a second, smaller
+caveat (~1pt router gap).
+
+**When to revisit.** Supersede once Q8 (semantic redaction) produces a leakage-free
+number; revisit the stage-1 init gap if strict E-001-init reproduction is needed.

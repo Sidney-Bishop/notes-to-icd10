@@ -318,3 +318,28 @@ to not reading first: the wasted 10-epoch E-002 run (~52 min real cost), and an
 initial "stage-2 = 10 epochs" suggestion (caught at command-confirmation, zero
 compute cost). Standing rule going forward: cite the source line for every
 hyperparameter.
+
+## 2026-06-01 — PROVISIONAL NUMBER PRODUCED: E2E 0.838 on the 971 split (D005 regime)
+
+Full pipeline ran end to end for the first time since the rebuild:
+- Stage-2: 19 resolvers trained (--epochs 20, warm-started from 30-epoch E-002),
+  3 skipped (P/Q/U). All chapter model/ layouts verified (D007 holds).
+- Calibrate: stage-1 + 19 resolvers, ECE avg 0.658→0.095, stage-1 T=1.2549.
+  CRITICAL path fix: --stage1-experiment must be E-010_40ep_E002Init, NOT the
+  default E-003_Hierarchical_ICD10 (whose stage-1/model/ is the D007-broken one —
+  config+tokenizer present, NO model.safetensors/label_map). Same trap in evaluate.
+- Evaluate (971 split, hierarchical): **E2E 0.838 | macro F1 0.766 | ECE 0.0487**.
+  Stage-1 chapter acc 0.952 (historical 0.964 — only ~1% gap, better than the ~3%
+  feared from base-init). Coverage@0.7 86.0% (acc 0.917 on covered).
+
+**This REPRODUCES the historical 83.9%** — the rebuilt, deterministic pipeline
+lands on the number the project always claimed. Reproducibility check: PASS.
+
+**Caveats (why this is PROVISIONAL, not publishable):**
+- D005 regime: code-only redaction, semantic labels RETAINED → biased UPWARD by
+  residual leakage. The publishable number needs semantic-label redaction (Q8) and
+  will be lower.
+- It matches history precisely because history carried the same leakage.
+- Env drift touched the graph reranker: sklearn TfidfVectorizer/TfidfTransformer
+  unpickled from 1.1.2 under 1.8.0 ("use at your own risk" warnings). Ran, but the
+  reranker's contribution may be subtly off under new sklearn. New open question.

@@ -154,3 +154,17 @@ That delta quantifies how much retained labels were inflating results.
 
 **Status:** OPEN. Gates the first *publishable* number (the D005 retrain is only a
 provisional reproducibility check).
+
+## Q9 — graph reranker uses sklearn artifacts pickled under old version (2026-06-01)
+
+During the E-010 hierarchical evaluate, the graph reranker loaded TfidfVectorizer
+and TfidfTransformer pickled under sklearn 1.1.2, now running under 1.8.0
+("InconsistentVersionWarning ... use at your own risk"). The run completed and
+produced E2E 0.838, but the reranker's contribution may be subtly affected by the
+version mismatch. This is a concrete instance of the env drift flagged in Q4.
+
+**To resolve:** either re-fit the TF-IDF artifacts under the pinned sklearn, or pin
+sklearn to a version compatible with the stored pickles, then re-run evaluate and
+confirm the number is stable. Cheap to check; matters for a publishable number.
+
+**Status:** OPEN, low-to-medium priority (didn't block the provisional number).
