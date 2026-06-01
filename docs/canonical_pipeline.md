@@ -106,12 +106,13 @@ uv run python scripts/build_graph.py \
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 4. E-001 — ICD-3 baseline (notebook 02 regime). Init for the Stage-1 router.
-#    30 epochs, lr 2e-5, batch 16.
+#    30 epochs, lr 2e-5, batch 16. code-filter ALL (verified nb02 cell 16: the
+#    billable filter is commented out; audit trail records code_status_filter "all").
 uv run python scripts/train.py \
     --experiment E-001_Baseline_ICD3 \
     --mode flat --label-scheme icd3 \
     --model emilyalsentzer/Bio_ClinicalBERT \
-    --code-filter billable --batch-size 16 --epochs 30
+    --code-filter all --batch-size 16 --epochs 30
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 5. E-002 — flat ICD-10 (notebook 03 regime). Init for the Stage-2 resolvers.
@@ -124,11 +125,13 @@ uv run python scripts/train.py \
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 6. E-003 Stage-1 — 22-way chapter router (notebook 04 regime).
-#    Init from E-001; 5 epochs, lr 2e-5, batch 16. Trained ONCE; reused by E-009.
+#    MUST init from E-001 (else cold-starts from base BERT). 5 epochs, batch 16.
+#    Trained ONCE; reused by E-009 via --stage1-experiment in calibrate/evaluate.
 uv run python scripts/train.py \
     --experiment E-003_Hierarchical_ICD10 \
     --mode hierarchical --stage 1 \
-    --code-filter billable --epochs 5
+    --stage1-init outputs/evaluations/E-001_Baseline_ICD3/model \
+    --code-filter billable --epochs 5 --batch-size 16
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 7. E-009 Stage-2 — 19 per-chapter resolvers, warm-started from E-002.
@@ -137,7 +140,7 @@ uv run python scripts/train.py \
     --experiment E-009_Balanced_E002Init \
     --mode hierarchical --stage 2 \
     --stage2-init outputs/evaluations/E-002_FullICD10_ClinicalBERT \
-    --code-filter billable --epochs 20
+    --code-filter billable --epochs 20 --batch-size 16 --use-presplit
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 8. Calibrate — temperature scaling for Stage-1 + 19 resolvers.
@@ -170,6 +173,25 @@ uv run python scripts/evaluate.py \
 - **`build_graph.py` is required, and its `--gold-path` default is wrong.** Pass
   `--gold-path data/gold/medsynth_gold_apso.parquet` explicitly. Without the
   graph, evaluate's reranker has nothing to read.
+- **`--code-filter` differs by experiment — verified from each notebook's own cfg:**
+  E-001 uses **`all`** (10,240 records; notebook 02 cell 16 keeps the billable
+  filter commented out and its audit trail records `code_status_filter: "all"`).
+  E-002 uses **`billable`** (9,660; notebook 03 cfg `code_status_filter: "billable"`,
+  matching `_filter_gold`'s own docstring). The `train.py` argparse help
+  ("`all` matches E-001/E-002") is misleading — it is correct for E-001 only.
+  Stages 1/2 (E-003/E-009) use `billable`.
+- **`--batch-size` must be passed explicitly.** The CLI default is 8; every
+  notebook cfg uses 16. Omitting it trains at half the intended batch size.
+- **`--stage2-init` points at the experiment ROOT, not its `model/` dir.** The
+  code tries `{init}/model` as a candidate and appends the subdir itself; passing
+  `.../E-002_FullICD10_ClinicalBERT/model` resolves to `.../model/model`, fails
+  all candidates, and silently cold-starts each resolver from base BERT (the
+  E-003 12.7% failure mode). Correct: `.../E-002_FullICD10_ClinicalBERT`.
+- **`--use-presplit` is Stage-2 only.** Flat mode (E-001/E-002) and Stage-1
+  ignore it and self-split via `_split_dataframe` (stratified, seed 42). For
+  Stage-2 it requires `prepare_splits.py` to have run under the SAME experiment
+  (E-009) so the per-chapter `stage2/{ch}/*_split.parquet` files exist; otherwise
+  it silently falls through to an internal split.
 - **`--epochs` must be passed explicitly.** The `train.py` CLI default is 10
   (artifacts.yaml says 3); neither matches any trained regime. Canonical: E-001
   = 30, E-002 = 40, Stage-1 = 5, Stage-2 = 20.

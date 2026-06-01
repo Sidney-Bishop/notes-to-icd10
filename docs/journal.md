@@ -377,3 +377,30 @@ every hyperparameter from the cfg dicts. Logged D009. This supersedes D008's
 naming (the session's E-010-throughout run was a deviation). Next: re-run the
 whole pipeline end-to-end under canonical E-009 naming, then reconcile README +
 supersede D008's number.
+
+## 2026-06-01 (cont.) — full command chain certified against source before re-run
+
+Read train.py argparse + data paths, prepare_splits.py, build_graph.py,
+verify_scripts.py, and re-read notebook 02 cell 16 to certify EVERY flag/path in
+the canonical run BEFORE committing compute. Findings that would have silently
+broken the run, now fixed in canonical_pipeline.md §3:
+- **--stage2-init must be the experiment ROOT** (.../E-002_FullICD10_ClinicalBERT),
+  NOT .../model. The code appends /model via a candidate path; passing /model →
+  /model/model → no match → silent cold-start of all 19 resolvers from base BERT
+  (the E-003 12.7% failure). Highest-risk catch.
+- **--stage1-init is REQUIRED** on the E-003 stage-1 step
+  (.../E-001_Baseline_ICD3/model) or stage-1 cold-starts from base BERT.
+- **--batch-size 16 must be explicit** everywhere (CLI default is 8; notebooks use 16).
+- **--code-filter differs by experiment, verified from each notebook's own cfg:**
+  E-001 = all (nb02 cell 16: filter commented out, audit trail "all");
+  E-002 = billable (nb03 cfg); stages 1/2 = billable.
+- **--use-presplit is Stage-2 only;** flat + stage-1 self-split (seed 42). Stage-2
+  presplit requires prepare_splits.py to have run under the SAME experiment (E-009).
+- E-001 has NO weights on disk (only PNGs/label map) → must be trained; it seeds
+  the stage-1 router. The old registry E-003 stage-1 (May 1) predates D006/D007
+  and the gold regen, so it is NOT reused — full chain retrained for provenance.
+
+Also moved two D007 stranded top-level safetensors aside (E-002/, E-003/stage1/)
+to /tmp/d007_stranded so the re-run writes clean dirs with no load ambiguity.
+
+Chain is now fully certified. Ready to launch the canonical E-009 re-run.
