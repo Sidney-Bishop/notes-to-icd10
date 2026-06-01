@@ -84,3 +84,20 @@ the rationale lives elsewhere. Promote to `status.md` "Next" when work starts.
       read deeply this session. Verify each (read argparse + trace I/O) BEFORE
       adding to the diagram. Until then the README should label its diagram
       "core reproduction pipeline," with these noted as "advanced / see docs."
+
+## README reconciliation (surfaced 2026-06-01)
+
+- [ ] **Decide whether the headline number gets a provisional caveat.** The top of
+      README.md (Results table, Overview, "83.9% accuracy") still presents the
+      number as clean/publishable. The verified 2026-06-01 run established it as
+      provisional (D005 regime: code-only redaction, semantic labels retained →
+      biased upward by leakage; not publishable until Q8). Editorial call: either
+      mark the headline provisional, or leave it and rely on the in-section caveat.
+- [ ] **Reconcile the two pipeline recipes in README.md into one canonical version.**
+      The README now carries both the original script-pipeline block (stage-1 under
+      E-003, 40-epoch E-002, build_graph.py + verify_scripts.py) and the verified
+      2026-06-01 subsection (stage-1 under E-010, 30-epoch E-002, no separate
+      graph-build step), with a reconciliation note between them. Before collapsing
+      to one: verify build_graph.py and verify_scripts.py (read argparse + I/O —
+      they were NOT traced this session), and decide which stage-1 experiment layout
+      is canonical. Ties into the "which clone/regime is source of truth" question.
