@@ -140,6 +140,16 @@ base, not E-001-initialised, so routing is slightly below the historical ~96%
 
 ## Q8 — Redact the diagnosis DESCRIPTION (not just the code), then rerun
 
+> **STATUS (2026-06-02): approach VALIDATED, migration pending.** Scope, method,
+> and validation are decided and recorded in **D011** — assessment-only,
+> dictionary-anchored deterministic redactor, LLM-advisory audit, ~94% clean on
+> the fired set (vs 50% for the earlier CDC-fuzzy matcher). Built and proven in
+> the EDA notebook (`01-EDA_SOAP_1.ipynb`, Q8 section). **Remaining work:** migrate
+> the redactor into `src/preprocessing.py` + wire into `prepare_data.py`, regenerate
+> gold, rerun the E-009 chain → first publishable number. Residual leakage
+> (note-level 77.9% exposure; rule fires on 5,610/9,660; restated-in-different-words
+> class) is documented in D011 and consciously accepted for this pass.
+
 The current canonical gold redacts the ICD-10 *code* strings but retains the
 human-readable diagnosis description they encode — e.g. "pain in left knee" for
 M25.562 — in the model input (see D005, D010). In the APSO notes that description

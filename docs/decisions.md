@@ -366,3 +366,63 @@ quantified leakage, not a regression.
 
 **When to revisit.** Supersede once Q8 produces a leakage-free number on
 regenerated gold.
+
+---
+
+## D011 — Description-redaction: assessment-only scope, dictionary-anchored, LLM-audited (2026-06-02)
+
+**Decision.** The Q8 description-redaction (removing the diagnosis label text the
+ICD-10 code encodes) operates on the **assessment section only**, using a
+**deterministic phrasing-dictionary redactor** (CDC description as fallback),
+validated by an **advisory local-LLM audit**. This supersedes the vague
+"semantic-label redaction" sketch and sets the method to be migrated into
+`src/preprocessing.py` + `prepare_data.py`.
+
+**Scope = assessment-only (evidence-based).** Per-section overlap audit of all
+9,660 billable records (full CDC description present, overlap=1.0):
+assessment 76.2%, plan 14.9%, subjective 15.7%, objective 6.3%. **Note-level
+(any section) = 77.9%** — only **1.7pp (169 records)** more than assessment-only.
+Eyeballing the P/S/O overlaps (dashboard tab 3) showed they are overwhelmingly
+*scattered legitimate clinical vocabulary* ("physical therapy for the left knee",
+"NSAIDs for pain") — i.e. token co-occurrence, NOT contiguous label restatement.
+Redacting P/S/O would gut clinical signal the model should use. Therefore:
+redact the assessment (where the contiguous label lives); **consciously accept
+the 169 blind-spot records as residual leak.** 77.9% is the honest note-level
+exposure figure; 76.2% is the assessment redaction target.
+
+**Method = dictionary-anchored deterministic rule.** MedSynth's actual diagnosis
+phrasings were harvested from the ~26% of raw notes carrying a `(ICD-10: CODE)`
+tag → `code → {phrasings, freq}` (1,056 codes, 1,342 phrasings after quarantine).
+Phrasings with CDC-overlap <0.3 (197 — mostly comorbidity intrusions, e.g.
+F12.20→"Hypertension") were quarantined, NOT used. Redactor matches the full
+phrase, removes ALL occurrences, uses a `[DIAGNOSIS]` placeholder mid-sentence
+and drops the line when the phrase stands alone. A **min-2-content-token guard**
+skips dangerously generic single-word descriptions ("Weakness") that would
+over-redact legitimate findings — those become accepted residual.
+
+**LLM = advisory auditor only (reproducibility-preserving).** The deterministic
+rule redacts; a local LLM (Path 1 direct API, temperature 0, served via oMLX)
+only *judges* original→processed and flags leak/over-redaction. It never writes
+gold. This keeps the published number's redaction reproducible; the LLM audit is
+re-runnable given a pinned stack but is not load-bearing for the result.
+
+**Validation.** On a 50-record sample: the dictionary redactor scored **45/50
+clean by LLM verdict; the 2 "over_redacted" were false alarms** (assessments that
+were label-only, so correct full removal looked like section deletion) → effective
+**~94% clean**, vs a **50% baseline** for an earlier CDC-fuzzy matcher (which left
+label fragments and broke sentences). Over-redaction of legitimate content is
+eliminated. Residual = 3/50 leak_remains, all one class: the label **restated in
+a surface form the dictionary lacks** (inserted article "the", dropped prefix
+"Old", rewording). Accepted as residual for now; an optional-article match is a
+noted future refinement, deliberately NOT added yet (it raises over-redaction
+risk to fix the less-costly failure mode).
+
+**Honest coverage caveat.** "~94% clean" is over the records the rule **fires on**
+(5,610 of 9,660). The 3,270 no-match + 780 guard-skip records are untouched and
+may retain leaks. So: of records we redact, ~94% are clean; this is NOT a claim
+that 94% of all leakage is removed. Total residual leakage across the corpus is
+higher and must be stated as such in the paper.
+
+**When to revisit.** After migrating to scripts + regenerating gold + rerunning
+the E-009 chain, the resulting accuracy (expected below 0.849) is the first
+publishable number; compare against 0.849 to quantify the leakage's contribution.

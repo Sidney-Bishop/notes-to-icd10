@@ -523,3 +523,48 @@ multi-token exact restatements). Also confirmed from source this session:
 description — so the notebook's "0 leaks remaining" meant 0 *code* leaks, never the
 semantic leak. Q8 updated with the table; next is prototyping the anchored
 redaction and a human-eyeball before/after sample.
+
+## 2026-06-02 — Q8 redactor BUILT & VALIDATED (~94% clean); assessment-only scope locked (D011)
+
+Turned the Q8 leakage finding into a working, validated description-redactor —
+all in the EDA notebook (the lab), nothing in gold touched yet.
+
+**Scope decided (D011): assessment-only.** All-4-section overlap audit showed the
+leak is overwhelmingly in the assessment (76.2%); note-level exposure is 77.9% —
+only 1.7pp / 169 records more. Eyeballing P/S/O (dashboard tab 3) confirmed those
+overlaps are scattered legitimate clinical vocabulary, not contiguous label
+restatement, so redacting them would gut signal. The 169 blind-spot records are
+consciously accepted as residual.
+
+**Method: dictionary-anchored deterministic redactor.** Harvested MedSynth's own
+diagnosis phrasings from the ~26% of raw notes carrying an (ICD-10:CODE) tag →
+code→{phrasings}. Quarantined 197 low-CDC-overlap suspects (comorbidity
+intrusions like F12.20→"Hypertension"). Final dictionary: 1,056 codes / 1,342
+phrasings, CDC description as fallback. Redactor removes all occurrences,
+[DIAGNOSIS] placeholder mid-sentence / drop-line when standalone, min-2-token
+guard against over-redacting generic words ("Weakness"). Fires on 5,610/9,660;
+3,270 no-match, 780 guard-skip.
+
+**Validation via local-LLM audit (advisory only, never writes gold; temp 0, oMLX
+direct API).** Dictionary redactor: 45/50 clean by verdict; the 2 "over_redacted"
+were false alarms (label-only assessments where correct full removal looked like
+deletion) → effectively ~94% clean. Earlier CDC-fuzzy matcher was the 50%
+baseline (left label fragments, broke sentences). Over-redaction of real content:
+eliminated. Residual: 3/50 leak_remains, all the same class — label restated in a
+surface form the dictionary lacks ("the" inserted, "Old" prefix dropped). Not
+chased: fixing it (optional-article match) would raise over-redaction risk to
+address the less-costly failure mode.
+
+**Process notes that mattered.** (1) The LLM judge is useful but fallible — twice
+it mis-flagged (the [DIAGNOSIS] placeholder as a leak; label-only assessments as
+over-redaction); reading the cases, not trusting the tally, caught both. The
+prompt now declares [DIAGNOSIS] as the success marker. (2) Honest coverage:
+"~94% clean" is over the FIRED set, not all records — total residual leakage is
+higher and must be stated that way in the paper. (3) All redaction logic kept in
+the notebook for evaluation; superseded versions preserved as markdown
+breadcrumbs (CDC-fuzzy, dict v1/v2) so the trail of what we tried survives.
+
+**Next:** migrate the validated redactor into src/preprocessing.py + prepare_data.py,
+regenerate gold, rerun the E-009 chain → first publishable number (expected below
+0.849; that delta quantifies the leakage). Tidy: strip empty `**\n\n**` fences
+when redaction empties an assessment.
