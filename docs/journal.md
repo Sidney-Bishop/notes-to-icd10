@@ -497,3 +497,29 @@ redaction removes, and whether descriptions are inserted verbatim+adjacent.
 
 Next concrete step: read `src/preprocessing.py`, then the notebook count of
 affected rows.
+
+## 2026-06-01 (cont.) — Q8 leakage QUANTIFIED: 76.2% of billable records carry the full label
+
+Built the leakage inventory we'd been reasoning about without a number. In the EDA
+notebook (Phase 0 env only — did NOT rerun the gold-rebuild phases), read the
+canonical gold, re-applied the certified `redact_icd10_sections` (so we measure the
+true model-input state), joined each record's CDC reference description
+(`data/ontology/icd10cm_2026.parquet`, un-dotted code join, 0 missing), and scored
+content-token overlap between description and assessment.
+
+**Result (9,660 billable records):** overlap=1.0 (full description present in
+assessment) **7,360 = 76.2%**; ≥0.8 78.3%; ≥0.6 83.8%; ≥0.5 86.3%; ≥0.3 89.0%.
+The leak is near-verbatim — M25.562 "Pain in left knee" → "Pain in the left knee";
+N39.0 "Urinary tract infection, site not specified" appears almost char-for-char.
+This is the dominant case: ~3 of 4 billable training records have the label written
+into the input. Per-record scores saved to outputs/audits/q8_leakage_scores.parquet.
+
+Reframes D010's 0.849: the headline is earned on data where the answer is usually
+on the page. Two bounds kept explicit: this measures description *presence* not
+causal inflation (magnitude needs the rerun), and token-overlap can hit 1.0 by
+chance on 1–2 token descriptions (not the driver here — the 1.0 cohort is
+multi-token exact restatements). Also confirmed from source this session:
+`src/preprocessing.py` redaction targets codes/parentheticals ONLY, never the
+description — so the notebook's "0 leaks remaining" meant 0 *code* leaks, never the
+semantic leak. Q8 updated with the table; next is prototyping the anchored
+redaction and a human-eyeball before/after sample.

@@ -148,8 +148,38 @@ rather than infer the diagnosis from the Subjective/Objective clinical findings.
 This is the residual leakage that makes the canonical 0.849 (D010) provisional and
 is a likely contributor to the synthetic→real gap (Q6).
 
+**QUANTIFIED (2026-06-01, EDA notebook audit).** The inventory we never had now
+exists. Of the **9,660 billable records**, measuring CDC-description content-token
+overlap with the (re-redacted) assessment field:
+
+| overlap ≥ | records | % |
+|---|---|---|
+| 1.0 (full description present) | 7,360 | **76.2%** |
+| 0.8 | 7,562 | 78.3% |
+| 0.6 | 8,092 | 83.8% |
+| 0.5 | 8,333 | 86.3% |
+| 0.3 | 8,596 | 89.0% |
+
+Clean join (0 records missing a CDC description). The leak is near-verbatim:
+M25.562 "Pain in left knee" → assessment "Pain in the left knee" / "Left knee
+pain"; N39.0 "Urinary tract infection, site not specified" → "Urinary Tract
+Infection, site not specified". This is the dominant case, not a tail: ~3 of 4
+billable training records carry the full label in the input. Per-record scores
+persisted to `outputs/audits/q8_leakage_scores.parquet` (+ summary json).
+
+**Two honesty bounds on this number.** (1) It measures description *presence*, NOT
+causal accuracy inflation — "76.2% contain the label" is not "accuracy drops 76pt".
+Some assessments remain diagnosable from the rest of the note after removal. The
+*magnitude* of inflation is only knowable from the Q8 rerun; this count is the
+*scope of exposure*. (2) Token-overlap can hit 1.0 by chance on very short
+descriptions, but the overlap=1.0 cohort is dominated by multi-token exact
+restatements (see examples), so that is not what drives 76.2%.
+
 **The approach (anchored, not blind fuzzy matching).** We have the CDC reference
-table (`cdc_fy2026_icd10.parquet`), which carries the official textual description
+table (`data/ontology/icd10cm_2026.parquet`, columns `code_no_decimal` /
+`description` — this is the file the audit used; a second copy exists at
+`data/gold/cdc_fy2026_icd10.parquet`, not yet compared), which carries the
+official textual description
 per code. So for each affected record the redaction is *anchored*: take that
 record's own reference description(s) and match them near the (former) code
 position, tolerating word-order and minor variants ("pain in left knee" ↔ "left
