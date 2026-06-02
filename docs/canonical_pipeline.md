@@ -212,14 +212,20 @@ uv run python scripts/evaluate.py \
 | E-001 | ICD-3, 675 classes | 87.6% | not billable; not directly comparable |
 | E-002 | flat ICD-10, 1,926 | 73.0% | flat baseline; chapter acc ~91.2% |
 | E-003 | hierarchical cold start | 12.7% (e2e 0.111 logged) | right architecture, wrong Stage-2 init |
-| **E-009** | **hierarchical, E-002 init** | **e2e 0.798 logged** (overview cites 77.2%) | **canonical best** |
+| **E-009** | **hierarchical, E-002 init** | **e2e 0.849 (verified, D010)** | **canonical best; provisional under D005** |
 
-Note the within-E-009 discrepancy (logged 0.798 vs overview 77.2%): these come
-from different runs/measurement points of the same notebook recipe over time, and
-the README's "83.9%" headline came from a later un-named run (the E-010 drift).
-The authoritative E-009 number is whatever a fresh canonical run (§3) produces;
-until then, treat 0.798 (the notebook's own logged e2e) as the reference and the
-README's 83.9% as unverified drift.
+The authoritative E-009 number is **0.849** (macro F1 0.774, ECE 0.0242), produced
+by the verified-clean canonical run of 2026-06-01 on the 971-item billable test
+split (D010 carries the full per-stage gate provenance). It supersedes the earlier
+references on this line — the notebook's logged 0.798, the overview's 77.2%, and
+the README's "83.9%" (E-010 drift) — all of which predate the source-verified
+rebuild.
+
+**This figure is provisional, not publishable (D005 / Q8).** It reflects the
+pipeline as currently built, in which the diagnosis description text (e.g. "pain
+in left knee") remains in the input even though the ICD-10 code is redacted. The
+first publishable number requires description-level redaction (Q8) and is expected
+to land below 0.849; that drop quantifies the leakage.
 
 ---
 

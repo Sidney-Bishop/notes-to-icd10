@@ -320,3 +320,49 @@ Stage-1 under E-010.
 
 **When to revisit.** After the canonical re-run lands a verified number, update
 the reference figure and supersede D008.
+
+---
+
+## D010 — Canonical E-009 number, produced by a verified-clean run (2026-06-01)
+
+**Decision.** The authoritative E-009 end-to-end figure is **0.849** (macro F1
+0.774, ECE 0.0242) on the canonical 971-item billable test split. This supersedes
+the D008 number (0.838) and the D009 placeholder reference (0.798 logged). It is
+recorded as the faithful, reproducible output of the documented pipeline — **and,
+per D005, it remains provisional and NOT publishable** (see leakage note below).
+
+**Provenance — why this number is citable as what it claims to be.** Produced by
+the full canonical re-run under source-verified naming (canonical_pipeline.md §3),
+with a gate passed after every stage:
+- E-001 (675 ICD-3, 30ep, code-filter all) → val_acc 0.869; model/ nested + loads (675).
+- E-002 (1,926 billable, 40ep) → val_acc 0.740, reproduces historical ~0.733;
+  model/ nested + loads (1926).
+- E-003 Stage-1 (22 chapters, 5ep, init from E-001) → val_acc 0.964, reproduces
+  historical exactly; stage1/model/ nested + loads (22). Replaces the D007-broken
+  on-disk E-003 stage-1.
+- E-009 Stage-2 (19 resolvers, 20ep, warm-started from E-002) → every chapter's
+  LOAD REPORT shows the 1926→N head reinit that proves E-002 transfer (NOT the
+  silent cold-start that caused the old 12.7% failure); [presplit] sizes matched
+  prepare_splits; spot-checked Z (263) and T (15) load.
+- Calibrate: Stage-1 temperature (1.1701) written to the **E-003** path, not E-009
+  — confirms the D009 "train Stage-1 once, reuse by reference" design works in
+  practice. 19 resolvers calibrated, P/Q/U skipped; avg ECE 0.688→0.077.
+- Evaluate: Stage-1 loaded from E-003; 19 resolvers from E-009; graph reranker
+  read from data/graph/. Test N = 971 (no split mismatch). Internally coherent:
+  chapter routing 0.984 × within-chapter 0.863 ≈ 0.849 e2e — no hidden inflation
+  path. Q9 sklearn warning fired on the linker pickles as predicted (certified
+  benign).
+
+**Why provisional, not publishable (D005 stands, now stated concretely).** The
+redaction removes the ICD-10 *code* strings but retains the human-readable
+diagnosis description they encode — e.g. "pain in left knee" for M25.562 — which
+in the APSO notes sits adjacent to where the code was. The model can therefore
+read the answer off the description text rather than infer the diagnosis from the
+Subjective/Objective clinical findings. 0.849 measures "the pipeline as currently
+built," not "what the model can actually diagnose." The first publishable number
+is gated on Q8 (description-level redaction + regenerate gold + rerun the chain)
+and is expected to come in **below** 0.849 — that drop is the result, the
+quantified leakage, not a regression.
+
+**When to revisit.** Supersede once Q8 produces a leakage-free number on
+regenerated gold.

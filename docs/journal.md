@@ -435,3 +435,65 @@ Two hazards caught and resolved at this gate:
    hazard — bare auto-detect must not be trusted when timestamped golds linger.
 
 Gate 1 (data+graph) PASSED. Next: E-001 (30ep) → gate model/ layout → E-002 (40ep).
+
+## 2026-06-01 (cont.) — CANONICAL RUN COMPLETE: E-009 = 0.849 (verified, provisional); leakage now concrete
+
+**The headline: the full pipeline ran clean, end to end, and every stage
+reproduced its expected number.** This is the win the whole reproducibility effort
+was driving toward — a faithful, gated, reproducible run under source-verified
+naming. The contradictory-numbers problem that started this is resolved: we can
+produce the project's number on demand, with provenance.
+
+Four-stage chain retrained from scratch, gate passed after each:
+- E-001 (675 ICD-3, 30ep, code-filter all) → val_acc 0.869; model/ nested, loads (675).
+- E-002 (1,926 billable, 40ep) → val_acc 0.740, reproduces historical ~0.733;
+  model/ nested, loads (1926); no stray top-level safetensors.
+- E-003 Stage-1 (22 chapters, 5ep, init from E-001) → val_acc 0.964, reproduces
+  historical EXACTLY; stage1/model/ nested, loads (22). Replaces the D007-broken
+  on-disk stage-1.
+- E-009 Stage-2 (19 resolvers, 20ep, warm from E-002) → all 19 trained, P/Q/U
+  skipped. Every chapter's LOAD REPORT showed the 1926→N head reinit that proves
+  E-002 transfer — NOT the silent cold-start that caused the old 12.7% failure.
+  [presplit] sizes matched prepare_splits. Spot-checked Z (263) and T (15) load.
+
+Calibrate (25s): Stage-1 T=1.1701 written to the **E-003** path, not E-009 — the
+D009 "train Stage-1 once, reuse by reference" design works in practice. 19
+resolvers calibrated, P/Q/U skipped, avg ECE 0.688→0.077. The low pre-cal
+coverage (0.0%→) is just diffuse softmax being sharpened by T<1, not a defect.
+
+Evaluate (61s): Stage-1 from E-003, 19 resolvers from E-009, graph reranker from
+data/graph/. **Test N = 971** (canonical, no mismatch). **E2E 0.849, macro F1
+0.774, ECE 0.0242.** Internally coherent: chapter routing 0.984 × within-chapter
+0.863 ≈ 0.849 — no hidden inflation path. Q9 sklearn warning fired on the linker
+pickles exactly as predicted (certified benign). Recorded as **D010**, supersedes
+D008.
+
+**The other half: that same run made the leakage concrete, and it keeps 0.849
+provisional (D005 stands).** 0.849 is a genuine achievement *as an artifact*
+(faithful, gated, reproducible) and NOT yet a scientific result. The redaction
+removes the ICD-10 *code* but retains the diagnosis *description* it encodes —
+"pain in left knee" for M25.562 — sitting right next to where the code was. The
+model can read the answer off that text instead of inferring from clinical
+findings. Both things are true; both are now in the record.
+
+**Found this session (extends the picture):**
+- `prepare_data.py` phase 3b computes a per-record `has_leakage` flag, then phase
+  3c redacts and *drops* it. Half the leakage inventory is built and discarded —
+  keeping it is most of the counting step Q8 needs.
+- The real redaction logic is in `src/preprocessing.py` (`ICD10_REDACT_PATTERN`,
+  `redact_icd10_sections`, `build_apso_note`) — NOT yet read. Its name suggests it
+  targets codes/sections, not description text, which would explain why
+  `has_leakage` never tracked the semantic leakage. Pending a read of that file.
+- We have the CDC reference descriptions per code → the description-redaction can
+  be *anchored* per record, not blind fuzzy matching.
+
+**Forward plan (now in Q8, rewritten):** prototype anchored description-redaction
+in the EDA notebook → confirm efficacy on a real before/after sample (check BOTH
+under- and over-redaction) → move the proven rule into preprocessing.py +
+prepare_data.py → regenerate gold → rerun the E-009 chain for the first
+*publishable* number (expected below 0.849; the drop is the quantified leakage).
+Two premises flagged as pending-verification, not fact: what the existing
+redaction removes, and whether descriptions are inserted verbatim+adjacent.
+
+Next concrete step: read `src/preprocessing.py`, then the notebook count of
+affected rows.

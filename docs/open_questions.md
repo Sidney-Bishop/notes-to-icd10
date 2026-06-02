@@ -138,22 +138,62 @@ base, not E-001-initialised, so routing is slightly below the historical ~96%
 
 ---
 
-## Q8 — Implement semantic-label redaction (the unimplemented cell-52 proposal)
+## Q8 — Redact the diagnosis DESCRIPTION (not just the code), then rerun
 
-The EDA notebook advocates redacting semantic diagnosis labels from the note text
-but never implements it (see D005). The current canonical gold retains labels like
-"pain in left knee" in the model input — residual label leakage that inflates
-accuracy and would not exist in real clinical notes (a likely contributor to the
-synthetic→real gap, Q6).
+The current canonical gold redacts the ICD-10 *code* strings but retains the
+human-readable diagnosis description they encode — e.g. "pain in left knee" for
+M25.562 — in the model input (see D005, D010). In the APSO notes that description
+sits adjacent to where the code was, so the model can read the answer off it
+rather than infer the diagnosis from the Subjective/Objective clinical findings.
+This is the residual leakage that makes the canonical 0.849 (D010) provisional and
+is a likely contributor to the synthetic→real gap (Q6).
 
-**Decide / do:** implement semantic-label redaction in `preprocessing.py` (strip
-the diagnosis description and the `ICD-10:` / `Description:` / `Diagnosis:`
-scaffolding, and ideally the `[REDACTED]` markers), regenerate gold, re-run the
-full pipeline, and report the accuracy **delta** vs the code-only regime (D005).
-That delta quantifies how much retained labels were inflating results.
+**The approach (anchored, not blind fuzzy matching).** We have the CDC reference
+table (`cdc_fy2026_icd10.parquet`), which carries the official textual description
+per code. So for each affected record the redaction is *anchored*: take that
+record's own reference description(s) and match them near the (former) code
+position, tolerating word-order and minor variants ("pain in left knee" ↔ "left
+knee pain"), NOT searching for arbitrary paraphrases anywhere in the note. Every
+removed span then traces back to a specific reference string for that specific
+record — auditable.
 
-**Status:** OPEN. Gates the first *publishable* number (the D005 retrain is only a
-provisional reproducibility check).
+**Plan / sequence.**
+1. *Notebook (lab, not fix).* In the EDA notebook: load gold, identify the
+   affected rows (description still present after the existing code-redaction),
+   **count them** (this is the inventory we never built — answers "how many
+   records have the issue"), prototype the anchored redaction, export a ~20-row
+   before/after sample for human confirmation.
+2. *Confirm efficacy — both directions.* The sample must show that the leak was
+   removed AND that legitimate clinical content the model should reason from was
+   NOT gutted. Over-redaction (deleting findings) is as much a failure as
+   under-redaction (leaving the description). A rule that scores 100% on "removed"
+   by deleting half the note is worse than the disease.
+3. *Move to the pipeline (the actual fix).* Only after sign-off: move the proven
+   rule into `src/preprocessing.py` and wire it as a phase in `prepare_data.py`,
+   so regenerating gold applies it and every downstream stage inherits it. The
+   notebook proves it; the scripts make it real.
+4. *Regenerate gold + rerun the full E-009 chain* for the first publishable
+   number. Report the **delta** vs the code-only regime (0.849). Expect a
+   meaningful drop — that delta IS the quantified leakage.
+
+**Pending verification (do NOT treat as established).** Two premises this plan
+rests on must be confirmed from source before building on them:
+- *What the existing redaction actually removes.* Have not yet read
+  `src/preprocessing.py` (`ICD10_REDACT_PATTERN`, `redact_icd10_sections`,
+  `build_apso_note`). Need it to define "affected rows" correctly and to extend
+  rather than duplicate/fight the existing logic. (Note: `prepare_data.py` phase
+  3b already computes a per-record `has_leakage` flag, then phase 3c redacts and
+  *drops* it — half the inventory is built and discarded; keeping it is most of
+  Q8's counting step.)
+- *That descriptions are inserted verbatim and adjacent to the code.* If
+  MedSynth templates/paraphrases the description into the note prose rather than
+  inserting it literally, the anchored match becomes guided-fuzzy rather than
+  near-exact. A 5-minute inspection of a few gold records (locate code position,
+  read the preceding span) settles it. The redaction rule's own precision/recall
+  must be verified before any rerun number is trusted.
+
+**Status:** OPEN, HIGH priority. Gates the first *publishable* number; the D010
+0.849 is only a provisional reproducibility result.
 
 ## Q9 — graph reranker uses sklearn artifacts pickled under old version (2026-06-01)
 
