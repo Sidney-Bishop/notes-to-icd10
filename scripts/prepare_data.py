@@ -28,7 +28,7 @@ from src.config import find_project_root  # noqa: E402 (import after sys.path se
 
 from src.config import config
 from src.gatekeeper import validate_dataframe
-from src.preprocessing import build_apso_note, redact_icd10_sections, ICD10_REDACT_PATTERN
+from src.preprocessing import build_apso_note, redact_icd10_sections, redact_descriptions, ICD10_REDACT_PATTERN
 
 # --- Canonical HF sources ---
 HF_REPO_ID      = "SidneyBishop/notes-to-icd10"
@@ -242,12 +242,17 @@ def phase_3c(df):
     df = redact_icd10_sections(df)
     return df.drop("has_leakage") if "has_leakage" in df.columns else df
 
-def phase_4(df, dry=False):
+def phase_3d(df, dictionary_path, cdc_path):
+    print("\n── Phase 3d: Description redaction (Q8, v5) ─────────────────────────")
+    return redact_descriptions(df, dictionary_path=dictionary_path, cdc_path=cdc_path)
+
+def phase_4(df, dry=False, redact_desc=False):
     print("\n── Phase 4: Export ───────────────────────────────────────")
     if dry:
         print(" (dry-run, skipping write)")
         return
-    p = config.resolve_path("data", "gold") / "medsynth_gold_apso.parquet"
+    fname = "medsynth_gold_apso_deleaked.parquet" if redact_desc else "medsynth_gold_apso.parquet"
+    p = config.resolve_path("data", "gold") / fname
     p.parent.mkdir(parents=True, exist_ok=True)
     df.write_parquet(p, compression="snappy")
     print(f" ✅ {p.name}")
@@ -257,6 +262,8 @@ def main():
     pa.add_argument("--no-duckdb", action="store_true")
     pa.add_argument("--dry-run", action="store_true")
     pa.add_argument("--offline", action="store_true")
+    pa.add_argument("--redact-descriptions", action="store_true",
+                    help="Q8: also redact diagnosis descriptions (v5) -> medsynth_gold_apso_deleaked.parquet")
     a = pa.parse_args()
 
     print(f"\n{'='*70}\n prepare_data.py — HF-locked canonical\n{'='*70}")
@@ -274,7 +281,12 @@ def main():
     g = phase_3a(g)
     g = phase_3b(g)
     g = phase_3c(g)
-    phase_4(g, a.dry_run)
+    if a.redact_descriptions:
+        ont = PROJECT_ROOT / "data" / "ontology"
+        g = phase_3d(g,
+                     dictionary_path=ont / "q8_phrasing_dictionary.json",
+                     cdc_path=ont / "icd10cm_2026.parquet")
+    phase_4(g, a.dry_run, a.redact_descriptions)
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,8831 @@
+{
+  "generated": "2026-06-02T18:37:37",
+  "source": "harvested from raw note (ICD-10:CODE) tags, billable records",
+  "keep_threshold_cdc_overlap": 0.3,
+  "n_codes": 1056,
+  "n_phrasings": 1342,
+  "dictionary": {
+    "M25.562": [
+      {
+        "phrase": "Pain in the left knee",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Pain in left knee",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Primary Osteoarthritis of the left knee",
+        "freq": 1,
+        "cdc_overlap": 0.5
+      }
+    ],
+    "N39.0": [
+      {
+        "phrase": "Urinary Tract Infection, site not specified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Urinary Tract Infection (UTI), Site Not Specified",
+        "freq": 1,
+        "cdc_overlap": 0.833
+      }
+    ],
+    "R11.2": [
+      {
+        "phrase": "Nausea with vomiting, unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z00.01": [
+      {
+        "phrase": "Encounter for general adult medical examination with abnormal findings",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E66.01": [
+      {
+        "phrase": "Severe obesity due to excess calories",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D50.9": [
+      {
+        "phrase": "Iron Deficiency Anemia, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E66.9": [
+      {
+        "phrase": "Obesity, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R55": [
+      {
+        "phrase": "Syncope and Collapse",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K59.00": [
+      {
+        "phrase": "Constipation, unspecified",
+        "freq": 4,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z20.828": [
+      {
+        "phrase": "Contact with and (suspected) exposure to other viral communicable diseases",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J96.01": [
+      {
+        "phrase": "Acute Respiratory Failure with Hypoxia",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E11.9": [
+      {
+        "phrase": "Type 2 Diabetes Mellitus without complications",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E55.9": [
+      {
+        "phrase": "Vitamin D deficiency, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F17.210": [
+      {
+        "phrase": "Nicotine dependence, cigarettes, uncomplicated",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F32.9": [
+      {
+        "phrase": "Major Depressive Disorder, Single Episode, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "G89.29": [
+      {
+        "phrase": "Other Chronic Pain",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Chronic Pain Syndrome",
+        "freq": 1,
+        "cdc_overlap": 0.667
+      }
+    ],
+    "R00.2": [
+      {
+        "phrase": "Palpitations",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z79.899": [
+      {
+        "phrase": "Other long term (current) drug therapy",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F11.20": [
+      {
+        "phrase": "Opioid Dependence, Uncomplicated",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Opioid Dependence",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N20.0": [
+      {
+        "phrase": "Calculus of Kidney",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E78.00": [
+      {
+        "phrase": "Pure Hypercholesterolemia, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Pure Hypercholesterolemia",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z37.0": [
+      {
+        "phrase": "Single live birth",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R07.89": [
+      {
+        "phrase": "Other chest pain",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E78.5": [
+      {
+        "phrase": "Hyperlipidemia, unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z20.822": [
+      {
+        "phrase": "Contact with and (suspected) exposure to COVID-19",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M17.11": [
+      {
+        "phrase": "Unilateral primary osteoarthritis, right knee",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R50.9": [
+      {
+        "phrase": "Fever, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R10.13": [
+      {
+        "phrase": "Epigastric pain",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Epigastric Pain",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N17.9": [
+      {
+        "phrase": "Acute Kidney Failure, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Acute Kidney Failure, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z51.11": [
+      {
+        "phrase": "Encounter for antineoplastic chemotherapy",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F41.1": [
+      {
+        "phrase": "Generalized Anxiety Disorder",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I11.0": [
+      {
+        "phrase": "Hypertensive Heart Disease with Heart Failure",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M25.561": [
+      {
+        "phrase": "Pain in right knee",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Chronic Right Knee Pain",
+        "freq": 1,
+        "cdc_overlap": 0.75
+      }
+    ],
+    "K21.9": [
+      {
+        "phrase": "Gastro-esophageal reflux disease (GERD) without esophagitis",
+        "freq": 1,
+        "cdc_overlap": 0.857
+      }
+    ],
+    "R07.9": [
+      {
+        "phrase": "Chest Pain, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Chest pain, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E29.1": [
+      {
+        "phrase": "Testicular Hypofunction",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J06.9": [
+      {
+        "phrase": "Acute Upper Respiratory Infection, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N18.6": [
+      {
+        "phrase": "End Stage Renal Disease (ESRD)",
+        "freq": 2,
+        "cdc_overlap": 0.8
+      },
+      {
+        "phrase": "End Stage Renal Disease",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D64.9": [
+      {
+        "phrase": "Anemia, unspecified",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "U07.1": [
+      {
+        "phrase": "COVID-19",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J30.1": [
+      {
+        "phrase": "Allergic rhinitis due to pollen",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z00.121": [
+      {
+        "phrase": "Routine Child Health Examination with Abnormal Findings",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I10": [
+      {
+        "phrase": "Essential (Primary) Hypertension",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M25.511": [
+      {
+        "phrase": "Pain in right shoulder",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M25.512": [
+      {
+        "phrase": "Left Shoulder Impingement Syndrome",
+        "freq": 1,
+        "cdc_overlap": 0.5
+      },
+      {
+        "phrase": "Left Shoulder Pain",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Left shoulder rotator cuff tendinitis",
+        "freq": 1,
+        "cdc_overlap": 0.4
+      }
+    ],
+    "R53.1": [
+      {
+        "phrase": "Weakness, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I48.91": [
+      {
+        "phrase": "Unspecified Atrial Fibrillation",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M25.551": [
+      {
+        "phrase": "Pain in right hip",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Hip Osteoarthritis",
+        "freq": 1,
+        "cdc_overlap": 0.5
+      },
+      {
+        "phrase": "Pain in the right hip",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Right hip pain suspected due to labral tear and advanced osteoarthritis",
+        "freq": 1,
+        "cdc_overlap": 0.375
+      }
+    ],
+    "R53.83": [
+      {
+        "phrase": "Other Fatigue",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M17.12": [
+      {
+        "phrase": "Unilateral primary osteoarthritis, left knee",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M62.81": [
+      {
+        "phrase": "Muscle Weakness, Generalized",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F41.9": [
+      {
+        "phrase": "Anxiety Disorder, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "A41.9": [
+      {
+        "phrase": "Sepsis, unspecified organism",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z87.891": [
+      {
+        "phrase": "Personal history of nicotine dependence",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J45.909": [
+      {
+        "phrase": "Unspecified asthma, uncomplicated",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I50.9": [
+      {
+        "phrase": "Heart Failure, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J44.9": [
+      {
+        "phrase": "Chronic Obstructive Pulmonary Disease (COPD), unspecified",
+        "freq": 1,
+        "cdc_overlap": 0.8
+      },
+      {
+        "phrase": "Chronic Obstructive Pulmonary Disease, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F33.1": [
+      {
+        "phrase": "Major Depressive Disorder, Recurrent, Moderate",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F84.0": [
+      {
+        "phrase": "Autistic Disorder",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Alex presents with symptoms consistent with Autistic Disorder",
+        "freq": 1,
+        "cdc_overlap": 0.333
+      }
+    ],
+    "E11.22": [
+      {
+        "phrase": "Type 2 diabetes mellitus with diabetic chronic kidney disease",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Type 2 Diabetes Mellitus with Diabetic Chronic Kidney Disease",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F43.10": [
+      {
+        "phrase": "Post-traumatic stress disorder, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Post-Traumatic Stress Disorder, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z99.2": [
+      {
+        "phrase": "Dependence on Renal Dialysis",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R26.89": [
+      {
+        "phrase": "Other abnormalities of gait and mobility",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M81.0": [
+      {
+        "phrase": "Age-related osteoporosis without current pathological fracture",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "H25.13": [
+      {
+        "phrase": "Age-related nuclear cataracts, bilateral",
+        "freq": 1,
+        "cdc_overlap": 0.8
+      }
+    ],
+    "I26.99": [
+      {
+        "phrase": "Other Pulmonary Embolism without Acute Cor Pulmonale",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other pulmonary embolism without acute cor pulmonale",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F17.200": [
+      {
+        "phrase": "Nicotine Dependence, Unspecified, Uncomplicated",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F10.20": [
+      {
+        "phrase": "Alcohol Dependence, Uncomplicated",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z01.810": [
+      {
+        "phrase": "Encounter for preprocedural cardiovascular examination",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I50.33": [
+      {
+        "phrase": "Acute on chronic diastolic (congestive) heart failure",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M25.572": [
+      {
+        "phrase": "Pain in the left ankle and joints of the left foot",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Pain in the left ankle and joints of left foot",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D22.5": [
+      {
+        "phrase": "Melanocytic nevi of the trunk",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R53.81": [
+      {
+        "phrase": "Other Malaise",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "OTHER MALAISE",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M54.9": [
+      {
+        "phrase": "Dorsalgia, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I63.9": [
+      {
+        "phrase": "Cerebral Infarction, Unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E11.42": [
+      {
+        "phrase": "Type 2 Diabetes Mellitus with Diabetic Polyneuropathy",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E53.8": [
+      {
+        "phrase": "Deficiency of other specified B group vitamins",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C34.90": [
+      {
+        "phrase": "Malignant neoplasm of unspecified part of unspecified bronchus or lung",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I73.9": [
+      {
+        "phrase": "Peripheral Vascular Disease",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Peripheral Vascular Disease (PVD), unspecified",
+        "freq": 1,
+        "cdc_overlap": 0.75
+      }
+    ],
+    "M16.11": [
+      {
+        "phrase": "Unilateral Primary Osteoarthritis, Right Hip",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Unilateral primary osteoarthritis, right hip",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R26.81": [
+      {
+        "phrase": "Unsteadiness on feet",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K44.9": [
+      {
+        "phrase": "Diaphragmatic hernia without obstruction or gangrene",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z79.4": [
+      {
+        "phrase": "Long term use of insulin",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Long-term (current) use of insulin",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z51.89": [
+      {
+        "phrase": "Encounter for other specified aftercare",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J40": [
+      {
+        "phrase": "Bronchitis, not specified as acute or chronic",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I50.22": [
+      {
+        "phrase": "Chronic Systolic (Congestive) Heart Failure",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N92.6": [
+      {
+        "phrase": "Irregular menstruation, unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I42.9": [
+      {
+        "phrase": "Cardiomyopathy, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M99.02": [
+      {
+        "phrase": "Segmental and somatic dysfunction of thoracic region",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J01.90": [
+      {
+        "phrase": "Acute Sinusitis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M25.571": [
+      {
+        "phrase": "Pain in right ankle and joints of right foot",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E11.621": [
+      {
+        "phrase": "Type 2 Diabetes Mellitus with Foot Ulcer",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N30.00": [
+      {
+        "phrase": "Acute cystitis without hematuria",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R10.11": [
+      {
+        "phrase": "Right Upper Quadrant Pain",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R73.09": [
+      {
+        "phrase": "Other abnormal glucose",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other Abnormal Glucose",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "L82.1": [
+      {
+        "phrase": "Other Seborrheic Keratosis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other seborrheic keratosis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N17.0": [
+      {
+        "phrase": "Acute Kidney Failure with Tubular Necrosis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S09.90XA": [
+      {
+        "phrase": "Unspecified injury of head, initial encounter",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z01.89": [
+      {
+        "phrase": "Encounter for other specified special examinations",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R21": [
+      {
+        "phrase": "Rash and other nonspecific skin eruption",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R10.84": [
+      {
+        "phrase": "Generalized abdominal pain",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Generalized Abdominal Pain",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M25.552": [
+      {
+        "phrase": "Pain in left hip",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Left hip pain",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "G62.9": [
+      {
+        "phrase": "Polyneuropathy, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D72.829": [
+      {
+        "phrase": "Elevated White Blood Cell Count, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Elevated White Blood Cell Count, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z79.891": [
+      {
+        "phrase": "Long term (current) use of opiate analgesic",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M54.41": [
+      {
+        "phrase": "John Doe is a 48-year-old male diagnosed with lumbago with sciatica on the right side",
+        "freq": 1,
+        "cdc_overlap": 0.4
+      }
+    ],
+    "K35.80": [
+      {
+        "phrase": "Unspecified Acute Appendicitis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F34.1": [
+      {
+        "phrase": "Dysthymic Disorder",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I95.9": [
+      {
+        "phrase": "Hypotension, unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Hypotension, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C50.919": [
+      {
+        "phrase": "Malignant neoplasm of unspecified site of unspecified female breast",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F33.2": [
+      {
+        "phrase": "Major Depressive Disorder, Recurrent Severe Without Psychotic Features",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N18.9": [
+      {
+        "phrase": "Chronic Kidney Disease, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Chronic Kidney Disease (CKD), Stage 3",
+        "freq": 1,
+        "cdc_overlap": 0.6
+      }
+    ],
+    "R11.10": [
+      {
+        "phrase": "Vomiting, unspecified",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M54.12": [
+      {
+        "phrase": "Radiculopathy, Cervical Region",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R00.0": [
+      {
+        "phrase": "Tachycardia, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K29.70": [
+      {
+        "phrase": "Gastritis, unspecified, without bleeding",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C50.911": [
+      {
+        "phrase": "Malignant neoplasm of unspecified site of right female breast",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Malignant Neoplasm of Unspecified Site of Right Female Breast",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M51.26": [
+      {
+        "phrase": "Other intervertebral disc displacement, lumbar region",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z88.0": [
+      {
+        "phrase": "Allergy to Penicillin",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Penicillin Allergy",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J69.0": [
+      {
+        "phrase": "Pneumonitis due to inhalation of food and vomit",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R91.8": [
+      {
+        "phrase": "Other nonspecific abnormal finding of lung field",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M79.672": [
+      {
+        "phrase": "Pain in left foot",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M79.7": [
+      {
+        "phrase": "Fibromyalgia",
+        "freq": 4,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N92.0": [
+      {
+        "phrase": "Excessive and frequent menstruation with regular cycle",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R11.0": [
+      {
+        "phrase": "Nausea",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "L30.9": [
+      {
+        "phrase": "Dermatitis, unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N40.1": [
+      {
+        "phrase": "Benign Prostatic Hyperplasia (BPH) with Lower Urinary Tract Symptoms (LUTS)",
+        "freq": 1,
+        "cdc_overlap": 0.778
+      }
+    ],
+    "R41.82": [
+      {
+        "phrase": "Altered Mental Status, Unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M25.50": [
+      {
+        "phrase": "Pain in unspecified joint",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R10.30": [
+      {
+        "phrase": "Lower abdominal pain, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F43.22": [
+      {
+        "phrase": "Adjustment Disorder with Anxiety",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M06.9": [
+      {
+        "phrase": "Rheumatoid Arthritis, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M10.9": [
+      {
+        "phrase": "Gout, unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R13.10": [
+      {
+        "phrase": "Dysphagia, unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J30.89": [
+      {
+        "phrase": "Other Allergic Rhinitis",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D63.1": [
+      {
+        "phrase": "Anemia in Chronic Kidney Disease",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F90.2": [
+      {
+        "phrase": "Attention-Deficit Hyperactivity Disorder, Combined Type",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M17.0": [
+      {
+        "phrase": "Bilateral primary osteoarthritis of the knee",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z3A.39": [
+      {
+        "phrase": "weeks gestation with preeclampsia",
+        "freq": 1,
+        "cdc_overlap": 0.667
+      }
+    ],
+    "N20.1": [
+      {
+        "phrase": "Calculus of Ureter",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Calculus of the ureter",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Calculus of ureter",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M79.671": [
+      {
+        "phrase": "Pain in right foot",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R33.9": [
+      {
+        "phrase": "Retention of Urine, Unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "G47.00": [
+      {
+        "phrase": "Insomnia, unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z47.89": [
+      {
+        "phrase": "Encounter for other orthopedic aftercare",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E11.69": [
+      {
+        "phrase": "Type 2 Diabetes Mellitus with other specified complications",
+        "freq": 1,
+        "cdc_overlap": 0.8
+      }
+    ],
+    "C79.51": [
+      {
+        "phrase": "Secondary malignant neoplasm of bone",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N93.9": [
+      {
+        "phrase": "Abnormal Uterine and Vaginal Bleeding, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z98.890": [
+      {
+        "phrase": "Other specified postprocedural states",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other Specified Postprocedural States",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M54.6": [
+      {
+        "phrase": "Pain in Thoracic Spine",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z79.82": [
+      {
+        "phrase": "Long-term use of aspirin",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Occasional heartburn and gastritis likely secondary to long-term aspirin use",
+        "freq": 1,
+        "cdc_overlap": 0.444
+      }
+    ],
+    "E11.40": [
+      {
+        "phrase": "Type 2 Diabetes Mellitus with Diabetic Neuropathy, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I25.2": [
+      {
+        "phrase": "Old Myocardial Infarction",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F43.23": [
+      {
+        "phrase": "Adjustment Disorder with Mixed Anxiety and Depressed Mood",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z01.00": [
+      {
+        "phrase": "Encounter for Examination of Eyes and Vision Without Abnormal Findings",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E11.8": [
+      {
+        "phrase": "Type 2 Diabetes Mellitus with unspecified complications",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z45.2": [
+      {
+        "phrase": "Adjustment and management of vascular access device",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z91.81": [
+      {
+        "phrase": "History of falling",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "History of Falling",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z38.01": [
+      {
+        "phrase": "Single liveborn infant, delivered by cesarean",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Post-cesarean delivery, single liveborn infant",
+        "freq": 1,
+        "cdc_overlap": 0.667
+      }
+    ],
+    "F90.9": [
+      {
+        "phrase": "Attention-Deficit Hyperactivity Disorder, Unspecified Type",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K62.5": [
+      {
+        "phrase": "Hemorrhage of Anus and Rectum",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R03.0": [
+      {
+        "phrase": "Elevated Blood Pressure Reading without diagnosis of Hypertension",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N95.1": [
+      {
+        "phrase": "Menopausal and Female Climacteric States",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C18.9": [
+      {
+        "phrase": "Malignant neoplasm of the colon, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R63.4": [
+      {
+        "phrase": "Abnormal weight loss",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I34.0": [
+      {
+        "phrase": "Nonrheumatic Mitral Valve Insufficiency",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M48.061": [
+      {
+        "phrase": "Spinal Stenosis, Lumbar Region Without Neurogenic Claudication",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K80.10": [
+      {
+        "phrase": "Calculus of gallbladder with chronic cholecystitis without obstruction",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J96.00": [
+      {
+        "phrase": "Acute Respiratory Failure",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R74.8": [
+      {
+        "phrase": "John Doe is diagnosed with abnormal levels of other serum enzymes",
+        "freq": 1,
+        "cdc_overlap": 0.571
+      },
+      {
+        "phrase": "Abnormal levels of other serum enzymes",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M79.89": [
+      {
+        "phrase": "Other Specified Soft Tissue Disorders",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M48.02": [
+      {
+        "phrase": "Spinal Stenosis, Cervical Region",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J10.1": [
+      {
+        "phrase": "Influenza due to other identified influenza virus with other respiratory manifestations",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "G47.30": [
+      {
+        "phrase": "Sleep Apnea, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M54.17": [
+      {
+        "phrase": "Radiculopathy, lumbosacral region",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M54.42": [
+      {
+        "phrase": "Lumbago with sciatica, left side",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "H25.12": [
+      {
+        "phrase": "Age-related nuclear cataract, left eye",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R91.1": [
+      {
+        "phrase": "Solitary Pulmonary Nodule",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C34.11": [
+      {
+        "phrase": "Malignant neoplasm of upper lobe, right bronchus or lung",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N91.2": [
+      {
+        "phrase": "Amenorrhea, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R27.8": [
+      {
+        "phrase": "Other lack of coordination",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "OTHER LACK OF COORDINATION",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R52": [
+      {
+        "phrase": "Pain, unspecified",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R18.8": [
+      {
+        "phrase": "Other Ascites",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z96.652": [
+      {
+        "phrase": "Presence of left artificial knee joint",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R20.0": [
+      {
+        "phrase": "Anesthesia of skin",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z88.8": [
+      {
+        "phrase": "Allergy status to other drugs, medicaments, and biological substances",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R31.0": [
+      {
+        "phrase": "Gross Hematuria",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F32.1": [
+      {
+        "phrase": "Major Depressive Disorder, single episode, moderate",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "H04.123": [
+      {
+        "phrase": "Dry Eye Syndrome of Bilateral Lacrimal Glands",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K63.5": [
+      {
+        "phrase": "Polyp of the Colon",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D68.9": [
+      {
+        "phrase": "Coagulation defect, unspecified",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "L81.4": [
+      {
+        "phrase": "Other Melanin Hyperpigmentation",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other melanin hyperpigmentation",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z95.5": [
+      {
+        "phrase": "Coronary artery disease with presence of coronary angioplasty implant and graft",
+        "freq": 1,
+        "cdc_overlap": 0.714
+      }
+    ],
+    "F10.10": [
+      {
+        "phrase": "Alcohol Abuse, Uncomplicated",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Alcohol abuse, uncomplicated",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R07.2": [
+      {
+        "phrase": "Precordial Pain",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R94.5": [
+      {
+        "phrase": "Abnormal results of liver function studies",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M25.531": [
+      {
+        "phrase": "Pain in the right wrist",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Pain in right wrist",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K64.8": [
+      {
+        "phrase": "Other Hemorrhoids",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R53.82": [
+      {
+        "phrase": "Chronic Fatigue, Unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Chronic Fatigue, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C54.1": [
+      {
+        "phrase": "Malignant neoplasm of endometrium",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R29.6": [
+      {
+        "phrase": "Repeated Falls",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Repeated falls",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E03.8": [
+      {
+        "phrase": "Other specified hypothyroidism",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M79.604": [
+      {
+        "phrase": "Right leg pain",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z95.0": [
+      {
+        "phrase": "Presence of Cardiac Pacemaker",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z95.1": [
+      {
+        "phrase": "Coronary Artery Disease (CAD), post-aortocoronary bypass graft",
+        "freq": 1,
+        "cdc_overlap": 0.375
+      }
+    ],
+    "F43.20": [
+      {
+        "phrase": "Adjustment Disorder, Unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F43.21": [
+      {
+        "phrase": "Adjustment Disorder with Depressed Mood",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M25.532": [
+      {
+        "phrase": "Pain in left wrist",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I50.43": [
+      {
+        "phrase": "Acute on chronic combined systolic (congestive) and diastolic (congestive) heart failure",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z88.5": [
+      {
+        "phrase": "Allergy Status to Narcotic Agent",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R04.0": [
+      {
+        "phrase": "Epistaxis",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K74.60": [
+      {
+        "phrase": "Unspecified cirrhosis of liver",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M79.605": [
+      {
+        "phrase": "Leg pain, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z30.2": [
+      {
+        "phrase": "Encounter for sterilization",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z68.1": [
+      {
+        "phrase": "BMI 19.9 or less, adult",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E44.0": [
+      {
+        "phrase": "Moderate Protein-Calorie Malnutrition",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S33.5XXA": [
+      {
+        "phrase": "Sprain of ligaments of lumbar spine",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N95.0": [
+      {
+        "phrase": "Postmenopausal bleeding",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J30.2": [
+      {
+        "phrase": "Other seasonal allergic rhinitis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C67.9": [
+      {
+        "phrase": "Malignant neoplasm of the bladder, unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Malignant neoplasm of bladder, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I25.5": [
+      {
+        "phrase": "Ischemic Cardiomyopathy",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R06.09": [
+      {
+        "phrase": "Other forms of dyspnea",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R63.5": [
+      {
+        "phrase": "Abnormal weight gain",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S39.012A": [
+      {
+        "phrase": "Strain of muscle, fascia, and tendon of the lower back, initial encounter",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I95.1": [
+      {
+        "phrase": "Orthostatic Hypotension",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R60.9": [
+      {
+        "phrase": "Edema, unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N92.1": [
+      {
+        "phrase": "Excessive and frequent menstruation with irregular cycles",
+        "freq": 1,
+        "cdc_overlap": 0.8
+      },
+      {
+        "phrase": "Excessive and Frequent Menstruation with Irregular Cycle",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R10.12": [
+      {
+        "phrase": "Left upper quadrant pain",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "L60.0": [
+      {
+        "phrase": "Ingrowing nail",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Ingrowing Nail",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K51.90": [
+      {
+        "phrase": "Ulcerative Colitis, unspecified, without complications",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I49.5": [
+      {
+        "phrase": "Sick Sinus Syndrome",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "SICK SINUS SYNDROME",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z32.01": [
+      {
+        "phrase": "Encounter for pregnancy test, result positive",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M75.42": [
+      {
+        "phrase": "Adhesive Capsulitis of Left Shoulder",
+        "freq": 1,
+        "cdc_overlap": 0.5
+      }
+    ],
+    "E46": [
+      {
+        "phrase": "Unspecified protein-calorie malnutrition",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z86.718": [
+      {
+        "phrase": "Personal history of other venous thrombosis and embolism",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Personal History of Other Venous Thrombosis and Embolism",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E11.21": [
+      {
+        "phrase": "Type 2 Diabetes Mellitus with Diabetic Nephropathy",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C79.31": [
+      {
+        "phrase": "Secondary malignant neoplasm of brain",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z95.2": [
+      {
+        "phrase": "Presence of prosthetic heart valve",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J43.9": [
+      {
+        "phrase": "Emphysema, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z08": [
+      {
+        "phrase": "Follow-up examination after completed treatment for malignant neoplasm",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E78.49": [
+      {
+        "phrase": "Other Hyperlipidemia",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Hyperlipidemia",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other hyperlipidemia",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z88.2": [
+      {
+        "phrase": "Allergy to Sulfonamides",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Allergy to sulfonamides",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "B18.2": [
+      {
+        "phrase": "Chronic Viral Hepatitis C",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I11.9": [
+      {
+        "phrase": "Hypertensive heart disease without heart failure",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S13.4XXA": [
+      {
+        "phrase": "Sprain of ligaments of cervical spine",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Sprain of ligaments of the cervical spine",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K58.9": [
+      {
+        "phrase": "Irritable Bowel Syndrome without Diarrhea",
+        "freq": 1,
+        "cdc_overlap": 0.6
+      },
+      {
+        "phrase": "Irritable Bowel Syndrome Without Diarrhea",
+        "freq": 1,
+        "cdc_overlap": 0.6
+      }
+    ],
+    "H61.23": [
+      {
+        "phrase": "Impacted Cerumen, Bilateral",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M19.012": [
+      {
+        "phrase": "Primary Osteoarthritis, Left Shoulder",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R32": [
+      {
+        "phrase": "Unspecified urinary incontinence",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "L57.8": [
+      {
+        "phrase": "Other skin changes due to chronic exposure to nonionizing radiation",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M43.16": [
+      {
+        "phrase": "Spondylolisthesis, lumbar region",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z85.828": [
+      {
+        "phrase": "Personal history of other malignant neoplasm of skin",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O48.0": [
+      {
+        "phrase": "Post-term pregnancy",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Post-term Pregnancy",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R27.9": [
+      {
+        "phrase": "Unspecified lack of coordination",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R51.9": [
+      {
+        "phrase": "Headache, unspecified",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D61.818": [
+      {
+        "phrase": "Other pancytopenia",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other Pancytopenia",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M79.641": [
+      {
+        "phrase": "Pain in right hand",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Pain in the right hand",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D50.8": [
+      {
+        "phrase": "Other Iron Deficiency Anemias",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F19.20": [
+      {
+        "phrase": "Other psychoactive substance dependence, uncomplicated",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z02.9": [
+      {
+        "phrase": "Encounter for preventive health services",
+        "freq": 1,
+        "cdc_overlap": 0.4
+      }
+    ],
+    "K42.9": [
+      {
+        "phrase": "Umbilical Hernia without obstruction or gangrene",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N97.9": [
+      {
+        "phrase": "Female infertility, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Female Infertility, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J34.2": [
+      {
+        "phrase": "Deviated Nasal Septum",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Mr. John Doe is a 52-year-old male with a significant deviated nasal septum",
+        "freq": 1,
+        "cdc_overlap": 0.333
+      }
+    ],
+    "Z87.442": [
+      {
+        "phrase": "Personal history of urinary calculi",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z34.90": [
+      {
+        "phrase": "Encounter for supervision of normal pregnancy, unspecified trimester",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M54.32": [
+      {
+        "phrase": "Sciatica, left side",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R62.7": [
+      {
+        "phrase": "Adult Failure to Thrive",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M17.9": [
+      {
+        "phrase": "Osteoarthritis of knee, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F39": [
+      {
+        "phrase": "Unspecified Mood [Affective] Disorder",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E11.29": [
+      {
+        "phrase": "Type 2 Diabetes Mellitus with other diabetic kidney complications",
+        "freq": 1,
+        "cdc_overlap": 0.833
+      }
+    ],
+    "E07.9": [
+      {
+        "phrase": "Disorder of thyroid, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Disorder of Thyroid, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M79.642": [
+      {
+        "phrase": "Tendonitis of the left hand",
+        "freq": 1,
+        "cdc_overlap": 0.667
+      },
+      {
+        "phrase": "Pain in left hand",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D47.3": [
+      {
+        "phrase": "Essential (Hemorrhagic) Thrombocythemia",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R31.29": [
+      {
+        "phrase": "Other microscopic hematuria",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other Microscopic Hematuria",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Microscopic Hematuria",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "H53.8": [
+      {
+        "phrase": "Other Visual Disturbances",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "The patient presents with other visual disturbances",
+        "freq": 1,
+        "cdc_overlap": 0.5
+      }
+    ],
+    "Z68.43": [
+      {
+        "phrase": "BODY MASS INDEX [BMI] 50.0-59.9, ADULT",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Obesity, BMI 50.0-59.9, Adult",
+        "freq": 1,
+        "cdc_overlap": 0.667
+      }
+    ],
+    "R29.898": [
+      {
+        "phrase": "Other symptoms and signs involving the musculoskeletal system",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R47.01": [
+      {
+        "phrase": "Aphasia",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I44.2": [
+      {
+        "phrase": "Complete atrioventricular block",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M06.09": [
+      {
+        "phrase": "Rheumatoid arthritis without rheumatoid factor, multiple sites",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K31.89": [
+      {
+        "phrase": "Other diseases of stomach and duodenum",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C34.31": [
+      {
+        "phrase": "Malignant neoplasm of lower lobe, right bronchus or lung",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R29.3": [
+      {
+        "phrase": "Abnormal posture",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E66.3": [
+      {
+        "phrase": "Overweight",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I46.9": [
+      {
+        "phrase": "Cardiac arrest, cause unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D72.819": [
+      {
+        "phrase": "Decreased White Blood Cell Count, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Decreased white blood cell count, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z94.4": [
+      {
+        "phrase": "Liver transplant status with suspected complications",
+        "freq": 1,
+        "cdc_overlap": 0.6
+      }
+    ],
+    "R80.9": [
+      {
+        "phrase": "Proteinuria, unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z51.5": [
+      {
+        "phrase": "Encounter for palliative care",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z90.710": [
+      {
+        "phrase": "Acquired absence of both cervix and uterus",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C34.91": [
+      {
+        "phrase": "Malignant neoplasm of unspecified part of right bronchus or lung",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J34.89": [
+      {
+        "phrase": "Other Specified Disorders of Nose and Nasal Sinuses",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N28.1": [
+      {
+        "phrase": "Cyst of Kidney, Acquired",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O26.893": [
+      {
+        "phrase": "Other Specified Pregnancy-Related Conditions, Third Trimester",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other specified pregnancy-related conditions, third trimester",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D12.2": [
+      {
+        "phrase": "Benign neoplasm of the ascending colon",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "L65.9": [
+      {
+        "phrase": "Non-scarring hair loss, unspecified",
+        "freq": 1,
+        "cdc_overlap": 0.5
+      }
+    ],
+    "O34.211": [
+      {
+        "phrase": "Maternal care for low transverse scar from previous cesarean delivery",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K29.00": [
+      {
+        "phrase": "Acute gastritis without bleeding",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Acute Gastritis Without Bleeding",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z3A.38": [
+      {
+        "phrase": "weeks gestation, mild preeclampsia",
+        "freq": 1,
+        "cdc_overlap": 0.5
+      },
+      {
+        "phrase": "Preterm labor at 32 weeks gestation",
+        "freq": 1,
+        "cdc_overlap": 0.5
+      }
+    ],
+    "D12.5": [
+      {
+        "phrase": "Benign Neoplasm of Sigmoid Colon",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R41.3": [
+      {
+        "phrase": "Other Amnesia",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M54.40": [
+      {
+        "phrase": "Lumbago with sciatica, unspecified side",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "G81.94": [
+      {
+        "phrase": "Hemiplegia, unspecified affecting left nondominant side",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R22.1": [
+      {
+        "phrase": "Localized swelling, mass, and lump, neck",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Localized swelling, mass, and lump in the neck",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R94.6": [
+      {
+        "phrase": "Abnormal results of thyroid function studies",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E11.649": [
+      {
+        "phrase": "Type 2 Diabetes Mellitus with Hypoglycemia without Coma",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Type 2 Diabetes Mellitus with hypoglycemia without coma",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N39.41": [
+      {
+        "phrase": "Urge Incontinence",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R01.1": [
+      {
+        "phrase": "Cardiac Murmur, Unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Cardiac murmur, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M25.569": [
+      {
+        "phrase": "Pain in unspecified knee",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Pain in the unspecified knee",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N52.9": [
+      {
+        "phrase": "Male Erectile Dysfunction, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Male Erectile Dysfunction, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M96.1": [
+      {
+        "phrase": "Postlaminectomy Syndrome, Not Elsewhere Classified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R10.10": [
+      {
+        "phrase": "Upper Abdominal Pain, Unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Upper abdominal pain, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z01.01": [
+      {
+        "phrase": "Encounter for examination of eyes and vision with abnormal findings",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R41.0": [
+      {
+        "phrase": "Disorientation, unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Disorientation, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N18.30": [
+      {
+        "phrase": "Chronic kidney disease, stage 3 unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "G25.81": [
+      {
+        "phrase": "Restless Legs Syndrome",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Restless legs syndrome (RLS)",
+        "freq": 1,
+        "cdc_overlap": 0.75
+      }
+    ],
+    "J12.82": [
+      {
+        "phrase": "Pneumonia due to coronavirus disease 2019 (COVID-19)",
+        "freq": 1,
+        "cdc_overlap": 0.8
+      }
+    ],
+    "K76.89": [
+      {
+        "phrase": "Other Specified Diseases of Liver",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D46.9": [
+      {
+        "phrase": "Myelodysplastic Syndrome, Unspecified",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "A41.51": [
+      {
+        "phrase": "Sepsis due to Escherichia coli [E. coli]",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M25.519": [
+      {
+        "phrase": "Pain in unspecified shoulder",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Pain in unspecified shoulder, likely involving impingement syndrome",
+        "freq": 1,
+        "cdc_overlap": 0.333
+      }
+    ],
+    "N64.89": [
+      {
+        "phrase": "Other specified disorders of the breast",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "The patient is diagnosed with other specified disorders of breast",
+        "freq": 1,
+        "cdc_overlap": 0.6
+      },
+      {
+        "phrase": "Other specified disorders of breast",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C91.00": [
+      {
+        "phrase": "The patient presents with Acute Lymphoblastic Leukemia",
+        "freq": 1,
+        "cdc_overlap": 0.6
+      }
+    ],
+    "C78.6": [
+      {
+        "phrase": "Secondary malignant neoplasm of retroperitoneum and peritoneum",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C78.00": [
+      {
+        "phrase": "Primary malignant neoplasm of the lung, unspecified",
+        "freq": 1,
+        "cdc_overlap": 0.75
+      }
+    ],
+    "B96.20": [
+      {
+        "phrase": "Unspecified Escherichia coli [E. coli] as the cause of diseases classified elsewhere",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J96.10": [
+      {
+        "phrase": "Chronic respiratory failure, unspecified whether with hypoxia or hypercapnia",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F20.9": [
+      {
+        "phrase": "Schizophrenia, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z74.1": [
+      {
+        "phrase": "Need for assistance with personal care",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M62.830": [
+      {
+        "phrase": "Muscle spasm of back",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Muscle Spasm of Back",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O02.1": [
+      {
+        "phrase": "Missed abortion",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J31.0": [
+      {
+        "phrase": "Chronic Rhinitis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R79.9": [
+      {
+        "phrase": "Abnormal finding of blood chemistry, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I42.8": [
+      {
+        "phrase": "Other Cardiomyopathies",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other cardiomyopathies",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z96.641": [
+      {
+        "phrase": "Presence of Right Artificial Hip Joint",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F29": [
+      {
+        "phrase": "Unspecified Psychosis not due to a substance or known physiological condition",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C56.9": [
+      {
+        "phrase": "Malignant neoplasm of unspecified ovary",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I51.7": [
+      {
+        "phrase": "Cardiomegaly",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E04.9": [
+      {
+        "phrase": "NONToxic Goiter, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "A09": [
+      {
+        "phrase": "Infectious gastroenteritis and colitis, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "The patient is diagnosed with Infectious Gastroenteritis and Colitis, unspecified",
+        "freq": 1,
+        "cdc_overlap": 0.6
+      }
+    ],
+    "Z96.1": [
+      {
+        "phrase": "Presence of Intraocular Lens",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Presence of intraocular lens",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N28.9": [
+      {
+        "phrase": "Disorder of Kidney and Ureter, Unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "L03.90": [
+      {
+        "phrase": "Cellulitis, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D63.8": [
+      {
+        "phrase": "Anemia in other chronic diseases classified elsewhere",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I49.3": [
+      {
+        "phrase": "Ventricular premature depolarization",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Ventricular Premature Depolarization",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J96.22": [
+      {
+        "phrase": "Acute and Chronic Respiratory Failure with Hypercapnia",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R06.2": [
+      {
+        "phrase": "Wheezing",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C34.12": [
+      {
+        "phrase": "Confirmed malignant neoplasm of the upper lobe, left bronchus or lung",
+        "freq": 1,
+        "cdc_overlap": 0.875
+      },
+      {
+        "phrase": "Malignant neoplasm of the upper lobe, left bronchus, or lung",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N32.81": [
+      {
+        "phrase": "Overactive Bladder",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J18.1": [
+      {
+        "phrase": "Lobar pneumonia, unspecified organism",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C71.9": [
+      {
+        "phrase": "Malignant neoplasm of brain, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "The patient has been diagnosed with a malignant neoplasm of the brain, unspecified",
+        "freq": 1,
+        "cdc_overlap": 0.429
+      }
+    ],
+    "M50.30": [
+      {
+        "phrase": "Other Cervical Disc Degeneration, unspecified cervical region",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other cervical disc degeneration, unspecified cervical region",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z33.1": [
+      {
+        "phrase": "Pregnant state, incidental",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N83.201": [
+      {
+        "phrase": "Unspecified ovarian cyst, right side",
+        "freq": 4,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J96.02": [
+      {
+        "phrase": "Acute Respiratory Failure with Hypercapnia",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C44.319": [
+      {
+        "phrase": "Basal cell carcinoma of the skin of other parts of the face",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O80": [
+      {
+        "phrase": "Full-term uncomplicated delivery",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Encounter for full-term uncomplicated delivery",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "P59.9": [
+      {
+        "phrase": "Neonatal Jaundice, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z83.3": [
+      {
+        "phrase": "Family history of diabetes mellitus",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Type 2 Diabetes Mellitus",
+        "freq": 1,
+        "cdc_overlap": 0.667
+      }
+    ],
+    "H25.813": [
+      {
+        "phrase": "Combined forms of age-related cataract, bilateral",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M79.602": [
+      {
+        "phrase": "Pain in left arm",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J98.4": [
+      {
+        "phrase": "Other disorders of lung",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other Disorders of Lung",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "T45.1X5A": [
+      {
+        "phrase": "Adverse effect of antineoplastic and immunosuppressive drugs",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Adverse Effect of Antineoplastic and Immunosuppressive Drugs",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R65.20": [
+      {
+        "phrase": "Severe sepsis without septic shock",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "B07.8": [
+      {
+        "phrase": "Other viral warts",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "G56.02": [
+      {
+        "phrase": "Osteoarthritis of the Left Knee",
+        "freq": 1,
+        "cdc_overlap": 0.333
+      }
+    ],
+    "N93.8": [
+      {
+        "phrase": "Other Specified Abnormal Uterine and Vaginal Bleeding",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D70.9": [
+      {
+        "phrase": "Neutropenia, unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "L08.9": [
+      {
+        "phrase": "Local infection of the skin and subcutaneous tissue, unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F05": [
+      {
+        "phrase": "Delirium due to known physiological condition",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O69.81X0": [
+      {
+        "phrase": "Labor and delivery complicated by nuchal cord without compression",
+        "freq": 1,
+        "cdc_overlap": 0.857
+      }
+    ],
+    "E05.00": [
+      {
+        "phrase": "Thyrotoxicosis with diffuse goiter without thyrotoxic crisis or storm",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O70.0": [
+      {
+        "phrase": "First-degree perineal laceration during delivery",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z30.42": [
+      {
+        "phrase": "Encounter for surveillance of injectable contraceptive",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I27.29": [
+      {
+        "phrase": "Other Secondary Pulmonary Hypertension",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z71.89": [
+      {
+        "phrase": "Other Specified Counseling",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E78.1": [
+      {
+        "phrase": "Pure Hyperglyceridemia",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M62.838": [
+      {
+        "phrase": "Other muscle spasm",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other Muscle Spasm",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F80.2": [
+      {
+        "phrase": "Mixed Receptive-Expressive Language Disorder",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M25.521": [
+      {
+        "phrase": "Pain in right elbow",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J96.11": [
+      {
+        "phrase": "The patient is diagnosed with Chronic Respiratory Failure with hypoxia",
+        "freq": 1,
+        "cdc_overlap": 0.667
+      },
+      {
+        "phrase": "Chronic Respiratory Failure with Hypoxia",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C18.2": [
+      {
+        "phrase": "Malignant neoplasm of the ascending colon",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Malignant neoplasm of ascending colon",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F43.12": [
+      {
+        "phrase": "PTSD, Chronic",
+        "freq": 1,
+        "cdc_overlap": 0.5
+      },
+      {
+        "phrase": "Post-Traumatic Stress Disorder, Chronic",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R39.15": [
+      {
+        "phrase": "Urgency of urination",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Urgency of Urination",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I50.21": [
+      {
+        "phrase": "Acute systolic (congestive) heart failure",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M19.071": [
+      {
+        "phrase": "Primary Osteoarthritis, Right Ankle, and Foot",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "L72.3": [
+      {
+        "phrase": "Sebaceous Cyst",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I50.31": [
+      {
+        "phrase": "Acute Diastolic (Congestive) Heart Failure",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I27.20": [
+      {
+        "phrase": "Pulmonary Hypertension, Unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Pulmonary Hypertension, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "L98.9": [
+      {
+        "phrase": "Disorder of the skin and subcutaneous tissue, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "T78.40XA": [
+      {
+        "phrase": "Allergy, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M25.522": [
+      {
+        "phrase": "Pain in left elbow",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N28.89": [
+      {
+        "phrase": "Other specified disorders of kidney and ureter",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R09.89": [
+      {
+        "phrase": "Other specified symptoms and signs involving the circulatory and respiratory systems",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K56.609": [
+      {
+        "phrase": "Unspecified intestinal obstruction, unspecified as to partial versus complete obstruction",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z13.89": [
+      {
+        "phrase": "Encounter for screening for other disorder, management of hypothyroidism",
+        "freq": 1,
+        "cdc_overlap": 0.667
+      }
+    ],
+    "R19.5": [
+      {
+        "phrase": "Other Fecal Abnormalities",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z86.711": [
+      {
+        "phrase": "Personal History of Pulmonary Embolism",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K02.9": [
+      {
+        "phrase": "Dental Caries, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Dental caries, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D22.9": [
+      {
+        "phrase": "Melanocytic Nevi, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I50.42": [
+      {
+        "phrase": "Chronic Combined Systolic (congestive) and Diastolic (congestive) Heart Failure",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Chronic Combined Systolic (Congestive) and Diastolic (Congestive) Heart Failure",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z78.0": [
+      {
+        "phrase": "Asymptomatic menopausal state",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Asymptomatic Menopausal State",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I49.9": [
+      {
+        "phrase": "Cardiac arrhythmia, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Cardiac Arrhythmia, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "B07.9": [
+      {
+        "phrase": "Viral wart, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "H25.811": [
+      {
+        "phrase": "Combined forms of age-related cataract, right eye",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z99.81": [
+      {
+        "phrase": "Dependence on Supplemental Oxygen",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M75.101": [
+      {
+        "phrase": "Unspecified rotator cuff tear or rupture of the right shoulder, not specified as traumatic",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F12.20": [
+      {
+        "phrase": "Cannabis dependence, uncomplicated",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "L90.5": [
+      {
+        "phrase": "Scar conditions and fibrosis of skin",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R09.81": [
+      {
+        "phrase": "Nasal Congestion",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "H40.003": [
+      {
+        "phrase": "Preglaucoma, unspecified, bilateral",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F43.25": [
+      {
+        "phrase": "Adjustment disorder with mixed disturbance of emotions and conduct",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C50.811": [
+      {
+        "phrase": "Malignant neoplasm of overlapping sites of right female breast",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N84.0": [
+      {
+        "phrase": "Polyp of Corpus Uteri",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R92.1": [
+      {
+        "phrase": "Mammographic calcification found on diagnostic imaging of the breast",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Mammographic calcification found on diagnostic imaging of the right breast",
+        "freq": 1,
+        "cdc_overlap": 0.857
+      }
+    ],
+    "E34.9": [
+      {
+        "phrase": "Endocrine Disorder, Unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M85.80": [
+      {
+        "phrase": "Other specified disorders of bone density and structure, unspecified site",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D23.5": [
+      {
+        "phrase": "Other benign neoplasm of skin of trunk",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R82.90": [
+      {
+        "phrase": "The patient presents with unspecified abnormal findings in urine",
+        "freq": 1,
+        "cdc_overlap": 0.6
+      }
+    ],
+    "Z74.09": [
+      {
+        "phrase": "Other Reduced Mobility",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other reduced mobility",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K76.9": [
+      {
+        "phrase": "Liver disease, unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Liver Disease, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K31.7": [
+      {
+        "phrase": "Polyp of Stomach and Duodenum",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J12.89": [
+      {
+        "phrase": "Other Viral Pneumonia",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D70.1": [
+      {
+        "phrase": "Agranulocytosis secondary to cancer chemotherapy",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S83.512A": [
+      {
+        "phrase": "Sprain of anterior cruciate ligament of left knee",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O99.214": [
+      {
+        "phrase": "Obesity complicating childbirth",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K76.6": [
+      {
+        "phrase": "Portal Hypertension",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C22.0": [
+      {
+        "phrase": "Liver Cell Carcinoma",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "G43.709": [
+      {
+        "phrase": "Chronic Migraine without Aura, Not Intractable, Without Status Migrainosus",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "G31.84": [
+      {
+        "phrase": "The patient is a 68-year-old male with a diagnosis of mild cognitive impairment",
+        "freq": 1,
+        "cdc_overlap": 0.375
+      }
+    ],
+    "H10.9": [
+      {
+        "phrase": "Unspecified Conjunctivitis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C50.112": [
+      {
+        "phrase": "Malignant neoplasm of the central portion of the left female breast",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Malignant neoplasm of central portion of left female breast",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R33.8": [
+      {
+        "phrase": "Other retention of urine",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z88.6": [
+      {
+        "phrase": "Allergy to analgesic agent",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K64.9": [
+      {
+        "phrase": "Unspecified Hemorrhoids",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M25.559": [
+      {
+        "phrase": "Pain in unspecified hip",
+        "freq": 5,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "L03.114": [
+      {
+        "phrase": "Cellulitis of the left upper limb",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M79.661": [
+      {
+        "phrase": "Pain in the right lower leg due to suspected deep vein thrombosis (DVT)",
+        "freq": 1,
+        "cdc_overlap": 0.444
+      }
+    ],
+    "Z87.19": [
+      {
+        "phrase": "Personal history of other diseases of the digestive system",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z86.19": [
+      {
+        "phrase": "Personal history of other infectious and parasitic diseases",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z31.41": [
+      {
+        "phrase": "Encounter for Fertility Testing",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M25.461": [
+      {
+        "phrase": "Effusion, Right Knee",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K25.9": [
+      {
+        "phrase": "Gastric ulcer unspecified as acute or chronic, without hemorrhage or perforation",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I20.9": [
+      {
+        "phrase": "Angina Pectoris, unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Angina Pectoris",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "H69.83": [
+      {
+        "phrase": "Other specified disorders of Eustachian tube, bilateral",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R25.2": [
+      {
+        "phrase": "Cramp and Spasm",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Muscle cramp and spasm",
+        "freq": 1,
+        "cdc_overlap": 0.667
+      }
+    ],
+    "M20.41": [
+      {
+        "phrase": "Acquired hammer toe deformity in the right foot",
+        "freq": 1,
+        "cdc_overlap": 0.833
+      },
+      {
+        "phrase": "Other hammer toe(s) (acquired), right foot",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z85.038": [
+      {
+        "phrase": "Personal history of other malignant neoplasm of large intestine",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "The patient has a personal history of other malignant neoplasms of the large intestine",
+        "freq": 1,
+        "cdc_overlap": 0.625
+      }
+    ],
+    "K92.0": [
+      {
+        "phrase": "Hematemesis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K72.00": [
+      {
+        "phrase": "Acute and Subacute Hepatic Failure Without Coma",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "B07.0": [
+      {
+        "phrase": "Plantar Wart",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Plantar wart",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M89.9": [
+      {
+        "phrase": "Disorder of Bone, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F25.9": [
+      {
+        "phrase": "Schizoaffective disorder, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z3A.37": [
+      {
+        "phrase": "weeks gestation of pregnancy",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D05.12": [
+      {
+        "phrase": "year-old female with intraductal carcinoma in situ",
+        "freq": 1,
+        "cdc_overlap": 0.5
+      },
+      {
+        "phrase": "Invasive Ductal Carcinoma of the Right Breast",
+        "freq": 1,
+        "cdc_overlap": 0.4
+      },
+      {
+        "phrase": "Intraductal carcinoma in situ",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K62.1": [
+      {
+        "phrase": "Rectal Polyp",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K82.8": [
+      {
+        "phrase": "Other specified diseases of the gallbladder",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other specified diseases of gallbladder",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z21": [
+      {
+        "phrase": "Symptomatic Human Immunodeficiency Virus (HIV) infection",
+        "freq": 1,
+        "cdc_overlap": 0.833
+      },
+      {
+        "phrase": "Asymptomatic Human Immunodeficiency Virus (HIV) Infection Status",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D53.9": [
+      {
+        "phrase": "Nutritional anemia, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Nutritional Anemia, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R63.0": [
+      {
+        "phrase": "Anorexia Nervosa",
+        "freq": 2,
+        "cdc_overlap": 0.5
+      },
+      {
+        "phrase": "Anorexia",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D35.2": [
+      {
+        "phrase": "Benign Neoplasm of Pituitary Gland",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R57.0": [
+      {
+        "phrase": "Cardiogenic shock",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z91.018": [
+      {
+        "phrase": "Allergy to other foods",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Allergy to Other Foods",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O77.0": [
+      {
+        "phrase": "Labor and delivery complicated by meconium in amniotic fluid",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I44.7": [
+      {
+        "phrase": "Left bundle-branch block, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Shows Left Bundle-Branch Block, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 0.8
+      },
+      {
+        "phrase": "Left Bundle-Branch Block, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Left Bundle-Branch Block, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S02.2XXA": [
+      {
+        "phrase": "Fracture of nasal bones, initial encounter for closed fracture",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M75.01": [
+      {
+        "phrase": "Adhesive Capsulitis of the Right Shoulder",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Osteoarthritis of Right Knee",
+        "freq": 1,
+        "cdc_overlap": 0.333
+      }
+    ],
+    "M51.27": [
+      {
+        "phrase": "Other Intervertebral Disc Displacement, Lumbosacral Region",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other intervertebral disc displacement, lumbosacral region",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S83.241A": [
+      {
+        "phrase": "Other tear of medial meniscus, current injury, right knee, initial encounter",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K01.1": [
+      {
+        "phrase": "Impacted teeth",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Impacted Teeth",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I82.409": [
+      {
+        "phrase": "Acute embolism and thrombosis of unspecified deep veins of unspecified lower extremity",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Acute embolism and thrombosis of unspecified deep veins of the right lower extremity",
+        "freq": 1,
+        "cdc_overlap": 0.875
+      }
+    ],
+    "M79.601": [
+      {
+        "phrase": "Pain in right arm",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Pain in the right arm",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "B18.1": [
+      {
+        "phrase": "Chronic Viral Hepatitis B without delta-agent",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "A04.72": [
+      {
+        "phrase": "Enterocolitis due to Clostridium difficile, not specified as recurrent",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Enterocolitis due to Clostridium difficile, Not Specified As Recurrent",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C79.89": [
+      {
+        "phrase": "Secondary malignant neoplasm of other specified sites",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M79.10": [
+      {
+        "phrase": "Myalgia, unspecified site",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E61.1": [
+      {
+        "phrase": "Iron Deficiency",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Iron deficiency anemia",
+        "freq": 1,
+        "cdc_overlap": 0.667
+      }
+    ],
+    "C78.01": [
+      {
+        "phrase": "Secondary malignant neoplasm of the right lung",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R59.1": [
+      {
+        "phrase": "Generalized enlarged lymph nodes",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Generalized Enlarged Lymph Nodes",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M19.072": [
+      {
+        "phrase": "Primary Osteoarthritis, Left Ankle and Foot",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "H66.001": [
+      {
+        "phrase": "Acute suppurative otitis media without spontaneous rupture of the ear drum, right ear",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M43.6": [
+      {
+        "phrase": "Torticollis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J35.3": [
+      {
+        "phrase": "Hypertrophy of Tonsils with Hypertrophy of Adenoids",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Hypertrophy of tonsils with hypertrophy of adenoids",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I67.89": [
+      {
+        "phrase": "Other Cerebrovascular Disease",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E11.49": [
+      {
+        "phrase": "Type 2 Diabetes Mellitus with other diabetic neurological complications",
+        "freq": 1,
+        "cdc_overlap": 0.833
+      }
+    ],
+    "I34.1": [
+      {
+        "phrase": "Nonrheumatic Mitral Valve Prolapse",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J34.3": [
+      {
+        "phrase": "Hypertrophy of Nasal Turbinates",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I67.1": [
+      {
+        "phrase": "Nonruptured cerebral aneurysm",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K80.12": [
+      {
+        "phrase": "Calculus of gallbladder with acute and chronic cholecystitis without obstruction",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z32.00": [
+      {
+        "phrase": "Encounter for pregnancy test, result unknown",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R25.1": [
+      {
+        "phrase": "Tremor, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Tremor, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R27.0": [
+      {
+        "phrase": "Ataxia, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J81.1": [
+      {
+        "phrase": "Chronic Pulmonary Edema",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M79.644": [
+      {
+        "phrase": "Pain in right fingers",
+        "freq": 1,
+        "cdc_overlap": 0.667
+      },
+      {
+        "phrase": "Pain in right finger(s)",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C64.2": [
+      {
+        "phrase": "Malignant neoplasm of the left kidney, except renal pelvis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C43.9": [
+      {
+        "phrase": "Malignant melanoma of the skin, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C44.519": [
+      {
+        "phrase": "Basal Cell Carcinoma of the skin of the right flank",
+        "freq": 1,
+        "cdc_overlap": 0.667
+      }
+    ],
+    "L84": [
+      {
+        "phrase": "Corns and Callosities",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N72": [
+      {
+        "phrase": "Inflammatory disease of the cervix uteri",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Inflammatory Disease of Cervix Uteri",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K90.0": [
+      {
+        "phrase": "Celiac Disease",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Crohn\u2019s Disease",
+        "freq": 1,
+        "cdc_overlap": 0.5
+      }
+    ],
+    "S72.001A": [
+      {
+        "phrase": "Fracture of unspecified part of neck of right femur, initial encounter for closed fracture",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C64.1": [
+      {
+        "phrase": "Malignant neoplasm of right kidney, except renal pelvis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Malignant neoplasm of the right kidney, except renal pelvis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I35.1": [
+      {
+        "phrase": "Nonrheumatic aortic valve insufficiency",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R47.1": [
+      {
+        "phrase": "Dysarthria and Anarthria",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C15.9": [
+      {
+        "phrase": "Malignant neoplasm of the esophagus, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S72.002A": [
+      {
+        "phrase": "Closed fracture of the right distal radius",
+        "freq": 1,
+        "cdc_overlap": 0.4
+      },
+      {
+        "phrase": "Fracture of unspecified part of neck of left femur, initial encounter for closed fracture",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z87.440": [
+      {
+        "phrase": "Personal history of urinary (tract) infections",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J32.4": [
+      {
+        "phrase": "Chronic pansinusitis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Chronic Pansinusitis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E16.2": [
+      {
+        "phrase": "Hypoglycemia, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K63.89": [
+      {
+        "phrase": "Other specified diseases of intestine",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other specified diseases of the intestine",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R19.4": [
+      {
+        "phrase": "Change in bowel habit",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Change in bowel habits",
+        "freq": 1,
+        "cdc_overlap": 0.667
+      },
+      {
+        "phrase": "Change in Bowel Habit",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R48.8": [
+      {
+        "phrase": "Other Symbolic Dysfunctions",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other symbolic dysfunctions",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E66.09": [
+      {
+        "phrase": "Other Obesity due to Excess Calories",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "The patient is diagnosed with other obesity due to excess calories",
+        "freq": 1,
+        "cdc_overlap": 0.6
+      },
+      {
+        "phrase": "Other obesity due to excess calories",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D12.4": [
+      {
+        "phrase": "Benign Neoplasm of Descending Colon",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "H40.053": [
+      {
+        "phrase": "Ocular Hypertension, Bilateral",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N83.8": [
+      {
+        "phrase": "Other noninflammatory disorders of ovary, fallopian tube, and broad ligament",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R29.810": [
+      {
+        "phrase": "Facial Weakness due to Guillain-Barr\u00e9 Syndrome",
+        "freq": 1,
+        "cdc_overlap": 0.4
+      },
+      {
+        "phrase": "Facial palsy, unspecified",
+        "freq": 1,
+        "cdc_overlap": 0.5
+      }
+    ],
+    "C50.212": [
+      {
+        "phrase": "Malignant Neoplasm of Upper-Inner Quadrant of Left Female Breast",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Malignant neoplasm of upper-inner quadrant of left female breast",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Diagnosis of malignant neoplasm of the upper-inner quadrant of the left female breast",
+        "freq": 1,
+        "cdc_overlap": 0.889
+      }
+    ],
+    "B96.89": [
+      {
+        "phrase": "Other specified bacterial agents as the cause of diseases classified elsewhere",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other Specified Bacterial Agents as the Cause of Diseases Classified Elsewhere",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J45.21": [
+      {
+        "phrase": "Mild Intermittent Asthma with Acute Exacerbation",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Mild Intermittent Asthma with (Acute) Exacerbation",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z79.02": [
+      {
+        "phrase": "Long-term use of antithrombotics/antiplatelets",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M25.462": [
+      {
+        "phrase": "Effusion, left knee",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "T81.89XA": [
+      {
+        "phrase": "Other complications of procedures, not elsewhere classified, initial encounter",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N39.46": [
+      {
+        "phrase": "Mixed Incontinence",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z11.52": [
+      {
+        "phrase": "Encounter for screening for COVID-19",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C15.5": [
+      {
+        "phrase": "Malignant neoplasm of lower third of esophagus",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K70.30": [
+      {
+        "phrase": "Alcoholic cirrhosis of liver without ascites",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F20.0": [
+      {
+        "phrase": "Paranoid Schizophrenia",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R35.1": [
+      {
+        "phrase": "Nocturia",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S52.502A": [
+      {
+        "phrase": "Unspecified fracture of the lower end of the left radius",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "L89.154": [
+      {
+        "phrase": "Diabetic foot ulcer",
+        "freq": 1,
+        "cdc_overlap": 0.333
+      }
+    ],
+    "C34.92": [
+      {
+        "phrase": "Malignant neoplasm of unspecified part of the left bronchus or lung",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I16.1": [
+      {
+        "phrase": "Hypertensive emergency",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Hypertensive Emergency",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I49.8": [
+      {
+        "phrase": "Other specified cardiac arrhythmias",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D68.59": [
+      {
+        "phrase": "Other primary thrombophilia",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other Primary Thrombophilia",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z92.3": [
+      {
+        "phrase": "History of irradiation",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Personal history of irradiation",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R06.89": [
+      {
+        "phrase": "Other abnormalities of breathing",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F33.3": [
+      {
+        "phrase": "Major Depressive Disorder, Recurrent, Severe with Psychotic Symptoms",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O36.5930": [
+      {
+        "phrase": "Maternal care for other known or suspected poor fetal growth, third trimester",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J02.8": [
+      {
+        "phrase": "Acute pharyngitis due to other specified organisms",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Acute Pharyngitis due to other specified organisms",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C50.512": [
+      {
+        "phrase": "Malignant neoplasm of lower-outer quadrant of left female breast",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z79.52": [
+      {
+        "phrase": "Long-term (current) use of systemic steroids",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Long term (current) use of systemic steroids",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M35.9": [
+      {
+        "phrase": "Systemic involvement of connective tissue, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "The patient presents with systemic involvement of connective tissue",
+        "freq": 1,
+        "cdc_overlap": 0.667
+      },
+      {
+        "phrase": "Systemic involvement of connective tissue",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C19": [
+      {
+        "phrase": "Malignant Neoplasm of Rectosigmoid Junction",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Malignant neoplasm of rectosigmoid junction",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M79.662": [
+      {
+        "phrase": "Pain in left lower leg",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "A69.20": [
+      {
+        "phrase": "Lyme Disease, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Lyme Disease",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "G82.20": [
+      {
+        "phrase": "Paraplegia, unspecified",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I20.0": [
+      {
+        "phrase": "Unstable Angina",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J30.81": [
+      {
+        "phrase": "Allergic Rhinitis due to Animal (Cat, Dog) Hair and Dander",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J80": [
+      {
+        "phrase": "Acute Respiratory Distress Syndrome (ARDS)",
+        "freq": 1,
+        "cdc_overlap": 0.8
+      }
+    ],
+    "K81.0": [
+      {
+        "phrase": "Acute diverticulitis",
+        "freq": 1,
+        "cdc_overlap": 0.5
+      }
+    ],
+    "K81.1": [
+      {
+        "phrase": "Chronic Cholecystitis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E11.59": [
+      {
+        "phrase": "Type 2 Diabetes Mellitus with other circulatory complications",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S22.42XA": [
+      {
+        "phrase": "Multiple fractures of ribs, left side, initial encounter for closed fracture",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F90.1": [
+      {
+        "phrase": "Attention-Deficit/Hyperactivity Disorder, Predominantly Hyperactive Type",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O99.02": [
+      {
+        "phrase": "Anemia complicating childbirth",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D51.9": [
+      {
+        "phrase": "Vitamin B12 Deficiency Anemia, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M16.0": [
+      {
+        "phrase": "Bilateral Primary Osteoarthritis of Hip",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M75.122": [
+      {
+        "phrase": "Complete rotator cuff tear or rupture of the left shoulder, not specified as traumatic",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K40.20": [
+      {
+        "phrase": "Bilateral inguinal hernia",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D57.00": [
+      {
+        "phrase": "HB-SS Disease with Crisis, Unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N13.6": [
+      {
+        "phrase": "Pyonephrosis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F12.10": [
+      {
+        "phrase": "Cannabis abuse, uncomplicated",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J96.20": [
+      {
+        "phrase": "Acute and chronic respiratory failure, unspecified whether with hypoxia or hypercapnia",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E21.3": [
+      {
+        "phrase": "Hyperparathyroidism, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K59.09": [
+      {
+        "phrase": "Other Constipation",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other constipation",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R94.39": [
+      {
+        "phrase": "Abnormal result of other cardiovascular function study",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K72.90": [
+      {
+        "phrase": "Hepatic Failure, Unspecified Without Coma",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O26.891": [
+      {
+        "phrase": "Other specified pregnancy-related conditions, first trimester",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other Specified Pregnancy Related Conditions, First Trimester",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K04.7": [
+      {
+        "phrase": "Periapical abscess without sinus",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Periapical Abscess Without Sinus",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M47.12": [
+      {
+        "phrase": "Other Spondylosis with Myelopathy, Cervical Region",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other spondylosis with myelopathy, cervical region",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J45.41": [
+      {
+        "phrase": "Moderate persistent asthma with acute exacerbation",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D69.59": [
+      {
+        "phrase": "Other secondary thrombocytopenia",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O09.521": [
+      {
+        "phrase": "Supervision of elderly multigravida, first trimester",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I45.10": [
+      {
+        "phrase": "Unspecified Right Bundle-Branch Block",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Unspecified right bundle-branch block",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "The patient presents with an unspecified right bundle-branch block",
+        "freq": 1,
+        "cdc_overlap": 0.667
+      }
+    ],
+    "R49.0": [
+      {
+        "phrase": "Dysphonia",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M75.111": [
+      {
+        "phrase": "Incomplete rotator cuff tear or rupture of the right shoulder",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K43.9": [
+      {
+        "phrase": "Ventral hernia without obstruction or gangrene",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K50.80": [
+      {
+        "phrase": "Crohn's disease of both small and large intestine without complications",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R61": [
+      {
+        "phrase": "Generalized Hyperhidrosis",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "G51.0": [
+      {
+        "phrase": "Bell's Palsy",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F17.290": [
+      {
+        "phrase": "Nicotine dependence, other tobacco product, uncomplicated",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K86.1": [
+      {
+        "phrase": "Chronic Pancreatitis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other Chronic Pancreatitis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R06.83": [
+      {
+        "phrase": "Snoring",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C43.59": [
+      {
+        "phrase": "Malignant melanoma of other part of trunk",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C01": [
+      {
+        "phrase": "Malignant neoplasm of the base of the tongue",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Malignant neoplasm of the base of tongue",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "G93.49": [
+      {
+        "phrase": "Other Encephalopathy",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C78.02": [
+      {
+        "phrase": "Secondary malignant neoplasm of the left lung",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "G47.31": [
+      {
+        "phrase": "Primary Central Sleep Apnea",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z68.35": [
+      {
+        "phrase": "BODY MASS INDEX [BMI] 35.0-35.9, ADULT",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Obesity, BMI 35.0-35.9, Adult",
+        "freq": 1,
+        "cdc_overlap": 0.667
+      }
+    ],
+    "M43.17": [
+      {
+        "phrase": "Spondylolisthesis, lumbosacral region",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C16.9": [
+      {
+        "phrase": "Malignant neoplasm of stomach, unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Malignant Neoplasm of Stomach, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Malignant neoplasm of the stomach, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z94.1": [
+      {
+        "phrase": "Heart transplant status",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R41.89": [
+      {
+        "phrase": "Other symptoms and signs involving cognitive functions and awareness",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other Symptoms and Signs Involving Cognitive Functions and Awareness",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F14.20": [
+      {
+        "phrase": "Cocaine dependence, uncomplicated",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "T14.8XXA": [
+      {
+        "phrase": "Other Injury of Unspecified Body Region",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K74.69": [
+      {
+        "phrase": "Other cirrhosis of liver",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other Cirrhosis of Liver",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "L73.2": [
+      {
+        "phrase": "Hidradenitis Suppurativa",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F60.3": [
+      {
+        "phrase": "Borderline Personality Disorder",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K83.8": [
+      {
+        "phrase": "Other specified diseases of biliary tract",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F80.9": [
+      {
+        "phrase": "Developmental disorder of speech and language, unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z85.51": [
+      {
+        "phrase": "Personal history of malignant neoplasm of the bladder",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I48.3": [
+      {
+        "phrase": "Typical Atrial Flutter",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I73.00": [
+      {
+        "phrase": "Raynaud's syndrome without gangrene",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C44.42": [
+      {
+        "phrase": "Squamous Cell Carcinoma of Skin of Scalp and Neck",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "G93.5": [
+      {
+        "phrase": "Compression of Brain",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Compression of the Brain",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N45.1": [
+      {
+        "phrase": "Epididymitis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D64.81": [
+      {
+        "phrase": "Anemia due to antineoplastic chemotherapy",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S00.03XA": [
+      {
+        "phrase": "Contusion of scalp",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I70.0": [
+      {
+        "phrase": "Atherosclerosis of Aorta",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C50.511": [
+      {
+        "phrase": "Malignant neoplasm of the lower-outer quadrant of the right breast",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Malignant neoplasm of the lower-outer quadrant of the right female breast",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M79.609": [
+      {
+        "phrase": "Pain in unspecified limb",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E83.110": [
+      {
+        "phrase": "Hereditary Hemochromatosis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M25.579": [
+      {
+        "phrase": "Pain in unspecified ankle and joints of unspecified foot",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "H26.491": [
+      {
+        "phrase": "Other Secondary Cataract, Right Eye",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M25.611": [
+      {
+        "phrase": "Stiffness of right shoulder, not elsewhere classified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D68.51": [
+      {
+        "phrase": "Activated Protein C Resistance",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K31.9": [
+      {
+        "phrase": "Disease of stomach and duodenum, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R54": [
+      {
+        "phrase": "Age-related physical debility",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F40.10": [
+      {
+        "phrase": "Social Phobia, Unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F11.23": [
+      {
+        "phrase": "Opioid dependence with withdrawal",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R30.9": [
+      {
+        "phrase": "Painful micturition, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I25.9": [
+      {
+        "phrase": "Mr. Robert Anderson is a 62-year-old male with chronic ischemic heart disease",
+        "freq": 1,
+        "cdc_overlap": 0.444
+      },
+      {
+        "phrase": "Chronic Ischemic Heart Disease, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "P22.0": [
+      {
+        "phrase": "Respiratory Distress Syndrome of Newborn",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R12": [
+      {
+        "phrase": "Heartburn",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O32.1XX0": [
+      {
+        "phrase": "Maternal care for breech presentation, not applicable or unspecified",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Maternal care for breech presentation, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "L91.0": [
+      {
+        "phrase": "Hypertrophic scar",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Hypertrophic Scar",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F32.89": [
+      {
+        "phrase": "Other Specified Depressive Episodes",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "The patient presents with symptoms consistent with Other Specified Depressive Episodes",
+        "freq": 1,
+        "cdc_overlap": 0.429
+      }
+    ],
+    "M54.89": [
+      {
+        "phrase": "Other dorsalgia",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "The patient is diagnosed with other dorsalgia",
+        "freq": 1,
+        "cdc_overlap": 0.333
+      },
+      {
+        "phrase": "Other Dorsalgia",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C50.111": [
+      {
+        "phrase": "Malignant neoplasm of the central portion of the right female breast",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "L40.59": [
+      {
+        "phrase": "Other Psoriatic Arthropathy",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D64.89": [
+      {
+        "phrase": "Other Specified Anemias",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other specified anemias",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "G40.89": [
+      {
+        "phrase": "Other Seizures",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other seizures",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "H35.372": [
+      {
+        "phrase": "Puckering of macula, left eye",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I96": [
+      {
+        "phrase": "Gangrene, not elsewhere classified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Gangrene, Not Elsewhere Classified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C79.9": [
+      {
+        "phrase": "Secondary malignant neoplasm of unspecified site",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N95.2": [
+      {
+        "phrase": "Postmenopausal Atrophic Vaginitis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z3A.36": [
+      {
+        "phrase": "weeks gestation with severe preeclampsia",
+        "freq": 1,
+        "cdc_overlap": 0.5
+      }
+    ],
+    "I61.9": [
+      {
+        "phrase": "Nontraumatic Intracerebral Hemorrhage, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Nontraumatic intracerebral hemorrhage, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R20.9": [
+      {
+        "phrase": "Unspecified disturbances of skin sensation",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "L71.8": [
+      {
+        "phrase": "Other Rosacea",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "L91.8": [
+      {
+        "phrase": "Other hypertrophic disorders of the skin",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other Hypertrophic Disorders of the Skin",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R22.2": [
+      {
+        "phrase": "Localized swelling, mass, and lump, trunk",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Localized Swelling, Mass, and Lump, Trunk",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N85.8": [
+      {
+        "phrase": "Other specified noninflammatory disorders of uterus",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other specified noninflammatory disorders of the uterus",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O34.219": [
+      {
+        "phrase": "Maternal care for unspecified type scar from previous cesarean delivery",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J98.8": [
+      {
+        "phrase": "Other specified respiratory disorders",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other Specified Respiratory Disorders",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D25.0": [
+      {
+        "phrase": "Submucous Leiomyoma of the Uterus",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Submucous leiomyoma of uterus",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C56.2": [
+      {
+        "phrase": "Malignant neoplasm of left ovary",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Malignant neoplasm of the left ovary",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "L03.031": [
+      {
+        "phrase": "Cellulitis of Right Toe",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K30": [
+      {
+        "phrase": "Functional Dyspepsia",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M79.18": [
+      {
+        "phrase": "Myalgia, other site",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D84.9": [
+      {
+        "phrase": "Immunodeficiency, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M75.81": [
+      {
+        "phrase": "Other shoulder lesions, right shoulder",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Anterior shoulder dislocation, right shoulder",
+        "freq": 1,
+        "cdc_overlap": 0.5
+      }
+    ],
+    "K85.10": [
+      {
+        "phrase": "Biliary Acute Pancreatitis without Necrosis or Infection",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "B00.9": [
+      {
+        "phrase": "Herpesviral infection, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F80.1": [
+      {
+        "phrase": "Expressive Language Disorder",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z48.22": [
+      {
+        "phrase": "Encounter for aftercare following kidney transplant",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "T78.3XXA": [
+      {
+        "phrase": "Angioneurotic Edema",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F91.3": [
+      {
+        "phrase": "Oppositional Defiant Disorder",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z78.9": [
+      {
+        "phrase": "Other Specified Health Status",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "L03.311": [
+      {
+        "phrase": "The patient is diagnosed with cellulitis of the abdominal wall",
+        "freq": 1,
+        "cdc_overlap": 0.6
+      }
+    ],
+    "L02.31": [
+      {
+        "phrase": "Cutaneous Abscess of Buttock",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I60.9": [
+      {
+        "phrase": "Nontraumatic Subarachnoid Hemorrhage, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Nontraumatic subarachnoid hemorrhage, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O20.9": [
+      {
+        "phrase": "Hemorrhage in Early Pregnancy, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Hemorrhage in early pregnancy, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z04.3": [
+      {
+        "phrase": "Encounter for examination and observation following other accident",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K43.0": [
+      {
+        "phrase": "Incisional hernia with obstruction, without gangrene",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F01.50": [
+      {
+        "phrase": "Vascular dementia without behavioral disturbance",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I44.1": [
+      {
+        "phrase": "Atrioventricular Block, Second Degree",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J96.91": [
+      {
+        "phrase": "Respiratory failure, unspecified with hypoxia",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J35.01": [
+      {
+        "phrase": "Chronic Tonsillitis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "G50.0": [
+      {
+        "phrase": "Trigeminal Neuralgia",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I08.1": [
+      {
+        "phrase": "Rheumatic disorders of both mitral and tricuspid valves",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "H53.2": [
+      {
+        "phrase": "Diplopia",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O13.4": [
+      {
+        "phrase": "Gestational (Pregnancy-induced) Hypertension complicating childbirth",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "H35.371": [
+      {
+        "phrase": "Puckering of macula, right eye",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "G25.0": [
+      {
+        "phrase": "Essential Tremor",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E13.9": [
+      {
+        "phrase": "Other specified diabetes mellitus without complications",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R19.00": [
+      {
+        "phrase": "Intra-abdominal and pelvic swelling, mass, and lump, unspecified site",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S69.92XA": [
+      {
+        "phrase": "Unspecified injury of left wrist, hand, and finger(s)",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Unspecified injury of the left wrist, hand, and finger(s), initial encounter",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O99.284": [
+      {
+        "phrase": "Endocrine, Nutritional and Metabolic Diseases Complicating Childbirth",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "G70.00": [
+      {
+        "phrase": "Myasthenia Gravis without (acute) exacerbation",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "G93.1": [
+      {
+        "phrase": "Anoxic Brain Damage, Not Elsewhere Classified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N32.89": [
+      {
+        "phrase": "Other specified disorders of bladder",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other Specified Disorders of Bladder",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R62.0": [
+      {
+        "phrase": "Delayed Milestone in Childhood",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Delayed milestone in childhood",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z90.13": [
+      {
+        "phrase": "Acquired absence of bilateral breasts and nipples",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D57.1": [
+      {
+        "phrase": "Sickle-cell disease without crisis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M13.0": [
+      {
+        "phrase": "Polyarthritis, unspecified",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z94.84": [
+      {
+        "phrase": "Stem cells transplant status",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I49.1": [
+      {
+        "phrase": "Atrial Premature Depolarization",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C18.0": [
+      {
+        "phrase": "Malignant Neoplasm of Cecum",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Malignant Neoplasm of Cecum, Stage IV with liver metastasis",
+        "freq": 1,
+        "cdc_overlap": 0.5
+      }
+    ],
+    "M12.9": [
+      {
+        "phrase": "Arthropathy, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J45.998": [
+      {
+        "phrase": "Other Asthma",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other asthma",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K29.60": [
+      {
+        "phrase": "Other gastritis without bleeding",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z98.61": [
+      {
+        "phrase": "Coronary Angioplasty Status",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Coronary angioplasty status",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z93.0": [
+      {
+        "phrase": "Tracheostomy Status",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I48.21": [
+      {
+        "phrase": "Permanent Atrial Fibrillation",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S23.3XXA": [
+      {
+        "phrase": "Sprain of ligaments of thoracic spine",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N43.3": [
+      {
+        "phrase": "Hydrocele, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z68.31": [
+      {
+        "phrase": "Obesity, BMI 31.0-31.9",
+        "freq": 1,
+        "cdc_overlap": 0.5
+      }
+    ],
+    "L73.9": [
+      {
+        "phrase": "Follicular disorder, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M99.00": [
+      {
+        "phrase": "Segmental and Somatic Dysfunction of Head Region",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S01.511A": [
+      {
+        "phrase": "Laceration without foreign body of the lower lip",
+        "freq": 1,
+        "cdc_overlap": 0.833
+      }
+    ],
+    "D45": [
+      {
+        "phrase": "Polycythemia Vera",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "The patient has been diagnosed with Polycythemia Vera",
+        "freq": 1,
+        "cdc_overlap": 0.333
+      }
+    ],
+    "S19.9XXA": [
+      {
+        "phrase": "Unspecified Injury of Neck",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Unspecified injury of neck",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C77.2": [
+      {
+        "phrase": "Secondary and unspecified malignant neoplasm of intra-abdominal lymph nodes",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "B35.3": [
+      {
+        "phrase": "Tinea Pedis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "G47.9": [
+      {
+        "phrase": "Sleep Disorder, Unspecified",
+        "freq": 4,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z3A.01": [
+      {
+        "phrase": "Less than 8 weeks gestation of pregnancy",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C49.9": [
+      {
+        "phrase": "Malignant neoplasm of connective and soft tissue, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K86.2": [
+      {
+        "phrase": "Cyst of Pancreas",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C53.9": [
+      {
+        "phrase": "Malignant neoplasm of cervix uteri, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E21.0": [
+      {
+        "phrase": "Primary Hyperparathyroidism",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z96.653": [
+      {
+        "phrase": "Presence of Artificial Knee Joint, Bilateral",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Presence of artificial knee joint, bilateral",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z86.16": [
+      {
+        "phrase": "Personal History of COVID-19",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I65.29": [
+      {
+        "phrase": "Occlusion and stenosis of unspecified carotid artery",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J91.0": [
+      {
+        "phrase": "Malignant Pleural Effusion",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M79.645": [
+      {
+        "phrase": "Unspecified pain in left finger(s)",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Pain in left finger(s)",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Q23.1": [
+      {
+        "phrase": "Congenital insufficiency of the aortic valve",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Congenital Insufficiency of Aortic Valve",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R40.4": [
+      {
+        "phrase": "Transient alteration of awareness",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K51.00": [
+      {
+        "phrase": "Ulcerative (chronic) pancolitis without complications",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N92.5": [
+      {
+        "phrase": "Other specified irregular menstruation",
+        "freq": 4,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other Specified Irregular Menstruation",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F11.10": [
+      {
+        "phrase": "Opioid Abuse",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S29.9XXA": [
+      {
+        "phrase": "Unspecified injury of thorax",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S22.41XA": [
+      {
+        "phrase": "Multiple fractures of ribs, right side, initial encounter for closed fracture",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O99.344": [
+      {
+        "phrase": "Other mental disorders complicating childbirth",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other Mental Disorders Complicating Childbirth",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M79.674": [
+      {
+        "phrase": "Pain in right toe(s)",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Pain in right toe",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N60.11": [
+      {
+        "phrase": "Diffuse Cystic Mastopathy of the Right Breast",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C09.9": [
+      {
+        "phrase": "Malignant neoplasm of tonsil, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z91.040": [
+      {
+        "phrase": "Latex Allergy",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "H61.21": [
+      {
+        "phrase": "Impacted Cerumen",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K52.89": [
+      {
+        "phrase": "Other specified noninfective gastroenteritis and colitis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K42.0": [
+      {
+        "phrase": "Umbilical hernia with obstruction, without gangrene",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O09.522": [
+      {
+        "phrase": "Supervision of elderly multigravida, second trimester",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F42.9": [
+      {
+        "phrase": "Obsessive-Compulsive Disorder, Unspecified",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Ms. Emily Harris is diagnosed with Obsessive-Compulsive Disorder (OCD), unspecified",
+        "freq": 1,
+        "cdc_overlap": 0.429
+      }
+    ],
+    "Z46.6": [
+      {
+        "phrase": "Encounter for fitting and adjustment of urinary device",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D23.9": [
+      {
+        "phrase": "Other benign neoplasm of skin, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M62.50": [
+      {
+        "phrase": "Muscle wasting and atrophy, not elsewhere classified, unspecified site",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M75.51": [
+      {
+        "phrase": "Bursitis of the right shoulder",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E11.10": [
+      {
+        "phrase": "Type 2 Diabetes Mellitus with Ketoacidosis without Coma",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E66.2": [
+      {
+        "phrase": "Morbid (Severe) Obesity with Alveolar Hypoventilation",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J01.40": [
+      {
+        "phrase": "Acute Pansinusitis, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z68.33": [
+      {
+        "phrase": "Body Mass Index [BMI] 33.0-33.9, adult",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z33.2": [
+      {
+        "phrase": "Encounter for elective termination of pregnancy",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K59.01": [
+      {
+        "phrase": "Slow Transit Constipation",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "H65.23": [
+      {
+        "phrase": "Chronic serous otitis media, bilateral",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M54.10": [
+      {
+        "phrase": "Radiculopathy, site unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D12.6": [
+      {
+        "phrase": "Benign neoplasm of colon, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R93.3": [
+      {
+        "phrase": "Abnormal findings on diagnostic imaging of other parts of the digestive tract",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I62.00": [
+      {
+        "phrase": "Nontraumatic subdural hemorrhage, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R19.8": [
+      {
+        "phrase": "Other Specified Symptoms and Signs Involving the Digestive System and Abdomen",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S80.01XA": [
+      {
+        "phrase": "Contusion of right knee",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C18.4": [
+      {
+        "phrase": "Malignant Neoplasm of Transverse Colon",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K86.89": [
+      {
+        "phrase": "Other Specified Diseases of Pancreas",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F42.2": [
+      {
+        "phrase": "Mixed Obsessional Thoughts and Acts",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S43.431A": [
+      {
+        "phrase": "Superior glenoid labrum lesion of the right shoulder, initial encounter",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N47.1": [
+      {
+        "phrase": "Phimosis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "L97.529": [
+      {
+        "phrase": "Non-pressure chronic ulcer of other part of left foot with unspecified severity",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O09.893": [
+      {
+        "phrase": "High-risk pregnancy, third trimester",
+        "freq": 1,
+        "cdc_overlap": 0.8
+      }
+    ],
+    "I69.398": [
+      {
+        "phrase": "Other sequelae of cerebral infarction",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other Sequelae of Cerebral Infarction",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C50.311": [
+      {
+        "phrase": "Malignant neoplasm of the lower-inner quadrant of the right female breast",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E11.622": [
+      {
+        "phrase": "Type 2 Diabetes Mellitus with Other Skin Ulcer",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Type 2 Diabetes Mellitus with complication of skin ulcer",
+        "freq": 1,
+        "cdc_overlap": 0.833
+      }
+    ],
+    "S61.412A": [
+      {
+        "phrase": "Laceration without foreign body of left hand",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J32.8": [
+      {
+        "phrase": "Other Chronic Sinusitis",
+        "freq": 4,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K61.1": [
+      {
+        "phrase": "Rectal Abscess",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R07.1": [
+      {
+        "phrase": "Chest pain on breathing",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "B08.1": [
+      {
+        "phrase": "Molluscum Contagiosum",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D63.0": [
+      {
+        "phrase": "Anemia in Neoplastic Disease",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z87.898": [
+      {
+        "phrase": "Personal history of other specified conditions",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Personal History of Other Specified Conditions",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R29.818": [
+      {
+        "phrase": "Other symptoms and signs involving the nervous system",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C67.2": [
+      {
+        "phrase": "Malignant neoplasm of the lateral wall of the bladder",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R57.8": [
+      {
+        "phrase": "Other Shock",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M50.322": [
+      {
+        "phrase": "Other cervical disc degeneration at C5-C6 level",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I27.0": [
+      {
+        "phrase": "Primary Pulmonary Hypertension",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M79.606": [
+      {
+        "phrase": "Pain in leg, unspecified",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N19": [
+      {
+        "phrase": "The patient is diagnosed with unspecified kidney failure",
+        "freq": 1,
+        "cdc_overlap": 0.5
+      }
+    ],
+    "D51.8": [
+      {
+        "phrase": "Other vitamin B12 deficiency anemias",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D89.9": [
+      {
+        "phrase": "Disorder involving the immune mechanism, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "G93.2": [
+      {
+        "phrase": "Benign Intracranial Hypertension",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N13.5": [
+      {
+        "phrase": "Crossing vessel and stricture of ureter without hydronephrosis",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F17.220": [
+      {
+        "phrase": "Nicotine dependence, chewing tobacco, uncomplicated",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Nicotine Dependence, Chewing Tobacco, Uncomplicated",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O21.9": [
+      {
+        "phrase": "Vomiting of pregnancy, unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Vomiting of Pregnancy, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N13.1": [
+      {
+        "phrase": "Hydronephrosis with ureteral stricture, not elsewhere classified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D24.2": [
+      {
+        "phrase": "Benign neoplasm of the left breast",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C76.0": [
+      {
+        "phrase": "Malignant neoplasm of head, face, and neck",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z86.39": [
+      {
+        "phrase": "Personal history of other endocrine, nutritional, and metabolic disease",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O36.63X0": [
+      {
+        "phrase": "Maternal care for excessive fetal growth, third trimester",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M25.662": [
+      {
+        "phrase": "Stiffness of left knee, not elsewhere classified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Stiffness of Left Knee, not elsewhere classified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "L97.519": [
+      {
+        "phrase": "Non-pressure chronic ulcer of other part of right foot, with unspecified severity",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "A63.0": [
+      {
+        "phrase": "Anogenital (Venereal) Warts",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O09.93": [
+      {
+        "phrase": "Supervision of high-risk pregnancy, unspecified, third trimester",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D12.8": [
+      {
+        "phrase": "Benign neoplasm of rectum",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Benign Neoplasm of Rectum",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "H43.811": [
+      {
+        "phrase": "Vitreous Degeneration, Right Eye",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N63.20": [
+      {
+        "phrase": "Unspecified lump in the left breast, unspecified quadrant",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O41.03X0": [
+      {
+        "phrase": "Polyhydramnios, Third Trimester",
+        "freq": 1,
+        "cdc_overlap": 0.667
+      }
+    ],
+    "Z31.83": [
+      {
+        "phrase": "Encounter for assisted reproductive fertility procedure cycle",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R13.19": [
+      {
+        "phrase": "Other Dysphagia",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other dysphagia",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S89.92XA": [
+      {
+        "phrase": "Unspecified injury of the left lower leg",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z68.37": [
+      {
+        "phrase": "Adult obesity",
+        "freq": 1,
+        "cdc_overlap": 0.5
+      }
+    ],
+    "M32.10": [
+      {
+        "phrase": "Systemic Lupus Erythematosus",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O72.1": [
+      {
+        "phrase": "Other immediate postpartum hemorrhage",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other Immediate Postpartum Hemorrhage",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I69.391": [
+      {
+        "phrase": "Dysphagia following cerebral infarction",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S80.02XA": [
+      {
+        "phrase": "Contusion of left knee",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C77.9": [
+      {
+        "phrase": "Secondary and unspecified malignant neoplasm of lymph node, unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I25.82": [
+      {
+        "phrase": "Chronic Total Occlusion of Coronary Artery",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C16.0": [
+      {
+        "phrase": "Malignant Neoplasm of Cardia",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D22.39": [
+      {
+        "phrase": "Melanocytic nevi of other parts of face",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J86.9": [
+      {
+        "phrase": "Pyothorax without fistula",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M62.89": [
+      {
+        "phrase": "Other specified disorders of muscle",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R13.14": [
+      {
+        "phrase": "The patient is diagnosed with dysphagia, pharyngoesophageal phase",
+        "freq": 1,
+        "cdc_overlap": 0.6
+      }
+    ],
+    "M81.8": [
+      {
+        "phrase": "Other osteoporosis without current pathological fracture",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D17.1": [
+      {
+        "phrase": "Benign lipomatous neoplasm of skin and subcutaneous tissue of trunk",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z93.6": [
+      {
+        "phrase": "Other artificial openings of urinary tract status",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N87.0": [
+      {
+        "phrase": "Mild cervical dysplasia",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N21.0": [
+      {
+        "phrase": "Calculus in bladder",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Calculus in Bladder",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I73.89": [
+      {
+        "phrase": "Other Specified Peripheral Vascular Diseases",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other specified peripheral vascular diseases",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z68.38": [
+      {
+        "phrase": "BMI 38.0-38.9, adult",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F43.9": [
+      {
+        "phrase": "Reaction to severe stress, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Reaction to Severe Stress, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S61.411A": [
+      {
+        "phrase": "Laceration without foreign body of right hand",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Laceration without foreign body of the right hand",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "L02.415": [
+      {
+        "phrase": "Cutaneous abscess of the right lower limb",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N81.10": [
+      {
+        "phrase": "Cystocele, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M86.8X7": [
+      {
+        "phrase": "Other Osteomyelitis, Ankle and Foot",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F10.229": [
+      {
+        "phrase": "Alcohol dependence with intoxication, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F31.2": [
+      {
+        "phrase": "Bipolar Disorder, Current Episode Manic Severe with Psychotic Features",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z90.5": [
+      {
+        "phrase": "Acquired absence of kidney",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "L98.8": [
+      {
+        "phrase": "Other specified disorders of the skin and subcutaneous tissue",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other Specified Disorders of the Skin and Subcutaneous Tissue",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M85.89": [
+      {
+        "phrase": "Other specified disorders of bone density and structure, multiple sites",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other Specified Disorders of Bone Density and Structure, Multiple Sites",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C83.38": [
+      {
+        "phrase": "Diffuse Large B-Cell Lymphoma, lymph nodes of multiple sites",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I24.9": [
+      {
+        "phrase": "Acute Ischemic Heart Disease, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S39.012D": [
+      {
+        "phrase": "Strain of muscle, fascia, and tendon of lower back, subsequent encounter",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M75.82": [
+      {
+        "phrase": "Other shoulder lesions, left shoulder",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S09.8XXA": [
+      {
+        "phrase": "Other Specified Injuries of Head, Initial Encounter",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "B35.4": [
+      {
+        "phrase": "Tinea Corporis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K43.6": [
+      {
+        "phrase": "Other and unspecified ventral hernia with obstruction, without gangrene",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "H26.493": [
+      {
+        "phrase": "Other secondary cataract, bilateral",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K26.4": [
+      {
+        "phrase": "Chronic or unspecified duodenal ulcer with hemorrhage",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N97.8": [
+      {
+        "phrase": "Female infertility of other origin",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R20.8": [
+      {
+        "phrase": "Other disturbances of skin sensation",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K63.1": [
+      {
+        "phrase": "Perforation of intestine (nontraumatic)",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "L72.8": [
+      {
+        "phrase": "Other follicular cysts of the skin and subcutaneous tissue",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Q21.0": [
+      {
+        "phrase": "Ventricular Septal Defect",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R76.11": [
+      {
+        "phrase": "Nonspecific reaction to tuberculin skin test without active tuberculosis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F32.A": [
+      {
+        "phrase": "Depression, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Depression, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J84.112": [
+      {
+        "phrase": "Idiopathic Pulmonary Fibrosis",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M75.22": [
+      {
+        "phrase": "Bicipital Tendinitis, Left Shoulder",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C55": [
+      {
+        "phrase": "Malignant Neoplasm of Uterus, Part Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S00.81XA": [
+      {
+        "phrase": "Abrasion of other part of head, initial encounter",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R23.8": [
+      {
+        "phrase": "Other skin changes",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other skin changes, likely tinea corporis",
+        "freq": 1,
+        "cdc_overlap": 0.4
+      }
+    ],
+    "N81.2": [
+      {
+        "phrase": "Incomplete Uterovaginal Prolapse",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M79.673": [
+      {
+        "phrase": "Pain in unspecified foot",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K22.10": [
+      {
+        "phrase": "Ulcer of esophagus without bleeding",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O30.043": [
+      {
+        "phrase": "Twin Pregnancy, Dichorionic/Diamniotic, Third Trimester",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z20.6": [
+      {
+        "phrase": "Contact with and (suspected) exposure to HIV",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K20.0": [
+      {
+        "phrase": "Eosinophilic Esophagitis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F14.10": [
+      {
+        "phrase": "Cocaine abuse, uncomplicated",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I83.813": [
+      {
+        "phrase": "Varicose veins of bilateral lower extremities with pain",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O42.02": [
+      {
+        "phrase": "Full-term premature rupture of membranes with onset of labor within 24 hours of rupture",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "H43.812": [
+      {
+        "phrase": "Vitreous degeneration, left eye",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R50.81": [
+      {
+        "phrase": "Fever presenting with conditions classified elsewhere",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N17.8": [
+      {
+        "phrase": "Acute Kidney Failure",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other Acute Kidney Failure",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "This 45-year-old female presents with other acute kidney failure",
+        "freq": 1,
+        "cdc_overlap": 0.375
+      },
+      {
+        "phrase": "Other acute kidney failure",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M48.56XA": [
+      {
+        "phrase": "Lumbar sprain",
+        "freq": 1,
+        "cdc_overlap": 0.5
+      },
+      {
+        "phrase": "Collapsed vertebra, lumbar region",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F50.9": [
+      {
+        "phrase": "Eating Disorder, Unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I33.0": [
+      {
+        "phrase": "Acute and Subacute Infective Endocarditis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "G44.89": [
+      {
+        "phrase": "Other headache syndrome",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M65.331": [
+      {
+        "phrase": "Trigger Finger, Right Middle Finger",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Trigger finger, right middle finger",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S33.8XXA": [
+      {
+        "phrase": "Maria Gonzalez is a 52-year-old female with a sprain of the lumbar spine and pelvis",
+        "freq": 1,
+        "cdc_overlap": 0.444
+      }
+    ],
+    "J35.1": [
+      {
+        "phrase": "Hypertrophy of tonsils",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R47.89": [
+      {
+        "phrase": "Other Speech Disturbances",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N18.31": [
+      {
+        "phrase": "Chronic Kidney Disease, Stage 3A",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "G91.9": [
+      {
+        "phrase": "Hydrocephalus, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "The patient is diagnosed with unspecified hydrocephalus",
+        "freq": 1,
+        "cdc_overlap": 0.333
+      }
+    ],
+    "M54.14": [
+      {
+        "phrase": "Radiculopathy, thoracic region",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C50.312": [
+      {
+        "phrase": "Malignant neoplasm of lower-inner quadrant of left female breast",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Malignant Neoplasm of Lower-Inner Quadrant of Left Female Breast",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z3A.41": [
+      {
+        "phrase": "weeks gestation of pregnancy",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D75.89": [
+      {
+        "phrase": "Other specified diseases of blood and blood-forming organs",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I69.320": [
+      {
+        "phrase": "Aphasia following cerebral infarction",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z11.8": [
+      {
+        "phrase": "Encounter for screening for other infectious and parasitic diseases",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F10.231": [
+      {
+        "phrase": "Alcohol dependence with withdrawal delirium",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O09.91": [
+      {
+        "phrase": "Supervision of high-risk pregnancy, unspecified, first trimester",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I49.01": [
+      {
+        "phrase": "Ventricular Fibrillation",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z01.10": [
+      {
+        "phrase": "Encounter for examination of ears and hearing without abnormal findings",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z99.11": [
+      {
+        "phrase": "Dependence on respirator [ventilator] status",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I82.411": [
+      {
+        "phrase": "Acute embolism and thrombosis of right femoral vein",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Acute Embolism and Thrombosis of Right Femoral Vein",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M99.06": [
+      {
+        "phrase": "Segmental and somatic dysfunction of the lower extremity",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K90.9": [
+      {
+        "phrase": "Intestinal Malabsorption, Unspecified",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z85.850": [
+      {
+        "phrase": "Personal history of malignant neoplasm of thyroid",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z96.611": [
+      {
+        "phrase": "Presence of right artificial shoulder joint",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M75.52": [
+      {
+        "phrase": "Bursitis of left shoulder",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Bursitis of the left shoulder",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "H43.393": [
+      {
+        "phrase": "Other vitreous opacities, bilateral",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M25.612": [
+      {
+        "phrase": "Stiffness of the left shoulder",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Stiffness of left shoulder, not elsewhere classified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J35.2": [
+      {
+        "phrase": "Hypertrophy of Adenoids",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R15.9": [
+      {
+        "phrase": "Full incontinence of feces",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Full Incontinence of Feces",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z30.433": [
+      {
+        "phrase": "Encounter for removal and reinsertion of intrauterine contraceptive device",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O03.4": [
+      {
+        "phrase": "Incomplete spontaneous abortion without complication",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N41.0": [
+      {
+        "phrase": "Acute Prostatitis",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F15.10": [
+      {
+        "phrase": "Other stimulant abuse, uncomplicated",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C67.8": [
+      {
+        "phrase": "Malignant neoplasm of overlapping sites of the bladder",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Malignant neoplasm of overlapping sites of bladder",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Malignant Neoplasm of Overlapping Sites of Bladder",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M54.81": [
+      {
+        "phrase": "Occipital Neuralgia",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F10.21": [
+      {
+        "phrase": "Alcohol Dependence, in remission",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "L71.9": [
+      {
+        "phrase": "Rosacea, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "B97.89": [
+      {
+        "phrase": "Other viral agents as the cause of diseases classified elsewhere",
+        "freq": 4,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "L20.84": [
+      {
+        "phrase": "Intrinsic (Allergic) Eczema",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K55.9": [
+      {
+        "phrase": "Vascular disorder of the intestine, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "T18.128A": [
+      {
+        "phrase": "Food in esophagus causing other injury",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "B95.61": [
+      {
+        "phrase": "Methicillin Susceptible Staphylococcus Aureus",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M79.675": [
+      {
+        "phrase": "Pain in Left Toe",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Pain in left toe(s)",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Gout, left big toe",
+        "freq": 1,
+        "cdc_overlap": 0.5
+      }
+    ],
+    "M51.06": [
+      {
+        "phrase": "Intervertebral Disc Disorders with Myelopathy, Lumbar Region",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S46.011A": [
+      {
+        "phrase": "Strain of muscle(s) and tendon(s) of the rotator cuff of the right shoulder",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "L89.152": [
+      {
+        "phrase": "Pressure Ulcer of Sacral Region, Stage 2",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M47.27": [
+      {
+        "phrase": "Other spondylosis with radiculopathy, lumbosacral region",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M65.341": [
+      {
+        "phrase": "Trigger Finger, Right Ring Finger",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I87.8": [
+      {
+        "phrase": "Other specified disorders of veins",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other Specified Disorders of Veins",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F51.01": [
+      {
+        "phrase": "Primary Insomnia",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I38": [
+      {
+        "phrase": "Endocarditis, valve unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "L70.8": [
+      {
+        "phrase": "Other Acne",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K64.1": [
+      {
+        "phrase": "Second Degree Hemorrhoids",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K75.4": [
+      {
+        "phrase": "Autoimmune Hepatitis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z95.818": [
+      {
+        "phrase": "Presence of other cardiac implants and grafts",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z87.01": [
+      {
+        "phrase": "Personal History of Pneumonia (Recurrent)",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N81.6": [
+      {
+        "phrase": "Rectocele",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S83.92XA": [
+      {
+        "phrase": "Sprain of left knee",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Sprain of unspecified site of the left knee",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E56.9": [
+      {
+        "phrase": "Vitamin Deficiency, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R23.2": [
+      {
+        "phrase": "Flushing",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N91.5": [
+      {
+        "phrase": "Oligomenorrhea, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D32.9": [
+      {
+        "phrase": "Benign neoplasm of meninges, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K08.89": [
+      {
+        "phrase": "Other specified disorders of teeth and supporting structures",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C71.1": [
+      {
+        "phrase": "Malignant neoplasm of the frontal lobe",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Malignant Neoplasm of Frontal Lobe",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C34.2": [
+      {
+        "phrase": "Malignant Neoplasm of Middle Lobe, Bronchus or Lung",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N94.9": [
+      {
+        "phrase": "Unspecified condition associated with female genital organs and menstrual cycle",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O99.213": [
+      {
+        "phrase": "Obesity complicating pregnancy, third trimester",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "OBESITY COMPLICATING PREGNANCY, THIRD TRIMESTER",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z68.44": [
+      {
+        "phrase": "Severe obesity with BMI 60.0-69.9",
+        "freq": 1,
+        "cdc_overlap": 0.333
+      },
+      {
+        "phrase": "BODY MASS INDEX [BMI] 60.0-69.9, ADULT",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M05.89": [
+      {
+        "phrase": "Other rheumatoid arthritis with rheumatoid factor of multiple sites",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O09.90": [
+      {
+        "phrase": "Supervision of high-risk pregnancy, unspecified trimester",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R68.82": [
+      {
+        "phrase": "Decreased Libido",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J15.1": [
+      {
+        "phrase": "Pneumonia due to Pseudomonas",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I85.00": [
+      {
+        "phrase": "Esophageal varices without bleeding",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Esophageal Varices without Bleeding",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "The patient is diagnosed with esophageal varices without bleeding",
+        "freq": 1,
+        "cdc_overlap": 0.667
+      }
+    ],
+    "H52.10": [
+      {
+        "phrase": "Myopia, unspecified eye",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C21.0": [
+      {
+        "phrase": "Malignant neoplasm of anus, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Malignant Neoplasm of Anus, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z79.3": [
+      {
+        "phrase": "Long-term use of hormonal contraceptives",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Long-term (Current) Use of Hormonal Contraceptives",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D81.9": [
+      {
+        "phrase": "Combined Immunodeficiency, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z96.659": [
+      {
+        "phrase": "Presence of unspecified artificial knee joint",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I48.4": [
+      {
+        "phrase": "Atypical Atrial Flutter",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E27.9": [
+      {
+        "phrase": "Disorder of Adrenal Gland, Unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F91.9": [
+      {
+        "phrase": "Conduct Disorder, Unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "H54.7": [
+      {
+        "phrase": "Unspecified Visual Loss",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S16.1XXD": [
+      {
+        "phrase": "Strain of muscle, fascia, and tendon at neck level, subsequent encounter",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Muscle strain of neck",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O62.1": [
+      {
+        "phrase": "Secondary Uterine Inertia",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S63.502A": [
+      {
+        "phrase": "Unspecified sprain of the left wrist, initial encounter",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Unspecified sprain of left wrist",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F31.30": [
+      {
+        "phrase": "Bipolar Disorder, Current Episode Depressed, Mild to Moderate Severity, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Bipolar Disorder, current episode depressed, mild to moderate severity, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J32.1": [
+      {
+        "phrase": "Chronic Frontal Sinusitis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K56.41": [
+      {
+        "phrase": "Fecal Impaction",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M25.541": [
+      {
+        "phrase": "Pain in joints of right hand",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Pain in joints of the right hand",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D23.39": [
+      {
+        "phrase": "Other benign neoplasm of skin of other parts of face",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O26.899": [
+      {
+        "phrase": "OTHER SPECIFIED PREGNANCY RELATED CONDITIONS, UNSPECIFIED TRIMESTER",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other specified pregnancy-related conditions, unspecified trimester",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other Specified Pregnancy Related Conditions, Unspecified Trimester",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N94.10": [
+      {
+        "phrase": "Unspecified Dyspareunia",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Unspecified dyspareunia",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M34.9": [
+      {
+        "phrase": "Systemic Sclerosis, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S99.921A": [
+      {
+        "phrase": "Unspecified Injury of Right Foot, Initial Encounter",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z86.69": [
+      {
+        "phrase": "Personal History of Other Diseases of the Nervous System and Sense Organs",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Personal history of other diseases of the nervous system and sense organs",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z87.11": [
+      {
+        "phrase": "Personal history of peptic ulcer disease",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S27.0XXA": [
+      {
+        "phrase": "Traumatic Pneumothorax, Initial Encounter",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R57.9": [
+      {
+        "phrase": "Shock, unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R22.41": [
+      {
+        "phrase": "Localized swelling, mass, and lump, right lower limb",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "G89.11": [
+      {
+        "phrase": "Acute pain due to trauma",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M65.332": [
+      {
+        "phrase": "Trigger Finger, Left Middle Finger",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Trigger finger, left middle finger",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I74.3": [
+      {
+        "phrase": "Embolism and thrombosis of arteries of the lower extremities",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D68.8": [
+      {
+        "phrase": "Other specified coagulation defects",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other Specified Coagulation Defects",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S82.841A": [
+      {
+        "phrase": "Displaced Bimalleolar Fracture of the Right Lower Leg",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F22": [
+      {
+        "phrase": "Delusional Disorder",
+        "freq": 2,
+        "cdc_overlap": 0.5
+      },
+      {
+        "phrase": "Delusional Disorders",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S22.31XA": [
+      {
+        "phrase": "Fracture of one rib, right side, initial encounter for closed fracture",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I35.9": [
+      {
+        "phrase": "Nonrheumatic Aortic Valve Disorder, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Nonrheumatic aortic valve disorder, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R94.4": [
+      {
+        "phrase": "Abnormal results of kidney function studies",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "H90.0": [
+      {
+        "phrase": "The patient presents with bilateral conductive hearing loss",
+        "freq": 1,
+        "cdc_overlap": 0.667
+      },
+      {
+        "phrase": "Conductive hearing loss, bilateral",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I62.9": [
+      {
+        "phrase": "Nontraumatic intracranial hemorrhage, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N76.1": [
+      {
+        "phrase": "Subacute and Chronic Vaginitis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I63.89": [
+      {
+        "phrase": "Other Cerebral Infarction",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other cerebral infarction",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M32.14": [
+      {
+        "phrase": "Glomerular disease in Systemic Lupus Erythematosus",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O75.89": [
+      {
+        "phrase": "Other specified complications of labor and delivery",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E10.22": [
+      {
+        "phrase": "Type 1 Diabetes Mellitus with Diabetic Chronic Kidney Disease",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z43.3": [
+      {
+        "phrase": "Encounter for attention to colostomy",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "H35.363": [
+      {
+        "phrase": "Drusen (Degenerative) of Macula, Bilateral",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Mr. Li is diagnosed with Drusen (Degenerative) of Macula, Bilateral",
+        "freq": 1,
+        "cdc_overlap": 0.8
+      }
+    ],
+    "I08.3": [
+      {
+        "phrase": "Combined Rheumatic Disorders of Mitral, Aortic, and Tricuspid Valves",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I77.6": [
+      {
+        "phrase": "Arteritis, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N84.1": [
+      {
+        "phrase": "Polyp of Cervix Uteri",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O09.513": [
+      {
+        "phrase": "Supervision of elderly primigravida, third trimester",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R82.998": [
+      {
+        "phrase": "Other abnormal findings in urine",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R39.14": [
+      {
+        "phrase": "Feeling of incomplete bladder emptying",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O69.1XX0": [
+      {
+        "phrase": "Labor complicated by cord around neck, with compression",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R45.1": [
+      {
+        "phrase": "Restlessness and Agitation",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M25.311": [
+      {
+        "phrase": "Other instability, right shoulder",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "H10.31": [
+      {
+        "phrase": "Unspecified Acute Conjunctivitis, Right Eye",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "P92.9": [
+      {
+        "phrase": "Feeding problem of newborn, unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "S61.012A": [
+      {
+        "phrase": "Laceration without foreign body of left thumb without damage to nail",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N96": [
+      {
+        "phrase": "Recurrent Pregnancy Loss",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Recurrent pregnancy loss",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J36": [
+      {
+        "phrase": "Peritonsillar Abscess",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "G91.2": [
+      {
+        "phrase": "Idiopathic Normal Pressure Hydrocephalus",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R87.619": [
+      {
+        "phrase": "Unspecified abnormal cytological findings in specimens from cervix uteri",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I42.2": [
+      {
+        "phrase": "Other Hypertrophic Cardiomyopathy",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I87.1": [
+      {
+        "phrase": "Compression of vein",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R22.42": [
+      {
+        "phrase": "Localized swelling, mass, and lump, left lower limb",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D27.1": [
+      {
+        "phrase": "Benign Neoplasm of Left Ovary",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N83.291": [
+      {
+        "phrase": "Other ovarian cyst, right side",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K63.2": [
+      {
+        "phrase": "Fistula of intestine",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I08.0": [
+      {
+        "phrase": "Rheumatic disorders of both mitral and aortic valves",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K81.9": [
+      {
+        "phrase": "Cholecystitis, unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "B96.81": [
+      {
+        "phrase": "Helicobacter pylori [H. pylori] as the cause of diseases classified elsewhere",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Helicobacter pylori (H. pylori) as the cause of diseases classified elsewhere",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "G57.61": [
+      {
+        "phrase": "Lesion of plantar nerve, right lower limb",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K60.2": [
+      {
+        "phrase": "Anal Fissure, Unspecified",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I50.41": [
+      {
+        "phrase": "Acute combined systolic (congestive) and diastolic (congestive) heart failure",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "L22": [
+      {
+        "phrase": "Chronic Atopic Dermatitis",
+        "freq": 1,
+        "cdc_overlap": 0.333
+      }
+    ],
+    "Z38.31": [
+      {
+        "phrase": "Twin liveborn infant, delivered by cesarean",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D06.9": [
+      {
+        "phrase": "Carcinoma in situ of cervix, unspecified",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O24.414": [
+      {
+        "phrase": "Gestational Diabetes Mellitus, Insulin Controlled",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I67.9": [
+      {
+        "phrase": "Cerebrovascular disease, unspecified",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Cerebrovascular Disease, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z91.013": [
+      {
+        "phrase": "Allergy to seafood",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R22.32": [
+      {
+        "phrase": "Localized swelling, mass, and lump, left upper limb",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z72.89": [
+      {
+        "phrase": "Other problems related to lifestyle",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "F10.120": [
+      {
+        "phrase": "Alcohol abuse with intoxication, uncomplicated",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O99.52": [
+      {
+        "phrase": "Diseases of the respiratory system complicating childbirth",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M10.00": [
+      {
+        "phrase": "Idiopathic Gout, Unspecified Site",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J03.00": [
+      {
+        "phrase": "Acute Streptococcal Tonsillitis, unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Acute Streptococcal Tonsillitis, Unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R60.1": [
+      {
+        "phrase": "Generalized Edema",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C25.1": [
+      {
+        "phrase": "Malignant Neoplasm of Body of Pancreas",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Malignant neoplasm of body of pancreas",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Malignant neoplasm of the body of the pancreas",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Malignant neoplasm of the body of pancreas",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M65.311": [
+      {
+        "phrase": "Trigger Thumb, right thumb",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Trigger Thumb, Right Thumb",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "L73.8": [
+      {
+        "phrase": "Diagnosed with Other Specified Follicular Disorders",
+        "freq": 1,
+        "cdc_overlap": 0.75
+      }
+    ],
+    "S83.91XA": [
+      {
+        "phrase": "Sprain of unspecified site of right knee",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N81.11": [
+      {
+        "phrase": "Cystocele, midline",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M21.371": [
+      {
+        "phrase": "Foot Drop, Right Foot",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C44.622": [
+      {
+        "phrase": "Squamous cell carcinoma of the skin of the right upper limb, including the shoulder",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K65.9": [
+      {
+        "phrase": "Peritonitis, unspecified",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "G24.3": [
+      {
+        "phrase": "Spasmodic Torticollis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R06.03": [
+      {
+        "phrase": "Acute Respiratory Distress",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K70.10": [
+      {
+        "phrase": "Alcoholic hepatitis without ascites",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "B19.10": [
+      {
+        "phrase": "Unspecified viral hepatitis B without hepatic coma",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "O47.1": [
+      {
+        "phrase": "False labor at or after 37 completed weeks of gestation",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J22": [
+      {
+        "phrase": "Unspecified Acute Lower Respiratory Infection",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Unspecified acute lower respiratory infection",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "K85.20": [
+      {
+        "phrase": "Alcohol Induced Acute Pancreatitis without Necrosis or Infection",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Alcohol-induced acute pancreatitis without necrosis or infection",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Alcohol-Induced Acute Pancreatitis Without Necrosis or Infection",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M31.6": [
+      {
+        "phrase": "Other giant cell arteritis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M77.8": [
+      {
+        "phrase": "Other enthesopathies, not elsewhere classified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other Enthesopathies, Not Elsewhere Classified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "J04.0": [
+      {
+        "phrase": "Acute Laryngitis",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N90.89": [
+      {
+        "phrase": "Other specified noninflammatory disorders of vulva and perineum",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other Specified Noninflammatory Disorders of Vulva and Perineum",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "E78.9": [
+      {
+        "phrase": "Disorder of lipoprotein metabolism, unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "C44.629": [
+      {
+        "phrase": "Squamous Cell Carcinoma of Skin of Left Upper Limb, Including Shoulder",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R58": [
+      {
+        "phrase": "Hemorrhage, not elsewhere classified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I82.432": [
+      {
+        "phrase": "Acute Embolism and Thrombosis of Left Popliteal Vein",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I63.40": [
+      {
+        "phrase": "Cerebral Infarction due to Embolism of Unspecified Cerebral Artery",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "L50.8": [
+      {
+        "phrase": "Other Urticaria",
+        "freq": 3,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other urticaria",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "I95.89": [
+      {
+        "phrase": "Other hypotension",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other Hypotension",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D04.39": [
+      {
+        "phrase": "Carcinoma in situ of skin of other parts of the face",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "A64": [
+      {
+        "phrase": "Unspecified sexually transmitted disease",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Unspecified Sexually Transmitted Disease",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "B95.2": [
+      {
+        "phrase": "Enterococcus as the cause of diseases classified elsewhere",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "T38.0X5A": [
+      {
+        "phrase": "Adverse effect of glucocorticoids and synthetic analogues, initial encounter",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "R10.0": [
+      {
+        "phrase": "Acute abdomen",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Acute Abdomen",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N73.9": [
+      {
+        "phrase": "Female pelvic inflammatory disease, unspecified",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "D22.4": [
+      {
+        "phrase": "Melanocytic nevi of the scalp and neck",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Melanocytic nevi of scalp and neck",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "H52.7": [
+      {
+        "phrase": "Unspecified disorder of refraction",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Unspecified Disorder of Refraction",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "M85.88": [
+      {
+        "phrase": "OTHER SPECIFIED DISORDERS OF BONE DENSITY AND STRUCTURE, OTHER SITE",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      },
+      {
+        "phrase": "Other specified disorders of bone density and structure, other site",
+        "freq": 1,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "Z3A.00": [
+      {
+        "phrase": "Pregnancy of unspecified gestational weeks",
+        "freq": 1,
+        "cdc_overlap": 0.667
+      }
+    ],
+    "I51.9": [
+      {
+        "phrase": "Heart disease, unspecified",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ],
+    "N64.52": [
+      {
+        "phrase": "Nipple Discharge",
+        "freq": 2,
+        "cdc_overlap": 1.0
+      }
+    ]
+  }
+}
