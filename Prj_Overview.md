@@ -16,6 +16,34 @@ All models are located in this folder: /Users/jroche/Workspace/Python/Notes_to_I
 
 ---
 
+> ## ⚠️ Current status (updated 3 June 2026) — read before the dated entries below
+>
+> **This document is a dated session journal.** Entries below are preserved as
+> written on their dates and record what was believed at the time. The most recent
+> results session here is **30 April 2026 (E-010)**, which declared E-010 the
+> "new project best" at 83.9% E2E. **That conclusion has since been superseded** by
+> work not yet folded into this journal (see `docs/decisions.md` D005–D014 and
+> `docs/journal.md` for the May–June 2026 record). In summary:
+>
+> - **The 83.9% / E-010 figure was measured under code-only redaction** — the ICD-10
+>   *code* was removed from the note but the human-readable *diagnosis description*
+>   (e.g. "pain in left knee" for M25.562) was left in, leaking the answer. E-010
+>   itself was later flagged as unverified drift; the source-verified code-only
+>   baseline is **E-009 at E2E 0.849**.
+> - **A full end-to-end rebuild on de-leaked data (code *and* description removed),
+>   E-016, scores E2E 0.567** (Macro F1 0.446, ECE 0.070). Both stages trained and
+>   evaluated on de-leaked data.
+> - **The 28.2-point gap (0.849 → 0.567) is diagnosis-description leakage** — ≈33%
+>   relative inflation of the apparent accuracy. 0.567 is the clean number; 0.849 is
+>   the leaky baseline. (Caveat: the de-leaked gold still carries ~18.6% residual
+>   description leakage, so 0.567 slightly over-estimates a perfectly-clean ceiling.)
+> - **Stage-1 router uses Bio_ClinicalBERT**, not roberta-base — confirmed from
+>   E-003's saved config. Any "roberta-base for Stage-1" mention in the dated plans
+>   below is a historical planning note, not what was run.
+>
+> The dated entries are left intact below for the historical record. Read them as
+> history, not as the current standing.
+
 ## 01-EDA_SOAP.ipynb
 
 ### Purpose
@@ -1772,6 +1800,13 @@ substantially better Z-code discrimination than the 20-epoch version.
 E-010 result documented. 83.9% E2E, 0.762 F1, 0.034 ECE, 82.1% Coverage@0.7
 at 95.2% accuracy — new definitive best. Supersedes E-009 (79.8%) and
 E-005c+Graph (77.4%) as current production baseline.
+
+> **Superseded (3 June 2026).** The "definitive best / current production baseline"
+> claim above was true as recorded on 30 April but no longer holds. The 83.9% figure
+> is the code-only (leaky) regime; E-010 was later flagged as unverified drift. The
+> source-verified code-only baseline is E-009 (0.849), and the de-leaked end-to-end
+> rebuild E-016 scores 0.567 — see the Current Status banner at the top of this
+> document and `docs/decisions.md` D014. This note is retained as historical record.
 
 
 
