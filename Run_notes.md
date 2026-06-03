@@ -4,8 +4,11 @@
 from scratch. Every command has been run and verified. Follow this document
 exactly to reproduce any result.
 
-**Last updated:** 6 May 2026
-**Current best:** E-010_40ep_E002Init — 83.9% E2E | 0.762 F1 | 0.034 ECE | 82.1% Coverage@0.7
+**Last updated:** 3 June 2026
+**Headline result:** two end-to-end runs differing only in redaction depth —
+code-only (E-009) E2E 0.849 vs code+description (E-016) E2E 0.567. The 28.2-point
+gap is diagnosis-description leakage. 0.567 is the de-leaked number; 0.849 is the
+leaky baseline.
 **Data status:** Phase 1b locked — HF Hub + DVC (commit 6dda8ac)
 
 ---
@@ -51,7 +54,8 @@ If any of the above fail, **stop and fix before proceeding**.
 
 | File | Records | Description | Source |
 |------|---------|-------------|--------|
-| `data/gold/medsynth_gold_apso.parquet` | 10,240 | Original gold layer — APSO-flipped, ICD-10 redacted, CDC FY2026 validated (9,660 billable + 580 non-billable) | Built from HF Hub |
+| `data/gold/medsynth_gold_apso.parquet` | 10,240 | Original gold layer — APSO-flipped, ICD-10 *code* redacted (diagnosis description retained), CDC FY2026 validated (9,660 billable + 580 non-billable) | Built from HF Hub |
+| `data/gold/medsynth_gold_apso_deleaked.parquet` | 10,240 | De-leaked gold — ICD-10 code *and* its associated diagnosis description redacted (situation 2) | Built with `prepare_data.py --redact-descriptions` |
 | `data/gold/medsynth_gold_apso.parquet.dvc` | — | DVC pointer file (tracked in git) | — |
 | `data/gold/MANIFEST_*.json` | — | SHA256 manifest with validation split | Generated |
 | `data/gold/medsynth_gold_augmented.parquet` | 11,214 | Above + 974 synthetic records for chapters O and Z | Historic |
@@ -67,8 +71,9 @@ If any of the above fail, **stop and fix before proceeding**.
 
 | Experiment | Gold file | Reason |
 |---|---|---|
-| E-001, E-002, E-003 | Original | Baseline experiments |
-| E-010 (current best) | Original | Clean head transfer — E-002 and Stage-2 same gold |
+| E-001, E-002, E-003 | Original | Baseline experiments (code-only regime) |
+| E-009 (code-only baseline) | Original | Leaky baseline — diagnosis description retained |
+| E-016 (de-leaked) | De-leaked | Situation 2 — code + description redacted |
 | E-005c pipeline | Augmented | Historic — O chapter augmentation |
 
 **Critical constraint:** E-002 and Stage-2 resolvers must use the **same**
@@ -80,8 +85,8 @@ to ~20%. This is enforced in `scripts/train.py`.
 ## Output Layout — Where Everything Goes
 
 ```
-outputs/evaluations/E-010_40ep_E002Init/
-    stage1/ → (reused from E-003_Hierarchical_ICD10)
+outputs/evaluations/E-016_Deleaked_FullRebuild/
+    stage1/ → (trained under this experiment; de-leaked regime)
     stage2/
         A/
             model.safetensors        ← weights
@@ -115,20 +120,22 @@ outputs/run.log                      ← append-only run log (do not edit manual
 E-001  (ICD-3 flat baseline — proof of concept)
   └── 87.2% accuracy, 675 classes
 
-E-002  (flat ICD-10, 40 epochs — CRITICAL: must be 40 epochs on original gold)
+E-002  (flat ICD-10, 40 epochs — CRITICAL: must be 40 epochs, same gold as Stage-2)
   └── 73.3% accuracy, 1,926 classes
   └── provides warm-start weights for all Stage-2 resolvers
         ↓
-E-003  (Stage-1 chapter router — train once, reuse in all hierarchical experiments)
-  └── 96.4–98.7% chapter routing accuracy
+Stage-1 chapter router (22-way; Bio_ClinicalBERT — trained per experiment)
+  └── 94–98% chapter routing accuracy
         ↓
-E-010  (current best — hierarchical, 40-epoch E-002 init, original gold)
-  └── 83.9% E2E accuracy, 0.762 F1, 82.1% Coverage@0.7 at 95.2% accuracy
+End-to-end hierarchical run (Stage-1 router + Stage-2 resolvers, E-002 init)
+  ├── E-009  code-only regime (diagnosis description retained) → E2E 0.849  [leaky baseline]
+  └── E-016  de-leaked regime (code + description redacted)    → E2E 0.567  [clean]
 ```
 
-**Why not augmented gold?** E-010 on original gold (83.9%) beats the previous
-best production pipeline using augmented gold + graph reranker + Z override
-(77.4%). The 40-epoch E-002 init is more valuable than augmentation.
+**The headline finding:** the same end-to-end pipeline scores 0.849 when the
+diagnosis description is left in the note and 0.567 when it is removed. The
+28.2-point drop is the leakage, not a change in the model or recipe — only the
+redaction depth of the data differs.
 
 ---
 
@@ -148,11 +155,18 @@ python scripts/generate_manifest.py
 # Pulls from HF Hub, validates CDC FY2026, generates gold + SHA256 manifest
 ```
 
-**Then prepare splits:**
+**For the de-leaked gold (situation 2):**
+```bash
+uv run python scripts/prepare_data.py --redact-descriptions
+# Writes data/gold/medsynth_gold_apso_deleaked.parquet
+# Flag OFF = byte-identical to the code-only (0.849) pipeline
+```
+
+**Then prepare splits** (substitute the experiment name you are running):
 ```bash
 uv run python scripts/prepare_splits.py \
-    --experiment E-010_40ep_E002Init \
-    --gold-path data/gold/medsynth_gold_apso.parquet
+    --experiment E-016_Deleaked_FullRebuild \
+    --gold-path data/gold/medsynth_gold_apso_deleaked.parquet
 ```
 
 **Expected output:**
@@ -168,7 +182,7 @@ Chapter A: 48 records → 38 train / 5 val / 5 test
 # Check manifest exists
 ls data/gold/MANIFEST_*.json
 # Check splits created
-ls outputs/evaluations/E-010_40ep_E002Init/stage2/
+ls outputs/evaluations/E-016_Deleaked_FullRebuild/stage2/
 # Expected: A B C D E F G H I J K L M N O P Q R S T U Z
 ```
 
@@ -209,7 +223,8 @@ ls data/graph/icd10_knowledge_graph.pkl
 **Purpose:** Flat classifier over all 1,926 ICD-10 codes. Serves two purposes:
 baseline accuracy for flat approach, and encoder weights to warm-start Stage-2.
 
-**⚠️ Must use 40 epochs.** 20 epochs costs ~4pp E2E accuracy on Stage-2 resolvers.
+**⚠️ Must use 40 epochs.** The model is still improving at epoch 20; 40 epochs
+produces richer encoder representations for the Stage-2 warm start.
 
 ```bash
 uv run python verify_scripts.py && \
@@ -239,37 +254,44 @@ skip this step — the registry copy is the 40-epoch version.
 
 ---
 
-## Stage 2 — E-003: Stage-1 Chapter Router
+## Stage 2 — Stage-1 Chapter Router
 
 **Purpose:** 22-way chapter classifier. Routes every note to the correct
 ICD-10 chapter before Stage-2 resolves the specific code.
 
-**Train once. Reused by all hierarchical experiments.**
+**Train per experiment.** For a clean end-to-end run the router must be trained
+on the *same* gold regime as Stage-2 — a router trained on code-only text but
+evaluated on de-leaked notes suffers a train/serve mismatch (Stage-1 accuracy
+collapsed from ~0.95 to ~0.76 when this was violated). Train Stage-1 under the
+experiment you are running, on the matching gold.
 
-**Why roberta-base?** Chapter routing is a coarser task — 22 classes with
-~440 records each. General encoder is sufficient and trains faster. Clinical
-domain knowledge is more valuable in Stage-2 where codes are fine-grained.
+**Model:** Bio_ClinicalBERT (confirmed from E-003's saved config — `model_type`
+bert, vocab 28996). The router uses the same clinical encoder as Stage-2; the
+chapter-routing task benefits from clinical domain knowledge just as code
+resolution does.
 
 ```bash
 uv run python verify_scripts.py && \
 uv run python scripts/train.py \
-    --experiment E-003_Hierarchical_ICD10 \
+    --experiment E-016_Deleaked_FullRebuild \
     --mode hierarchical \
     --stage 1 \
+    --model emilyalsentzer/Bio_ClinicalBERT \
     --code-filter billable \
+    --gold-path data/gold/medsynth_gold_apso_deleaked.parquet \
     --epochs 5
 ```
 
-**Expected:** ~25 minutes. Best epoch ~4. Val accuracy ~96–97%.
+**Expected:** ~25 minutes. Best epoch ~4. Val accuracy ~94–97%.
 
 **Verify:**
 ```bash
-find outputs/evaluations/E-003_Hierarchical_ICD10/stage1 -name "model.safetensors"
+find outputs/evaluations/E-016_Deleaked_FullRebuild/stage1 -name "model.safetensors"
 # Must return exactly one path
 
 python3 -c "
 import json
-lm = json.load(open('outputs/evaluations/E-003_Hierarchical_ICD10/stage1/label_map.json'))
+lm = json.load(open('outputs/evaluations/E-016_Deleaked_FullRebuild/stage1/label_map.json'))
 print('Chapters:', len(lm['label2id']))
 "
 # Expected: 22
@@ -277,19 +299,20 @@ print('Chapters:', len(lm['label2id']))
 
 ---
 
-## Stage 3 — E-010: Stage-2 Resolvers (40-epoch E-002 init)
+## Stage 3 — Stage-2 Resolvers (40-epoch E-002 init)
 
 **Purpose:** 19 per-chapter resolvers, each initialised from the 40-epoch
-E-002 encoder. This is the key step that produces the 83.9% result.
+E-002 encoder. Trained on the same gold regime as Stage-1.
 
 ```bash
 uv run python verify_scripts.py && \
 uv run python scripts/train.py \
-    --experiment E-010_40ep_E002Init \
+    --experiment E-016_Deleaked_FullRebuild \
     --mode hierarchical \
     --stage 2 \
     --code-filter billable \
     --stage2-init outputs/evaluations/registry/E-002_FullICD10_ClinicalBERT \
+    --gold-path data/gold/medsynth_gold_apso_deleaked.parquet \
     --epochs 20
 ```
 
@@ -314,7 +337,7 @@ final classifier layer is reinitialised — this is correct behaviour.
 
 **Verify:**
 ```bash
-find outputs/evaluations/E-010_40ep_E002Init/stage2 \
+find outputs/evaluations/E-016_Deleaked_FullRebuild/stage2 \
     -name "model.safetensors" | wc -l
 # Expected: 19
 ```
@@ -322,22 +345,28 @@ find outputs/evaluations/E-010_40ep_E002Init/stage2 \
 **Chapters P, Q, U are skipped by design** — too few records for reliable
 training. They use majority-class fallback predictions at inference.
 
+> **Tip:** Stages 2 and 3, plus calibration and evaluation, can be run in one
+> orchestrated command via `run_experiment.py --train-stage1` (this is how E-016
+> was produced — see the end-to-end block in the README). Running them
+> individually as above is equivalent and easier to debug.
+
 ---
 
-## Stage 4 — Calibrate E-010
+## Stage 4 — Calibrate
 
 **Purpose:** Fit temperature scalar T per resolver so confidence scores
 are reliable for auto-code threshold decisions.
 
 **Prerequisite:** If `label_map.json` or `test_split.parquet` are missing
-from `E-003_Hierarchical_ICD10/stage1/`, run the fix first:
+from the Stage-1 directory, run the fix first:
 
 ```bash
 # Fix 1: generate label_map.json from chapter_mapping.json
 python3 -c "
 import json
 from pathlib import Path
-with open('outputs/evaluations/E-003_Hierarchical_ICD10/stage1/chapter_mapping.json') as f:
+stage1 = 'outputs/evaluations/E-016_Deleaked_FullRebuild/stage1'
+with open(f'{stage1}/chapter_mapping.json') as f:
     ch_map = json.load(f)
 label_map = {
     'label2id': ch_map['chapter2id'],
@@ -345,18 +374,18 @@ label_map = {
     'num_labels': ch_map['num_chapters'],
     'label_scheme': 'chapter'
 }
-with open('outputs/evaluations/E-003_Hierarchical_ICD10/stage1/label_map.json', 'w') as f:
+with open(f'{stage1}/label_map.json', 'w') as f:
     json.dump(label_map, f, indent=4)
 print('Written:', len(label_map['id2label']), 'chapters')
 "
 
-# Fix 2: regenerate test_split.parquet from gold layer
+# Fix 2: regenerate test_split.parquet from the gold layer (use the matching gold)
 uv run python -c "
 import polars as pl
 from pathlib import Path
 from sklearn.model_selection import train_test_split
 
-gold_path = Path('data/gold') / 'medsynth_gold_apso.parquet'
+gold_path = Path('data/gold') / 'medsynth_gold_apso_deleaked.parquet'
 df = pl.read_parquet(gold_path).filter(pl.col('code_status') == 'billable')
 df = df.with_columns(pl.col('standard_icd10').str.slice(0, 1).alias('chapter_label'))
 chapters = sorted(df['chapter_label'].unique().to_list())
@@ -368,25 +397,25 @@ df = df.with_columns(
 df_pd = df.select(['id','apso_note','standard_icd10','chapter_label','chapter_id']).to_pandas()
 _, temp = train_test_split(df_pd, test_size=0.2, stratify=df_pd['chapter_id'], random_state=42)
 _, test = train_test_split(temp, test_size=0.5, random_state=42)
-out = Path('outputs/evaluations/E-003_Hierarchical_ICD10/stage1/test_split.parquet')
+out = Path('outputs/evaluations/E-016_Deleaked_FullRebuild/stage1/test_split.parquet')
 pl.from_pandas(test).write_parquet(out)
 print(f'Written: {len(test)} records')
 "
 ```
 
-Then calibrate:
+Then calibrate (Stage-1 experiment must match where Stage-1 was trained):
 
 ```bash
 uv run python scripts/calibrate.py \
-    --experiment E-010_40ep_E002Init \
-    --stage1-experiment E-003_Hierarchical_ICD10
+    --experiment E-016_Deleaked_FullRebuild \
+    --stage1-experiment E-016_Deleaked_FullRebuild
 ```
 
-**Expected summary:**
+**Expected summary (de-leaked regime, E-016):**
 ```
-Avg temperature:  ~0.28
-Avg ECE:          0.665 → 0.115
-Avg Coverage@0.7: 80.5%  (avg accuracy on covered: 90.7%)
+Avg temperature:  ~0.34
+Avg ECE:          0.413 → 0.196
+Avg Coverage@0.7: ~54%   (avg accuracy on covered: ~0.79)
 ```
 
 If ECE gets **worse** after calibration, the classifier heads did not converge
@@ -394,45 +423,57 @@ properly — retrain with more epochs or check the warm start path.
 
 **Verify:**
 ```bash
-find outputs/evaluations/E-010_40ep_E002Init/stage2 \
+find outputs/evaluations/E-016_Deleaked_FullRebuild/stage2 \
     -name "temperature.json" | wc -l
 # Expected: 19
 ```
 
 ---
 
-## Stage 5 — Evaluate E-010
+## Stage 5 — Evaluate
 
 ```bash
 uv run python scripts/evaluate.py \
-    --experiment E-010_40ep_E002Init \
+    --experiment E-016_Deleaked_FullRebuild \
     --mode hierarchical \
-    --stage1-experiment E-003_Hierarchical_ICD10 \
+    --stage1-experiment E-016_Deleaked_FullRebuild \
     --threshold 0.7
 ```
 
-**Expected results:**
+**Expected results — situation 2 (de-leaked, E-016):**
 ```
-📈 Stage-1 (chapter) accuracy: 0.987
-📈 Stage-2 (within-chapter):   0.850
-📈 End-to-end accuracy:        0.839
-📈 Macro F1:                   0.762
-📈 ECE:                        0.034
-📈 Coverage@τ=0.7:             82.1% (accuracy=0.952)
+📈 Stage-1 (chapter) accuracy: 0.948
+📈 Stage-2 (within-chapter):   0.598
+📈 End-to-end accuracy:        0.567
+📈 Macro F1:                   0.446
+📈 ECE:                        0.0703
+📈 Coverage@τ=0.7:             48.2% (accuracy=0.818)
 ```
+
+**For comparison — situation 1 (code-only, E-009, leaky baseline):**
+```
+📈 Stage-1 (chapter) accuracy: 0.984
+📈 Stage-2 (within-chapter):   0.863
+📈 End-to-end accuracy:        0.849
+📈 Macro F1:                   0.774
+📈 ECE:                        0.024
+📈 Coverage@τ=0.7:             81.2% (accuracy=0.952)
+```
+
+The difference between the two is the quantified diagnosis-description leakage.
 
 **Register results:**
 ```bash
 uv run python -c "
 from src.experiment_logger import ExperimentLogger, status
-el = ExperimentLogger('E-010_40ep_E002Init', script='scripts/train.py')
+el = ExperimentLogger('E-016_Deleaked_FullRebuild', script='scripts/run_experiment.py')
 el.log_results({
-    'e2e_accuracy':    0.839,
-    'macro_f1':        0.762,
-    'stage1_accuracy': 0.987,
-    'within_chapter':  0.850,
-    'ece':             0.034,
-    'coverage_07':     0.821,
+    'e2e_accuracy':    0.567,
+    'macro_f1':        0.446,
+    'stage1_accuracy': 0.948,
+    'within_chapter':  0.598,
+    'ece':             0.0703,
+    'coverage_07':     0.482,
 })
 status()
 "
@@ -451,8 +492,8 @@ sys.path.insert(0, '.')
 from src.inference import HierarchicalPredictor
 
 predictor = HierarchicalPredictor(
-    experiment_name='E-010_40ep_E002Init',
-    stage1_experiment='E-003_Hierarchical_ICD10',
+    experiment_name='E-016_Deleaked_FullRebuild',
+    stage1_experiment='E-016_Deleaked_FullRebuild',
 )
 
 note = '''
@@ -490,10 +531,14 @@ Top 5 predictions:
 Expected: A69.20 (Lyme disease, unspecified)
 ```
 
+> Note: this smoke-test note states the diagnosis in plain text ("Lyme Disease"),
+> so it exercises the inference path, not the de-leaked regime. It is a wiring
+> check, not a leakage-free accuracy measurement.
+
 **If the smoke test fails:**
 1. Run `uv run python verify_scripts.py` — all checks must pass
-2. Check Stage-2 weights: `find outputs/evaluations/E-010_40ep_E002Init/stage2 -name "model.safetensors" | wc -l` — should return 19
-3. Check Stage-1 weights: `ls outputs/evaluations/E-003_Hierarchical_ICD10/stage1/model/model.safetensors`
+2. Check Stage-2 weights: `find outputs/evaluations/E-016_Deleaked_FullRebuild/stage2 -name "model.safetensors" | wc -l` — should return 19
+3. Check Stage-1 weights: `ls outputs/evaluations/E-016_Deleaked_FullRebuild/stage1/model/model.safetensors`
 
 ---
 
@@ -503,7 +548,7 @@ Expected: A69.20 (Lyme disease, unspecified)
 ## Disk Management — Reclaim Checkpoint Storage
 
 Training checkpoints accumulate during the pipeline (~3.6GB per resolver,
-~150-270GB for a full E-003 + E-009 + E-010 run). After training completes
+~150-270GB for a full end-to-end run). After training completes
 successfully, use the cleanup script to reclaim disk space.
 
 **The cleanup script is safe** — it only removes `checkpoint-N/` and
@@ -518,7 +563,7 @@ uv run python scripts/cleanup.py --dry-run
 uv run python scripts/cleanup.py
 
 # Keep current best, clean everything else
-uv run python scripts/cleanup.py --keep E-010_40ep_E002Init
+uv run python scripts/cleanup.py --keep E-016_Deleaked_FullRebuild
 
 # Clean one experiment only
 uv run python scripts/cleanup.py --experiment E-003_Hierarchical_ICD10
@@ -534,7 +579,6 @@ uv run python scripts/cleanup.py --experiment E-003_Hierarchical_ICD10
 ```bash
 du -sh outputs/evaluations/*/  | sort -rh
 # Each experiment should now be 7-10GB (model weights only)
-# E-010_40ep_E002Init will show as clean immediately after training
 ```
 
 > **When to run:** After every full pipeline run before committing results.
@@ -565,10 +609,11 @@ Step 3 is optional — run after any training to reclaim disk space.
 
 | Decision | Rationale |
 |---|---|
-| roberta-base for Stage-1 | Coarser task — 22 classes, ~440 records each. General encoder sufficient. |
+| Bio_ClinicalBERT for Stage-1 | Confirmed from E-003's saved config (model_type bert, vocab 28996). Chapter routing benefits from clinical domain knowledge; the router shares the clinical encoder with Stage-2. |
 | Bio_ClinicalBERT for Stage-2 | Code resolution needs clinical domain knowledge. MIMIC-III pretraining decisive. |
-| 40 epochs for E-002 | Model still improving at epoch 20. +4.1pp E2E accuracy vs 20 epochs. |
-| Original gold for E-010 | Full head transfer (E-002 and Stage-2 same code space). Augmented gold causes head mismatch. |
+| 40 epochs for E-002 | Model still improving at epoch 20; 40 epochs aids convergence and produces a richer encoder for the Stage-2 warm start. |
+| Same gold for E-002 and Stage-2 | Full head transfer (same code space). Mismatched gold causes head mismatch and E2E collapse. |
+| Stage-1 trained on the same regime as Stage-2 | A router trained on code-only text but served de-leaked notes mismatches (Stage-1 acc 0.95→0.76). Train both stages on the same gold. |
 | Presplits mandatory | Without fixed splits, test sets differ per run and results are not comparable. |
 | Z override permanently removed | "physical exam" appears in every APSO template — phrase override corrupts 100% of predictions. |
 | Skip chapters P, Q, U | Too few records for reliable training. Majority-class fallback is more accurate. |
@@ -594,6 +639,10 @@ No internet or HF Hub down. Check connection, or use `dvc pull` if data already 
 `--stage2-init` path wrong or E-002 weights missing.
 Check: `find outputs/evaluations/registry/E-002_FullICD10_ClinicalBERT -name "model.safetensors"`
 
+**Stage-1 chapter accuracy much lower at eval than at calibration**
+Train/serve regime mismatch — Stage-1 was trained on a different gold regime than
+the notes it is evaluated on. Retrain Stage-1 on the same gold as Stage-2.
+
 **Calibration shows T < 0.1 (clamped to 0.05)**
 Resolver is overconfident in wrong direction — head reinit issue.
 Retrain with more epochs or verify warm start was applied.
@@ -611,28 +660,39 @@ Reduce `--batch-size` to 8 or 4.
 
 ---
 
-## Full Leaderboard — 6 May 2026 (Phase 1b locked)
+## Leaderboard — End-to-End Runs (3 June 2026)
 
-| Rank | Experiment | Stage-1 | E2E | F1 | ECE | Cov@0.7 | Cov Acc |
+The two rows that matter are the same pipeline under the two redaction regimes.
+Earlier experiments are architecture history (all code-only regime) and are not
+directly comparable to the de-leaked number.
+
+| Run | Regime | Stage-1 | E2E | F1 | ECE | Cov@0.7 | Cov Acc |
 |---|---|---|---|---|---|---|---|
-| 🥇 | **E-010_40ep_E002Init** | **98.7%** | **83.9%** | **0.762** | **0.034** | **82.1%** | **95.2%** |
-| 🥈 | E-009_Balanced_E002Init | 96.4% | 79.8% | 0.711 | — | — | — |
-| 🥉 | E-005c + Graph + Override | 97.0% | 77.4% | 0.679 | 0.027 | 68.5% | 93.6% |
-| 4th | E-002 flat | — | 73.3% | 0.634 | — | — | — |
-| 5th | E-008_Balanced | — | 34.2% | 0.249 | — | — | — |
-| 6th | E-006_Hierarchical_Clean | — | 23.8% | 0.160 | — | — | — |
-| 7th | E-004a_Hierarchical_E002Init | — | 20.9% | 0.141 | — | — | — |
-| 8th | E-003_Hierarchical_ICD10 | — | 11.1% | 0.075 | — | — | — |
+| **E-009_Balanced_E002Init** | code-only (leaky baseline) | 98.4% | **84.9%** | 0.774 | 0.024 | 81.2% | 95.2% |
+| **E-016_Deleaked_FullRebuild** | code + description (clean) | 94.8% | **56.7%** | 0.446 | 0.070 | 48.2% | 81.8% |
+| E-015_E009_Deleaked | de-leaked, Stage-1 reused (lower bound) | 75.8% | 48.2% | 0.368 | 0.131 | 47.5% | — |
+| E-005c + Graph + Override | code-only (historic) | 97.0% | 77.4% | 0.679 | 0.027 | 68.5% | 93.6% |
+| E-002 flat | code-only (historic) | — | 73.3% | 0.634 | — | — | — |
 
-**The single most important architectural insights:**
+*E-015 is retained as the intermediate step that exposed the Stage-1 train/serve
+mismatch: reusing a code-only-trained router on de-leaked notes dropped Stage-1 to
+0.758 and E2E to 0.482; retraining Stage-1 on de-leaked data (E-016) recovered it to
+0.948 / 0.567.*
 
-> 1. Train E-002 on the **same gold dataset** as Stage-2 — head mismatch
->    collapses E2E from ~80% to ~20%.
+**The single most important findings:**
+
+> 1. **Diagnosis-description leakage inflates the headline by ~33%** — the same
+>    pipeline scores 0.849 code-only vs 0.567 de-leaked. Report 0.567 as the clean
+>    number, 0.849 as the leaky baseline.
 >
-> 2. Train E-002 for **40 epochs**, not 20 — costs +4.1pp E2E accuracy.
+> 2. Train E-002 on the **same gold dataset** as Stage-2 — head mismatch collapses
+>    E2E from ~80% to ~20%.
+>
+> 3. Train **both stages on the same redaction regime** — a code-only router served
+>    de-leaked notes mismatches and understates true accuracy.
 
 ---
 
-*Last updated: 6 May 2026*
-*Current best: E-010_40ep_E002Init — 83.9% E2E | 0.762 F1 | 0.034 ECE*
+*Last updated: 3 June 2026*
+*Headline: code-only (E-009) E2E 0.849 vs de-leaked (E-016) E2E 0.567 — the gap is diagnosis-description leakage*
 *Data: HF-locked + DVC (commit 6dda8ac)*
