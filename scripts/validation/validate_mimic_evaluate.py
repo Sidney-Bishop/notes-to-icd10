@@ -76,6 +76,16 @@ MEDSYNTH_HYBRID_REFERENCE = {
     "note":             "E-014 SupCon Z override, MedSynth synthetic test set",
 }
 
+MEDSYNTH_REFERENCE_DELEAKED = {
+    "experiment":       "E-016_Deleaked_FullRebuild",
+    "e2e_accuracy":     0.567,
+    "macro_f1":         0.446,
+    "ece":              0.0703,
+    "coverage_at_0.7":  0.482,
+    "n_records":        966,
+    "note":             "de-leaked full end-to-end rebuild (code + description redacted), single run",
+}
+
 
 def load_gold_layer() -> pl.DataFrame:
     """Load the prepared MIMIC-IV Gold layer."""
@@ -90,11 +100,15 @@ def load_gold_layer() -> pl.DataFrame:
     return df
 
 
-def load_predictor(use_supcon_z: bool) -> HierarchicalPredictor:
+def load_predictor(
+    use_supcon_z: bool,
+    base_experiment: str = "E-010_40ep_E002Init",
+    stage1_experiment: str = "E-003_Hierarchical_ICD10",
+) -> HierarchicalPredictor:
     """Load the hierarchical predictor, optionally with SupCon Z override."""
     predictor = HierarchicalPredictor(
-        experiment_name="E-010_40ep_E002Init",
-        stage1_experiment="E-003_Hierarchical_ICD10",
+        experiment_name=base_experiment,
+        stage1_experiment=stage1_experiment,
     )
 
     if use_supcon_z:
@@ -297,8 +311,11 @@ def save_results(
 
 def main(args) -> None:
     t_start = time.perf_counter()
-    experiment_label = "E-010" + (" + E-014 SupCon Z" if args.supcon_z else "")
-    reference = MEDSYNTH_HYBRID_REFERENCE if args.supcon_z else MEDSYNTH_REFERENCE
+    experiment_label = args.base_experiment + (" + E-014 SupCon Z" if args.supcon_z else "")
+    if args.deleaked_reference:
+        reference = MEDSYNTH_REFERENCE_DELEAKED
+    else:
+        reference = MEDSYNTH_HYBRID_REFERENCE if args.supcon_z else MEDSYNTH_REFERENCE
 
     print("=" * 70)
     print(f"  validate_mimic_evaluate.py — MIMIC-IV Validation")
@@ -309,7 +326,11 @@ def main(args) -> None:
     # Load data and model
     df = load_gold_layer()
     print(f"\n📥 Loading predictor ({experiment_label})...")
-    predictor = load_predictor(use_supcon_z=args.supcon_z)
+    predictor = load_predictor(
+        use_supcon_z=args.supcon_z,
+        base_experiment=args.base_experiment,
+        stage1_experiment=args.stage1_experiment,
+    )
 
     # Run evaluation
     print(f"\n── Evaluation ───────────────────────────────────────────────────────")
@@ -372,6 +393,21 @@ def parse_args():
         type=float,
         default=0.7,
         help="Confidence threshold for Coverage@τ (default: 0.7)"
+    )
+    parser.add_argument(
+        "--base-experiment",
+        default="E-010_40ep_E002Init",
+        help="Base hierarchical experiment for all resolvers (default: E-010_40ep_E002Init)"
+    )
+    parser.add_argument(
+        "--stage1-experiment",
+        default="E-003_Hierarchical_ICD10",
+        help="Stage-1 router experiment (default: E-003_Hierarchical_ICD10)"
+    )
+    parser.add_argument(
+        "--deleaked-reference",
+        action="store_true",
+        help="Compare against the de-leaked E-016 reference (0.567) instead of leaky E-010 (0.858)"
     )
     return parser.parse_args()
 
