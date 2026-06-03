@@ -140,15 +140,21 @@ base, not E-001-initialised, so routing is slightly below the historical ~96%
 
 ## Q8 — Redact the diagnosis DESCRIPTION (not just the code), then rerun
 
-> **STATUS (2026-06-02): approach VALIDATED, migration pending.** Scope, method,
-> and validation are decided and recorded in **D011** — assessment-only,
-> dictionary-anchored deterministic redactor, LLM-advisory audit, ~94% clean on
-> the fired set (vs 50% for the earlier CDC-fuzzy matcher). Built and proven in
-> the EDA notebook (`01-EDA_SOAP_1.ipynb`, Q8 section). **Remaining work:** migrate
-> the redactor into `src/preprocessing.py` + wire into `prepare_data.py`, regenerate
-> gold, rerun the E-009 chain → first publishable number. Residual leakage
-> (note-level 77.9% exposure; rule fires on 5,610/9,660; restated-in-different-words
-> class) is documented in D011 and consciously accepted for this pass.
+> **STATUS (2026-06-02): redactor FINALIZED (v5), migration in progress.** Scope &
+> architecture in **D011**; final redactor version, corpus residual, and the
+> rejected-v4 breadcrumb in **D012**. The redactor is **v5** (assessment-only,
+> dictionary-anchored, article-tolerant, min-2-token guard, LLM-advisory audit).
+> Measured corpus-wide: **18.6% residual** leak after redaction (removes 75.6% of
+> pre-existing leakage; fires on 6,091/9,660). Stratified 500-record audit: fired
+> stratum 96% clean, nomatch stratum 61% genuinely leaks (real recall gap). A more
+> aggressive v4 reached 13.3% residual but was **rejected** for reintroducing
+> over-redaction of clinical findings (see D012). Residual composition: reworded
+> (genuine ceiling) + guard-skipped single-word labels + CDC-fallback (partly LLM
+> false-positives). **Remaining work:** migrating v5 into `src/preprocessing.py` +
+> `prepare_data.py` behind a flag on branch `q8/description-redaction`; then
+> port-verify (must reproduce 18.6%/6,091), regenerate gold, rerun E-009 → first
+> publishable number. Inference parity DEFERRED (code unknown at inference — see
+> D012/journal).
 
 The current canonical gold redacts the ICD-10 *code* strings but retains the
 human-readable diagnosis description they encode — e.g. "pain in left knee" for
@@ -248,3 +254,33 @@ sklearn to a version compatible with the stored pickles, then re-run evaluate an
 confirm the number is stable. Cheap to check; matters for a publishable number.
 
 **Status:** VERIFIED BENIGN (2026-06-01). scispacy 0.5.5 pins no sklearn version; a --dry-run behavioural check showed the UMLS linker produces correct concepts under sklearn 1.8.0 (M25.562 → C0030193 "Pain" @0.97). The InconsistentVersionWarning is precautionary/cosmetic, not breakage. Optional future tidy: pin sklearn to silence the warning, but no correctness issue. Downgraded from low-medium to cosmetic.
+
+---
+
+## Q10 — DSPy/GEPA for hardening the Q8 audit judge (parked, audit-only)
+
+**Idea.** Use DSPy (and an optimizer such as GEPA) with the local LLM stack to
+*compile* the Q8 audit prompt rather than hand-write it — optimizing the local
+LLM's leak/over-redaction verdicts to better match ground truth, making the audit
+*judge* more reliable.
+
+**Hard guardrail (non-negotiable).** DSPy may touch the **audit only**, NEVER the
+redaction path. The published number's redaction must stay a deterministic,
+re-runnable rule (D011). An optimizer-produced, stochastically-generated prompt
+must not become load-bearing for the gold the model trains on — that would be a
+reproducibility regression dressed as an improvement. LLM audits; deterministic
+rule redacts. This boundary survives DSPy.
+
+**Prerequisite.** Optimizing the judge requires a **human-labeled** gold set
+(~150–200 records hand-marked clean/leak_remains/over_redacted). The LLM cannot be
+optimized toward its own verdicts (circular). Building that labeled set is the
+real cost and the gating task.
+
+**Priority / timing.** LOW, and explicitly **post-first-publishable-number**.
+Inserting a prompt-optimization framework now is scope creep that delays the
+migration→regenerate→rerun path. The current deterministic dictionary redactor
+(~94% clean on fired records, D011) is a stronger basis for a publishable result
+than a higher-scoring but non-reproducible LLM redactor.
+
+**Status:** PARKED (2026-06-02). Revisit only after the first publishable number
+exists, and only for audit-judge hardening.

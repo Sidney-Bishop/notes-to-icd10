@@ -568,3 +568,65 @@ breadcrumbs (CDC-fuzzy, dict v1/v2) so the trail of what we tried survives.
 regenerate gold, rerun the E-009 chain → first publishable number (expected below
 0.849; that delta quantifies the leakage). Tidy: strip empty `**\n\n**` fences
 when redaction empties an assessment.
+
+## 2026-06-02 (cont.) — Q8 redactor: from "94% on 50" to measured 18.6% residual; v4 rejected, v5 final (D012)
+
+After committing D011 (which validated the approach on 50 records), we did the
+harder measurement work. The 50-sample was encouraging but couldn't see the recall
+gap; the corpus-wide numbers and a 500-record stratified audit could, and they
+reshaped the picture. Full trail here because the path matters for anyone following.
+
+**1. Corpus-wide deterministic residual.** Re-ran the token-overlap leak test on
+the redactor *output* over all 9,660 billable (no LLM). v3 (D011's redactor):
+residual 23.5% (2,270), removed 69.2%, fired 5,610. So the honest figure is not
+"94% clean" — that was over the fired set — but "23.5% of all billable still leak
+after redaction." Both true, different denominators. This became the number to
+improve.
+
+**2. Stratified 500-record LLM audit (300 fired + 200 nomatch).** Fired stratum
+96% clean — confirms quality at scale, the 50-sample wasn't a fluke. Nomatch
+stratum 61% genuinely leak — the records we DON'T fire on mostly DO still contain
+the label. So the recall gap is real, not an artifact of the loose overlap metric.
+
+**3. Decomposed the 122 confirmed nomatch misses.** article_insertion 20%
+(inserted "the" defeats the match — fixable), guard_skipped 26% (single-word
+labels we skip on purpose), on_CDC_fallback 34% (dict miss — but reading them,
+some are LLM false-positives / code-assessment mismatches, not real leaks), reworded
+20% (genuine paraphrase, deterministic ceiling). So ~half the gap is fixable,
+~a fifth is a hard ceiling, a third needs discounting for false-positives.
+
+**4. v4: chased recall, caught a regression.** Added (a) optional-article matching
+and (b) standalone-short-phrase recovery. Residual dropped to 13.3% — tempting.
+But a risk-weighted 200-record precision audit (oversampling the new behaviors)
+showed fix (b) reintroduced the over-redaction the guard was built to stop: it cut
+short labels out of finding sentences — "moderate wheezing and…" → "moderate  and…"
+(R06.2), aphasia (R47.01), pyonephrosis (N13.6). Real damage to clinical signal.
+Fix (a) was clean (apparent over-redactions were label-only-assessment false alarms).
+
+**5. v5 = v3 + article-tolerance only.** Dropped fix (b). Residual 18.6% (1,799),
+removed 75.6%, fired 6,091. We deliberately took 18.6% over v4's 13.3%: the extra
+recall corrupted findings, and over-redaction is a worse failure than residual leak.
+v5 is the redactor we migrate. Recorded as D012.
+
+**Method lesson reinforced (twice).** The local-LLM judge mis-flagged twice and
+both were caught by READING cases, not trusting counts: it called the [DIAGNOSIS]
+placeholder a leak (fixed in the prompt), and called label-only assessments
+"over_redacted" when full removal correctly emptied the section. The judge is
+advisory; tallies get verified by eyeball before we act on them. This is now a
+standing practice for the audit.
+
+**Housekeeping done alongside:** consolidated the EDA notebook to a single clean
+underscore-named file (01-EDA_SOAP_1.ipynb; the space-named original and the
+interim _clean copy removed), with superseded redactor versions preserved as
+markdown breadcrumbs. Parked DSPy/GEPA as Q10 (audit-judge hardening only,
+post-first-number, needs a human-labeled set; never the redaction path).
+
+**Next:** migrate v5 into src/preprocessing.py + prepare_data.py behind a flag
+(flag gates phase 3d AND switches output filename so leaky + de-leaked golds
+coexist for a clean A/B), on branch q8/description-redaction. Port-verification
+gate: migrated redact_descriptions must reproduce 18.6% / 6,091 before we trust the
+rerun. Then rerun E-009 → first publishable number (expect below 0.849; the delta
+is the leakage contribution). Inference parity (prepare_inference_input) DEFERRED:
+at inference the code is unknown, so code-keyed redaction can't apply as-is —
+real train/serve asymmetry needing its own design pass; the rerun measures the
+leakage effect, not a deployable model.

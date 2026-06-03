@@ -426,3 +426,156 @@ higher and must be stated as such in the paper.
 **When to revisit.** After migrating to scripts + regenerating gold + rerunning
 the E-009 chain, the resulting accuracy (expected below 0.849) is the first
 publishable number; compare against 0.849 to quantify the leakage's contribution.
+
+---
+
+## D012 — Q8 redactor finalized at v5 (article-tolerant); v4 recall fix rejected for over-redaction (2026-06-02)
+
+**Supersedes the redactor-detail in D011** (scope and architecture in D011 stand;
+this records the final redactor version and the corpus-wide residual, which D011
+predated). The redactor to migrate is **v5**.
+
+**Why this decision exists.** D011 validated the *approach* on a 50-record sample
+(~94% clean). Afterward we measured the redactor corpus-wide and ran a 500-record
+stratified audit. Those revealed the recall gap that the 50-sample could not, and
+drove two more redactor iterations. This records what we found and why v5 is final.
+
+**Corpus-wide deterministic residual (the honest figure).** Re-running the
+token-overlap leak test on the redactor *output* across all 9,660 billable
+records (no LLM, no sample):
+- pre-redaction leak: 7,372 (76.3%)
+- **v3** (D011's redactor): residual 2,270 (**23.5%**), removed 69.2%, fired 5,610.
+- **v5** (final): residual 1,799 (**18.6%**), removed 75.6%, fired 6,091.
+
+"~94% clean" in D011 was over the *fired* set; **18.6% of all billable records
+still leak after v5**. Both numbers are true; they answer different questions.
+
+**Stratified 500-record LLM audit (fired 300 + nomatch 200).**
+- fired stratum: **96% clean** — confirms redaction quality at scale (not just n=50).
+- nomatch stratum: **61% genuinely still leak** — the recall gap is REAL, not a
+  metric artifact. Of records the rule does not fire on, most truly retain the label.
+
+**Recall-gap decomposition (122 confirmed nomatch leaks categorized).**
+- article_insertion 20% — dictionary phrase defeated by an inserted "the"/"a"
+  (e.g. "Disease of **the** stomach…"). **Fixable → fixed in v5.**
+- guard_skipped 26% — single-content-token descriptions ("Weakness", "Other Shock")
+  skipped by the min-2-token guard. **Accepted residual** (skipping is correct;
+  matching them over-redacts — see v4 below).
+- on_CDC_fallback 34% — code absent from dictionary; CDC string didn't match. NB:
+  inspection showed SOME of these are LLM false-positives / code-assessment
+  mismatches (assessment is about a different condition than the code), i.e. NOT
+  true misses. The 34% overstates real residual.
+- reworded 20% — label genuinely paraphrased ("Old MI" → "history of myocardial
+  infarction", "prosthetic heart valve" → "mechanical mitral valve replacement").
+  **Genuine deterministic ceiling** — cannot be caught without semantic matching,
+  which would over-redact. Accepted residual.
+
+**v4 attempted, then REJECTED (the key breadcrumb).** v4 = v3 + two recall fixes:
+(a) optional-article matching, (b) standalone-short-phrase recovery (drop the guard
+when a short phrase is a whole standalone line). v4 reached **13.3% residual** —
+better recall. BUT a risk-weighted precision audit (200 records, oversampling the
+new behaviors) showed fix (b) **reintroduced over-redaction of clinical findings**:
+it cut short labels out of *finding sentences* — "moderate **wheezing** and…" →
+"moderate  and…" (R06.2), "Moderate **aphasia**, difficulty…" (R47.01),
+"consistent with acute **pyonephrosis**" (N13.6). Embedded-short over-redaction is
+exactly what the guard existed to prevent. Fix (a), article-tolerance, was clean
+(its apparent over-redactions were label-only-assessment false alarms).
+
+**v5 = v3 + article-tolerance ONLY (fix (a) kept, fix (b) dropped).** Deliberately
+chose **18.6% residual over v4's 13.3%**: the extra ~5pp recall came at the cost of
+corrupting clinical findings the model must learn from. **Over-redaction (damaging
+legitimate content) is a worse failure than residual leak** — we accept a higher
+leak rate to guarantee we are not mangling findings. This trade is the core of the
+decision.
+
+**LLM-judge fallibility (method note).** The local-LLM auditor mis-flagged twice,
+both caught by *reading cases, not trusting tallies*: (1) it read the `[DIAGNOSIS]`
+placeholder as a surviving leak (fixed by declaring the marker in the prompt);
+(2) it called label-only assessments "over_redacted" when correct full removal left
+an empty section. Lesson recorded: the LLM is an advisory flagger; verdicts are
+confirmed by reading, especially before acting on a tally.
+
+**Final accepted residual = 18.6%**, composed of: reworded (genuine ceiling) +
+guard-skipped single-word labels (skipping is safer than over-redacting) +
+CDC-fallback (partly real misses, partly LLM false-positives). Consistent with the
+project stance: residual leak is documented and accepted; over-redaction is not.
+
+**Migrate v5** (article-tolerant full-phrase match, [DIAGNOSIS] placeholder
+mid-sentence / drop-line standalone, remove-all-occurrences, min-2-token guard,
+dictionary + CDC fallback) into `src/preprocessing.py` + `prepare_data.py`, behind
+a flag, then rerun. Port-verification gate: confirm the migrated function
+reproduces 18.6% residual / 6,091 fired before trusting the rerun.
+
+---
+
+## D013 — LLM-assisted audit: methodology & reproducibility (publication record) (2026-06-02)
+
+Publication-grade record of the local-LLM auditor used throughout Q8. Captures
+what model, served how, doing what job, with what guardrails, and how it shaped
+the redaction decisions WITHOUT contaminating the reproducible gold artifact.
+Cross-refs: D011 (architecture), D012 (v5 outcome & the convergence path),
+`prompts/q8_audit_prompt.md` (the prompt, committed). NB a fuller serving writeup
+(`serving_local_models.md`) is not yet in the repo; the operational specifics
+needed to reproduce the audit are recorded inline in §3 below.
+
+**1. Role — advisory auditor, never redactor.** The deterministic dictionary rule
+(`redact_descriptions`, v5) produces the gold. The LLM only *judges* the rule's
+output per record — verdict ∈ {clean, leak_remains, over_redacted, both} — to
+measure redaction quality and surface failure modes. The LLM NEVER writes, edits,
+or selects gold content. This is the central reproducibility guarantee: **the
+published de-leaked gold does not depend on any stochastic LLM output.** A reader
+can regenerate the gold from the committed dictionary + deterministic code without
+ever invoking the LLM.
+
+**2. Model — agnostic design, named instance.** The method is model-agnostic: it
+accepts any sufficiently capable instruction-following model served locally; the
+model is selected from the live oMLX roster at run time (NOT hardcoded), and its
+identity/capability is recorded from the runtime roster rather than assumed. The
+results reported in this work were produced with the specific instance
+**`Qwen3-Coder-30B-A3B-Instruct-MLX-6bit`**. Both facts belong in the paper: the
+design does not depend on one model, and the reported numbers are reproducible with
+this exact instance.
+
+**3. Serving — local, Path 1 direct API.** Served via **oMLX** at
+`http://127.0.0.1:8000`, OpenAI-compatible **Path 1 direct API**
+(`/v1/chat/completions`). (Path 2, the `claude -p` agentic route, was NOT used for
+the audit.) The Path 1 vs Path 2 distinction and the "capability recorded from
+roster, not hardcoded" pattern are described in an external serving writeup
+(`serving_local_models.md`) which should be added to the repo before publication;
+until then the reproducibility-critical specifics (model §2, endpoint, API, temp
+§4) are captured here in D013. Auth token is a local placeholder.
+
+**4. Determinism — temperature 0, top_p 1.** All audit calls use temperature 0,
+top_p 1, so verdicts are re-runnable on the pinned stack. Honest caveat for the
+paper: this yields determinism *given the same model weights and serving stack* —
+it is an engineering reproducibility property, not a mathematical guarantee across
+model or runtime updates. The audit is therefore reproducible as an artifact
+(pinned stack), and the deterministic gold is reproducible independently of it.
+
+**5. Prompt — versioned artifact, evolved.** The audit prompt is a committed file,
+`prompts/q8_audit_prompt.md`, read directly by the audit cell (NOT pasted inline —
+avoids drift between documented and executed prompt). It evolved during the work;
+the material change was declaring the `[DIAGNOSIS]` placeholder as a SUCCESS marker
+after the judge initially mis-read it as a surviving leak (see §7). The prompt
+defines the four verdicts, requires reasoning-before-verdict, and includes worked
+examples.
+
+**6. How the LLM shaped convergence (v1→v5).** The auditor *informed* but did not
+*decide* the redactor evolution. It flagged the v4 short-standalone fix as
+reintroducing over-redaction of clinical findings (→ rejected, see D012), and its
+500-record stratified audit confirmed the recall gap was real (nomatch stratum 61%
+genuine leaks). Every redaction DECISION was made by a human reading the flagged
+cases; the LLM was a flagger whose tallies were verified by eyeball. The paper's
+honest characterization: **LLM-assisted auditing, human-adjudicated decisions,
+deterministic redaction.** The convergence to v5 (and the rejection of v4) is
+attributable to human judgment over LLM-surfaced evidence, not to the LLM itself.
+
+**7. Limitations (for the paper).** (a) The judge is fallible: it mis-flagged at
+least twice — reading the `[DIAGNOSIS]` placeholder as a leak, and calling
+label-only assessments "over_redacted" when correct full removal emptied the
+section. Both were caught by reading cases, not trusting tallies; this is why
+human adjudication is load-bearing. (b) LLM-audited samples (50; 500 stratified;
+200 precision) are samples, not the full corpus — the deterministic residual
+(D012, 18.6%) is the exhaustive measure; the LLM clean-rates (96% fired) are
+sampled. (c) "Clean rate" is over the records the rule *fires on*, not all records.
+(d) Audit reproducibility depends on the pinned local stack (§4).
