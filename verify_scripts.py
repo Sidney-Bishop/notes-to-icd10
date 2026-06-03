@@ -1,213 +1,224 @@
 """
 verify_scripts.py — Pre-flight script verification
 
-Run this before every training session to confirm:
-1. Python cache is clear
-2. All required scripts and source files exist
-3. inference.py uses ExperimentPaths (no duplicated path logic)
-3b. prepare_data.py uses HF Hub (no CDC FTP), enforces SHA256
-3c. generate_manifest.py captures git commit, SHA256, schema
-3d. DVC pointer files and gold MANIFEST are present
-4. train.py, calibrate.py, evaluate.py have ExperimentLogger wired up
-5-8. Various correctness checks carried forward from prior refactors
+Run before every training session to confirm the codebase is in a known-good
+state. Refactored so each check group is a callable function returning
+(name, passed, detail) tuples — unit-testable in tests/test_verify_scripts.py —
+while `python verify_scripts.py` behaves exactly as before (runs all checks,
+prints, exits 0/1).
 
 Usage:
     python3 verify_scripts.py
-
-All checks must pass before running any training command.
 """
+
+from __future__ import annotations
 
 import sys
 import subprocess
+import importlib.util
 from pathlib import Path
 
 ROOT = Path(__file__).parent
-SCRIPTS = ROOT / "scripts"
-SRC = ROOT / "src"
-
 PASS = "✅"
 FAIL = "❌"
-errors = []
 
-def check(name, condition, detail=""):
-    if condition:
-        print(f"  {PASS} {name}")
-    else:
-        print(f"  {FAIL} {name}" + (f" — {detail}" if detail else ""))
-        errors.append(name)
+# A check result: (name, passed, detail)
+CheckResult = tuple[str, bool, str]
 
-print("\n" + "="*60)
-print(" Pre-flight Verification")
-print("="*60)
 
-# ── 1. Clear cache ──────────────────────────────────────────
-print("\n[1] Clearing Python bytecode cache...")
-result = subprocess.run(
-    ["find", ".", "-type", "d", "-name", "__pycache__", "-exec", "rm", "-rf", "{}", "+"],
-    capture_output=True, cwd=ROOT
-)
-result2 = subprocess.run(
-    ["find", ".", "-name", "*.pyc", "-delete"],
-    capture_output=True, cwd=ROOT
-)
-print(f"  {PASS} Cache cleared")
+# ---------------------------------------------------------------------------
+# Individual check groups — pure (read files, return results; no printing,
+# no global state). Each takes the project root so tests can point at fixtures.
+# ---------------------------------------------------------------------------
 
-# ── 2. Check required files exist ───────────────────────────
-print("\n[2] Checking required files exist...")
-required_files = [
-    SRC / "experiment_logger.py",
-    SRC / "paths.py",
-    SRC / "inference.py",
-    SRC / "gatekeeper.py",
-    SRC / "preprocessing.py",
-    SCRIPTS / "train.py",
-    SCRIPTS / "calibrate.py",
-    SCRIPTS / "evaluate.py",
-    SCRIPTS / "prepare_splits.py",
-    SCRIPTS / "prepare_data.py",
-    SCRIPTS / "generate_manifest.py",
+def check_required_files(root: Path) -> list[CheckResult]:
+    scripts, src = root / "scripts", root / "src"
+    required = [
+        src / "experiment_logger.py", src / "paths.py", src / "inference.py",
+        src / "gatekeeper.py", src / "preprocessing.py",
+        scripts / "train.py", scripts / "calibrate.py", scripts / "evaluate.py",
+        scripts / "prepare_splits.py", scripts / "prepare_data.py",
+        scripts / "generate_manifest.py",
+    ]
+    return [(f.name, f.exists(), f"missing at {f}") for f in required]
+
+
+def check_inference(root: Path) -> list[CheckResult]:
+    text = (root / "src" / "inference.py").read_text()
+    z_override_active = ("pred_chapter = 'Z'" in text or 'pred_chapter = "Z"' in text)
+    multi_conv = "ExperimentPaths" in text and "stage2_model_dir" in text
+    return [
+        ("Z override removed", not z_override_active,
+         "Z override still active — will corrupt all predictions"),
+        ("Multi-convention stage2 loader present", multi_conv,
+         "ExperimentPaths not used for stage2 path resolution in inference.py"),
+    ]
+
+
+def check_prepare_data(root: Path) -> list[CheckResult]:
+    text = (root / "scripts" / "prepare_data.py").read_text()
+    return [
+        ("HF Hub used instead of CDC FTP",
+         "hf_hub_download" in text and "ftp.cdc.gov" not in text,
+         "Still using CDC FTP — should use hf_hub_download"),
+        ("SHA256 constants defined", "EXPECTED_SHA256" in text,
+         "EXPECTED_SHA256 dict missing"),
+        ("SHA256 verification called", "_verify_sha256" in text,
+         "_verify_sha256() not called"),
+        ("Offline flag present", "--offline" in text,
+         "No --offline flag"),
+    ]
+
+
+def check_generate_manifest(root: Path) -> list[CheckResult]:
+    text = (root / "scripts" / "generate_manifest.py").read_text()
+    return [
+        ("Manifest captures git commit", "git_commit" in text, "git_commit not recorded"),
+        ("Manifest captures SHA256", "sha256" in text, "SHA256 not recorded"),
+        ("Manifest captures schema", "schema" in text, "schema not recorded"),
+    ]
+
+
+def check_dvc_pointers(root: Path) -> list[CheckResult]:
+    gold = root / "data" / "gold"
+    results = []
+    for dvc_file in (root / "data" / "medsynth" / "icd10_notes.parquet.dvc",
+                     gold / "cdc_fy2026_icd10.parquet.dvc"):
+        results.append((f"{dvc_file.name} present", dvc_file.exists(),
+                        f"DVC pointer missing at {dvc_file}"))
+    results.append(("Gold parquet DVC pointer present",
+                    len(list(gold.glob("medsynth_gold_apso_*.parquet.dvc"))) > 0,
+                    "No medsynth_gold_apso_*.parquet.dvc found"))
+    results.append(("Gold MANIFEST present",
+                    len(list(gold.glob("MANIFEST_*.json"))) > 0,
+                    "No MANIFEST_*.json found — run generate_manifest.py"))
+    return results
+
+
+def check_train(root: Path) -> list[CheckResult]:
+    text = (root / "scripts" / "train.py").read_text()
+    return [
+        ("ExperimentLogger imported in train.py",
+         "from src.experiment_logger import ExperimentLogger" in text, ""),
+        ("log_start called in train.py", "exp_logger.log_start" in text, ""),
+        ("log_complete called in train.py", "exp_logger.log_complete" in text, ""),
+        ("TrainingResult .get() bug fixed", "hasattr(obj, key)" in text,
+         "Still using .get() on TrainingResult dataclass"),
+        ("Gold path resolution fixed", "gold_path.is_absolute()" in text,
+         "Gold path not resolved against PROJECT_ROOT"),
+    ]
+
+
+def check_calibrate(root: Path) -> list[CheckResult]:
+    text = (root / "scripts" / "calibrate.py").read_text()
+    return [
+        ("ExperimentLogger in calibrate.py", "ExperimentLogger" in text, ""),
+        ("log_start called in calibrate.py", "log_start" in text, ""),
+    ]
+
+
+def check_evaluate(root: Path) -> list[CheckResult]:
+    text = (root / "scripts" / "evaluate.py").read_text()
+    return [
+        ("ExperimentLogger in evaluate.py", "ExperimentLogger" in text, ""),
+        ("log_results called in evaluate.py", "log_results" in text, ""),
+    ]
+
+
+def check_prepare_splits(root: Path) -> list[CheckResult]:
+    text = (root / "scripts" / "prepare_splits.py").read_text()
+    return [("Gold path resolution fixed in prepare_splits.py",
+             "is_absolute()" in text,
+             "prepare_splits.py still uses raw relative gold path")]
+
+
+def check_experiment_logger(root: Path) -> list[CheckResult]:
+    text = (root / "src" / "experiment_logger.py").read_text()
+    return [
+        ("ExperimentLogger class present", "class ExperimentLogger" in text, ""),
+        ("status() function present", "def status()" in text, ""),
+        ("run.log path defined", "run.log" in text, ""),
+        ("experiments.json path defined", "experiments.json" in text, ""),
+    ]
+
+
+def check_runtime_import(root: Path) -> list[CheckResult]:
+    """
+    Actually import src/experiment_logger.py and report whether it succeeds.
+
+    (Previously this was dead code: `... if False else None` plus a hardcoded
+    check(..., True), so it ALWAYS passed without importing anything. Now it
+    genuinely loads the module.)
+    """
+    target = root / "src" / "experiment_logger.py"
+    try:
+        spec = importlib.util.spec_from_file_location("experiment_logger", target)
+        if spec is None or spec.loader is None:
+            return [("src.experiment_logger importable", False, "could not build import spec")]
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)   # real import — raises on failure
+        return [("src.experiment_logger importable", True, "")]
+    except Exception as e:  # noqa: BLE001 — we want to report any import failure
+        return [("src.experiment_logger importable", False, str(e))]
+
+
+# ---------------------------------------------------------------------------
+# Aggregation
+# ---------------------------------------------------------------------------
+
+ALL_CHECKS = [
+    check_required_files, check_inference, check_prepare_data,
+    check_generate_manifest, check_dvc_pointers, check_train,
+    check_calibrate, check_evaluate, check_prepare_splits,
+    check_experiment_logger, check_runtime_import,
 ]
-for f in required_files:
-    check(f.name, f.exists(), f"missing at {f}")
 
-# ── 3. Check inference.py — Z override must be gone ─────────
-print("\n[3] Checking inference.py...")
-inference_text = (SRC / "inference.py").read_text()
-z_override_active = (
-    "pred_chapter = 'Z'" in inference_text or
-    'pred_chapter = "Z"' in inference_text
-)
-check("Z override removed", not z_override_active,
-      "Z override still active — will corrupt all predictions")
 
-# Multi-convention loading is now delegated to ExperimentPaths in src/paths.py.
-# Verify inference.py imports and uses it rather than duplicating the logic.
-multi_conv = "ExperimentPaths" in inference_text and "stage2_model_dir" in inference_text
-check("Multi-convention stage2 loader present", multi_conv,
-      "ExperimentPaths not used for stage2 path resolution in inference.py")
+def run_all_checks(root: Path) -> list[CheckResult]:
+    results: list[CheckResult] = []
+    for fn in ALL_CHECKS:
+        results.extend(fn(root))
+    return results
 
-# ── 3b. Check prepare_data.py — HF Hub architecture ────────
-print("\n[3b] Checking prepare_data.py...")
-prepare_text = (SCRIPTS / "prepare_data.py").read_text()
-check("HF Hub used instead of CDC FTP",
-      "hf_hub_download" in prepare_text and "ftp.cdc.gov" not in prepare_text,
-      "Still using CDC FTP — should use hf_hub_download")
-check("SHA256 constants defined",
-      "EXPECTED_SHA256" in prepare_text,
-      "EXPECTED_SHA256 dict missing — downloads not verified")
-check("SHA256 verification called",
-      "_verify_sha256" in prepare_text,
-      "_verify_sha256() not called — hash enforcement missing")
-check("Offline flag present",
-      "--offline" in prepare_text,
-      "No --offline flag — pipeline will hang in offline environments")
 
-# ── 3c. Check generate_manifest.py — provenance capture ─────
-print("\n[3c] Checking generate_manifest.py...")
-manifest_text = (SCRIPTS / "generate_manifest.py").read_text()
-check("Manifest captures git commit",
-      "git_commit" in manifest_text,
-      "git_commit not recorded in manifest")
-check("Manifest captures SHA256",
-      "sha256" in manifest_text,
-      "SHA256 not recorded in manifest")
-check("Manifest captures schema",
-      "schema" in manifest_text,
-      "Polars schema not recorded in manifest")
+def clear_cache(root: Path) -> None:
+    """Side-effecting: remove __pycache__ and *.pyc. Run only by the CLI."""
+    subprocess.run(["find", ".", "-type", "d", "-name", "__pycache__",
+                    "-exec", "rm", "-rf", "{}", "+"], capture_output=True, cwd=root)
+    subprocess.run(["find", ".", "-name", "*.pyc", "-delete"],
+                   capture_output=True, cwd=root)
 
-# ── 3d. Check DVC pointer files exist ───────────────────────
-print("\n[3d] Checking DVC pointer files...")
-dvc_files = [
-    ROOT / "data" / "medsynth" / "icd10_notes.parquet.dvc",
-    ROOT / "data" / "gold" / "cdc_fy2026_icd10.parquet.dvc",
-]
-for dvc_file in dvc_files:
-    check(f"{dvc_file.name} present", dvc_file.exists(),
-          f"DVC pointer missing at {dvc_file}")
 
-gold_dvc = list((ROOT / "data" / "gold").glob("medsynth_gold_apso_*.parquet.dvc"))
-check("Gold parquet DVC pointer present",
-      len(gold_dvc) > 0,
-      "No medsynth_gold_apso_*.parquet.dvc found in data/gold/")
+def main() -> int:
+    print("\n" + "=" * 60)
+    print(" Pre-flight Verification")
+    print("=" * 60)
 
-gold_manifest = list((ROOT / "data" / "gold").glob("MANIFEST_*.json"))
-check("Gold MANIFEST present",
-      len(gold_manifest) > 0,
-      "No MANIFEST_*.json found in data/gold/ — run generate_manifest.py")
+    print("\n[1] Clearing Python bytecode cache...")
+    clear_cache(ROOT)
+    print(f"  {PASS} Cache cleared")
 
-# ── 4. Check train.py — logger must be present ──────────────# ── 4. Check train.py — logger must be present ──────────────
-print("\n[4] Checking train.py...")
-train_text = (SCRIPTS / "train.py").read_text()
-check("ExperimentLogger imported in train.py",
-      "from src.experiment_logger import ExperimentLogger" in train_text)
-check("log_start called in train.py",
-      "exp_logger.log_start" in train_text)
-check("log_complete called in train.py",
-      "exp_logger.log_complete" in train_text)
-check("TrainingResult .get() bug fixed",
-      "hasattr(obj, key)" in train_text,
-      "Still using .get() on TrainingResult dataclass")
-check("Gold path resolution fixed",
-      "gold_path.is_absolute()" in train_text,
-      "Gold path not resolved against PROJECT_ROOT")
+    results = run_all_checks(ROOT)
+    failed = []
+    for name, passed, detail in results:
+        if passed:
+            print(f"  {PASS} {name}")
+        else:
+            print(f"  {FAIL} {name}" + (f" — {detail}" if detail else ""))
+            failed.append(name)
 
-# ── 5. Check calibrate.py — logger must be present ──────────
-print("\n[5] Checking calibrate.py...")
-calibrate_text = (SCRIPTS / "calibrate.py").read_text()
-check("ExperimentLogger in calibrate.py",
-      "ExperimentLogger" in calibrate_text)
-check("log_start called in calibrate.py",
-      "log_start" in calibrate_text)
-
-# ── 6. Check evaluate.py — logger must be present ───────────
-print("\n[6] Checking evaluate.py...")
-evaluate_text = (SCRIPTS / "evaluate.py").read_text()
-check("ExperimentLogger in evaluate.py",
-      "ExperimentLogger" in evaluate_text)
-check("log_results called in evaluate.py",
-      "log_results" in evaluate_text)
-
-# ── 7. Check prepare_splits.py — path fix present ───────────
-print("\n[7] Checking prepare_splits.py...")
-splits_text = (SCRIPTS / "prepare_splits.py").read_text()
-check("Gold path resolution fixed in prepare_splits.py",
-      "is_absolute()" in splits_text,
-      "prepare_splits.py still uses raw relative gold path")
-
-# ── 8. Check experiment_logger.py exists and is functional ──
-print("\n[8] Checking experiment_logger.py...")
-logger_text = (SRC / "experiment_logger.py").read_text()
-check("ExperimentLogger class present",
-      "class ExperimentLogger" in logger_text)
-check("status() function present",
-      "def status()" in logger_text)
-check("run.log path defined",
-      "run.log" in logger_text)
-check("experiments.json path defined",
-      "experiments.json" in logger_text)
-
-# ── 9. Runtime import check ──────────────────────────────────
-print("\n[9] Runtime import check...")
-try:
-    import importlib.util
-    spec = importlib.util.spec_from_file_location(
-        "experiment_logger", SRC / "experiment_logger.py"
-    )
-    mod = importlib.util.load_from_spec(spec) if False else None
-    check("src.experiment_logger importable", True)
-except Exception as e:
-    check("src.experiment_logger importable", False, str(e))
-
-# ── Summary ──────────────────────────────────────────────────
-print("\n" + "="*60)
-if errors:
-    print(f" {FAIL} {len(errors)} check(s) FAILED:")
-    for e in errors:
-        print(f"    — {e}")
-    print("\n  Fix these before running any training commands.")
-    print("="*60 + "\n")
-    sys.exit(1)
-else:
+    print("\n" + "=" * 60)
+    if failed:
+        print(f" {FAIL} {len(failed)} check(s) FAILED:")
+        for n in failed:
+            print(f"    — {n}")
+        print("\n  Fix these before running any training commands.")
+        print("=" * 60 + "\n")
+        return 1
     print(f" {PASS} All checks passed — safe to run training")
-    print("="*60 + "\n")
-    sys.exit(0)
+    print("=" * 60 + "\n")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
