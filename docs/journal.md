@@ -689,3 +689,29 @@ missing sys.path bootstrap; docs drift (E-012/013/014 undocumented).
 **Next:** record the E-015 number; compare to 0.849 (delta = leakage contribution);
 then README/paper reconciliation and the deferred items (inference parity,
 serving_local_models.md, Q11).
+
+## 2026-06-03 (cont.) — E-015 de-leaked number: 0.849 → 0.482 (D014 RESULT)
+
+The rerun finished (~83 min, clean). The leakage-corrected E2E accuracy is **0.482**
+(Macro F1 0.368, ECE 0.1313), vs the 0.849 leaky baseline (D010) — a 36.7-point drop.
+Description leakage accounted for the large majority of the apparent performance;
+0.849 was substantially inflated, as D005/D010 suspected. First publishable
+leakage-corrected number.
+
+Key honesty point captured in D014: **0.482 is a lower bound.** The reused E-003
+Stage-1 router scored 0.972 on its own calibration data but 0.758 on the de-leaked
+eval set — it was trained on leaky text and degrades when fed de-leaked notes. So
+0.482 conflates the intended effect (Stage-2 can't read the answer) with an
+introduced Stage-1 train/serve mismatch. True clean performance is expected somewhat
+above 0.482 but far below 0.849. Follow-up: a --train-stage1 rerun on de-leaked gold
+to isolate the pure effect. Reporting rule for now: "0.482, de-leaked, Stage-1 reused
+(lower bound)" alongside 0.849 — not as a single clean replacement.
+
+The run otherwise behaved exactly as designed: de-leaked gold loaded (9,660 billable),
+19 Stage-2 resolvers trained + 3 chapters skipped (P/Q/U fallbacks), E-003 Stage-1
+reused, epochs 20, seed 42. The LayerNorm beta/gamma and classifier-reinit warnings
+were benign as expected. Number recorded in D014.
+
+**Next:** README/Our_paper reconciliation (still show 83.9%/0.849 as clean — now
+demonstrably inflated); the --train-stage1 fully-de-leaked follow-up; then the
+deferred items (inference parity, serving_local_models.md, Q11).

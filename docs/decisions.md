@@ -642,9 +642,43 @@ both golds coexist). Verified on disk: 9,660 billable rows (matches original),
 validated v5 (D012). The local-LLM auditor is NOT involved in any of this (D013);
 the gold is fully deterministic.
 
-**Expected outcome.** E-015 E2E accuracy is expected BELOW the 0.849 baseline; the
-delta is the description-leakage contribution to the inflated number. A large drop
-⇒ leakage was inflating heavily; a small drop ⇒ the model was mostly learning real
-signal. Either is a legitimate, reportable result. Result to be recorded here and
-in the journal once the run completes. Residual leakage (18.6%) means the corrected
-number is itself a slight over-estimate of true clean performance — state as such.
+**RESULT (2026-06-03, run completed; ~83 min).**
+
+    Metric        E-009 (leaky, D010)   E-015 (de-leaked)   Δ
+    E2E accuracy            0.849              0.482        −0.367  (−43% rel)
+    Macro F1                0.774              0.368        −0.406
+    ECE                     0.0242             0.1313       +0.107  (worse)
+    Coverage@0.7            (—)                0.475
+    N (test)                971                966
+    Stage-1 chapter acc     ~0.97              0.758 (eval) / 0.972 (calib)
+
+The headline: removing the diagnosis-description leakage collapses E2E accuracy
+from 0.849 to **0.482** — a 36.7-point absolute drop. The description leakage was
+responsible for the large majority of the apparent performance. The 0.849 baseline
+was substantially inflated, confirming the D005/D010 suspicion. This is the
+first leakage-corrected number and it is a legitimate, reportable result.
+
+**Critical interpretation caveat — 0.482 is a LOWER BOUND, conflating two effects.**
+The Stage-1 router (reused from E-003, trained on LEAKY text) measured acc=0.972 on
+its own calibration data but only **0.758** on the de-leaked eval set. Same router,
+different text: it had partly learned to route chapters using description tokens we
+then redacted, so its routing degrades on de-leaked notes. Thus the 0.482 reflects
+BOTH (a) the intended effect — Stage-2 can no longer read the answer off the text —
+AND (b) an INTRODUCED train/serve mismatch — Stage-1 trained on leaky text, evaluated
+on de-leaked text. Effect (b) is an artifact of reusing the leaky-trained router
+(the deliberate control in this experiment), not a property of the de-leaked data.
+A fully-clean number requires retraining Stage-1 on de-leaked data too
+(`--train-stage1` rerun). The TRUE de-leaked performance is therefore expected
+somewhat ABOVE 0.482 (less Stage-1 damage) — but still far below 0.849.
+This exactly realises the D014 caveat ("not fully-de-leaked end-to-end") and shows
+it is material, not academic. Additionally, residual leakage (18.6%) means even a
+fully-Stage-1-retrained number would slightly over-estimate true clean performance.
+
+**Follow-up (logged):** a `--train-stage1` rerun on the de-leaked gold to remove the
+Stage-1 mismatch and isolate the pure leakage effect. Until then, report 0.482 as
+"de-leaked, Stage-1 reused (lower bound)" alongside 0.849, NOT as a single clean
+replacement number.
+
+Calibration note: avg Stage-2 ECE improved 0.408→0.192 post-temperature; several
+chapters collapsed to the T=0.05 floor (C, N, S) — over-confident small resolvers,
+worth a glance in the follow-up but not blocking.
