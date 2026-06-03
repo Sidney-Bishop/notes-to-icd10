@@ -248,6 +248,21 @@ class ExperimentPaths:
         """True if all specified chapters have model weights."""
         return all(self.stage2_trained(ch) for ch in chapters)
 
+    def stage2_splits_complete(self, chapter: str) -> bool:
+        """True if all three per-chapter splits (train/val/test) exist.
+
+        Distinct from stage2_trained() (which only checks model weights).
+        E-016 had weights + test_split.parquet but no train/val splits, so
+        stage2_trained() reported True while the splits were incomplete —
+        silently breaking downstream SupCon, which reads train/val. Both
+        signals are needed; they measure different things.
+        """
+        return (
+            self.stage2_train_split(chapter).exists()
+            and self.stage2_val_split(chapter).exists()
+            and self.stage2_test_split(chapter).exists()
+        )
+
     def calibrated(self) -> bool:
         return self.calibration_report().exists()
 
