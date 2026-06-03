@@ -221,7 +221,17 @@ def _split_dataframe(
         then split the 20% into equal val and test
 
     Returns (train_df, val_df, test_df).
+
+    The frame is sorted by a stable key before splitting so the partition is
+    content-addressed: it depends only on (row content, seed), never on the
+    order rows arrived in. Without this, regenerating splits from re-ordered
+    gold produces a different partition and can cause train/val contamination.
     """
+    # Stable, content-addressed ordering before the (position-based) split.
+    if "id" in df.columns:
+        df = df.sort("id")
+    elif "standard_icd10" in df.columns and "apso_note" in df.columns:
+        df = df.sort(["standard_icd10", "apso_note"])
     df_pd = df.to_pandas()
 
     train_pd, temp_pd = train_test_split(
