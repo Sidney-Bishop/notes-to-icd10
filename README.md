@@ -10,26 +10,56 @@
 [![Dataset](https://img.shields.io/badge/dataset-SidneyBishop%2Fnotes--to--icd10-orange.svg)](https://huggingface.co/datasets/SidneyBishop/notes-to-icd10)
 [![DVC](https://img.shields.io/badge/data-DVC-blueviolet.svg)](https://dvc.org)
 
-Two-stage hierarchical ICD-10 coding from clinical notes using Bio_ClinicalBERT —
-**83.9% accuracy across 1,926 ICD-10 codes** from ~4 training examples per code.
+Two-stage hierarchical ICD-10 coding from clinical notes using Bio_ClinicalBERT.
+**End-to-end accuracy is 56.7% on the de-leaked dataset**, compared with 84.9% when
+only the ICD-10 code is redacted and the diagnosis description is left in the note.
+The 28.2-point gap is diagnosis-description leakage, measured directly by running the
+same pipeline end-to-end under both redaction regimes (see Results).
 
 ---
 
 ## 🏆 Results
 
-| Experiment | Architecture | Accuracy | Macro F1 | ECE | Coverage@0.7 |
+The headline question for this dataset is how much the apparent accuracy depends on
+diagnosis text that leaks the answer. We measured it directly: the same two-stage
+pipeline, trained and evaluated end-to-end, under two redaction regimes that differ
+**only** in how much is removed from the note's Assessment section.
+
+| Redaction regime | Run | E2E Acc | Macro F1 | ECE | Cov@0.7 |
 |---|---|---|---|---|---|
-| E-001 | ICD-3 flat, 675 classes | 87.6%* | 0.8456 | — | — |
-| E-002 | ICD-10 flat, 1,926 classes | 73.0% | 0.626 | — | — |
-| E-003 | Hierarchical, cold start Stage-2 | 12.7% | 0.083 | — | — |
-| E-009 | Hierarchical, E-002 init (20 epochs) | 77.2% | 0.679 | — | — |
-| **E-010** | **Hierarchical, E-002 init (40 epochs)** | **83.9%** | **0.762** | **0.034** | **82.1%** |
+| **1. Code-only** (ICD-10 code removed, diagnosis description left in) | E-009 | **84.9%** | 0.774 | 0.024 | 81.2% |
+| **2. Code + description** (ICD-10 code *and* its associated diagnosis text removed) | E-016 | **56.7%** | 0.446 | 0.070 | 48.2% |
+
+Both runs are full end-to-end rebuilds (Stage-1 router + Stage-2 resolvers trained and
+evaluated on the same gold), Bio_ClinicalBERT, 20 epochs, seed 42, billable codes,
+E-002 Stage-2 initialisation, threshold 0.7. The only difference is the redaction
+depth of the training/eval data.
+
+**Reading the result:** removing the diagnosis description — the human-readable text
+that names the condition the ICD-10 code stands for — drops end-to-end accuracy from
+84.9% to 56.7%, a 28.2-point absolute fall (≈33% relative). Regime 1 (84.9%) measures
+the pipeline on notes where the answer is usually spelled out in the Assessment text;
+regime 2 (56.7%) measures it on notes where that text has been removed, so the model
+must work from the surrounding clinical findings. Regime 2 reflects the task as
+intended.
+
+*Caveat:* the de-leaked gold used for regime 2 still carries ~18.6% residual
+description leakage (some phrasings are not caught by the deterministic redactor), so
+56.7% is a slight over-estimate of a perfectly-clean ceiling, not an under-estimate.
+
+### Architecture ablation (code-only regime)
+
+These earlier results established the architecture and all share regime 1 (code-only
+redaction); they are not directly comparable to the de-leaked 56.7% above.
+
+| Experiment | Architecture | Accuracy | Macro F1 |
+|---|---|---|---|
+| E-001 | ICD-3 flat, 675 classes | 87.6%* | 0.8456 |
+| E-002 | ICD-10 flat, 1,926 classes | 73.0% | 0.626 |
+| E-003 | Hierarchical, cold start Stage-2 | 12.7% | 0.083 |
+| E-009 | Hierarchical, E-002 init (20 epochs) | 84.9% | 0.774 |
 
 *E-001 uses ICD-3 (675 classes), not billable ICD-10 codes — not directly comparable.
-
-**Best model (E-010):** 83.9% top-1 accuracy, 0.762 Macro F1, 98.7% chapter
-routing accuracy, 84.8% within-chapter accuracy. Auto-codes 82.1% of cases
-at 95.2% accuracy; routes remaining 17.9% to human review.
 
 ---
 
@@ -43,17 +73,18 @@ initialiser** substantially outperforms flat ICD-10 classification —
 
 ### Key Findings
 
-- **Flat ICD-10 classification** (E-002) achieves 73.0% — a strong baseline
-  given ~4 training examples per code across 1,926 classes
+- **Diagnosis-description leakage dominates the apparent accuracy** — the same
+  end-to-end pipeline scores 84.9% with the diagnosis description left in the note
+  and 56.7% with it removed. The 28.2-point gap is leakage, not capability.
+- **Flat ICD-10 classification** (E-002) achieves 73.0% (code-only regime) — a strong
+  baseline given ~4 training examples per code across 1,926 classes
 - **Hierarchical architecture fails without correct initialisation** (E-003,
   12.7%) — training Stage-2 resolvers from scratch is insufficient despite
   a 96.3% accurate Stage-1 router
-- **E-002 initialisation fixes Stage-2** (E-009, 77.2%) — pre-learned ICD-10
+- **E-002 initialisation fixes Stage-2** (E-009) — pre-learned ICD-10
   representations transfer cleanly to per-chapter resolvers
-- **Epoch count matters** (E-010, 83.9%) — 40-epoch E-002 produces richer
-  encoder representations than 20-epoch, adding +4.1pp E2E accuracy
-- **Z-chapter is the primary remaining gap** — 47.1% E2E (263 codes,
-  administrative language with high lexical overlap)
+- **Z-chapter is the primary remaining gap** — 58.3% E2E in the de-leaked regime
+  (263 codes, administrative language with high lexical overlap)
 
 ---
 
@@ -269,7 +300,7 @@ uv run jupyter notebook
 | `02-Model_ClinicalBERT_Baseline_ICD3.ipynb` | E-001 ICD-3 baseline | ~2.5 hrs |
 | `03-Model_ClinicalBERT_Surgical_ICD10.ipynb` | E-002 flat ICD-10 (40 epochs) | ~4 hrs |
 | `04-Model_Hierarchical_ICD10.ipynb` | E-003 hierarchical cold start | ~2 hrs |
-| `05-Model_Hierarchical_ICD10_E002Init.ipynb` | E-010 best model | ~2 hrs |
+| `05-Model_Hierarchical_ICD10_E002Init.ipynb` | Hierarchical Stage-2 (E-002 init) | ~2 hrs |
 
 Total training time: approximately 11–12 hours on Apple M5 Max.
 
@@ -287,7 +318,7 @@ uv run python scripts/prepare_data.py
 
 # 2. Deterministic splits
 uv run python scripts/prepare_splits.py \
-    --experiment E-010_40ep_E002Init \
+    --experiment E-009_Balanced_E002Init \
     --gold-path data/gold/medsynth_gold_apso.parquet
 
 # 3. Build knowledge graph (~5 min)
@@ -302,62 +333,84 @@ uv run python scripts/train.py \
     --model emilyalsentzer/Bio_ClinicalBERT \
     --code-filter billable --batch-size 16 --epochs 40
 
-# 5. Train E-003: Stage-1 chapter router (~25 min)
+# 5. Train Stage-1 chapter router (~25 min)
 uv run python scripts/train.py \
-    --experiment E-003_Hierarchical_ICD10 \
+    --experiment E-009_Balanced_E002Init \
     --mode hierarchical --stage 1 \
     --code-filter billable --epochs 5
 
-# 6. Train E-010: Stage-2 resolvers from E-002 init (~100 min)
+# 6. Train Stage-2 resolvers from E-002 init (~100 min)
 uv run python scripts/train.py \
-    --experiment E-010_40ep_E002Init \
+    --experiment E-009_Balanced_E002Init \
     --mode hierarchical --stage 2 \
     --code-filter billable --epochs 20 \
     --stage2-init outputs/evaluations/E-002_FullICD10_ClinicalBERT
 
 # 7. Calibrate
 uv run python scripts/calibrate.py \
-    --experiment E-010_40ep_E002Init \
-    --stage1-experiment E-003_Hierarchical_ICD10
+    --experiment E-009_Balanced_E002Init \
+    --stage1-experiment E-009_Balanced_E002Init
 
 # 8. Evaluate
 uv run python scripts/evaluate.py \
-    --experiment E-010_40ep_E002Init \
+    --experiment E-009_Balanced_E002Init \
     --mode hierarchical \
-    --stage1-experiment E-003_Hierarchical_ICD10 \
+    --stage1-experiment E-009_Balanced_E002Init \
     --threshold 0.7
 ```
 
-**Expected results:** E2E accuracy 83.9%, Macro F1 0.763, ECE 0.034, Coverage@0.7 82.1%.
+**Expected results (code-only regime, situation 1):** E2E accuracy ≈84.9%, Macro F1
+≈0.77, ECE ≈0.024, Coverage@0.7 ≈81%. This is the leaky baseline — the diagnosis
+description is still present in the note.
+
+**For the de-leaked pipeline (situation 2, ≈56.7%):** add `--redact-descriptions` to
+`prepare_data.py` (writes `data/gold/medsynth_gold_apso_deleaked.parquet`), then run a
+full end-to-end rebuild that trains Stage-1 fresh on the de-leaked gold:
+
+```bash
+# de-leaked gold
+uv run python scripts/prepare_data.py --redact-descriptions
+
+# full end-to-end de-leaked rebuild (both stages trained on de-leaked data)
+PYTHONPATH=. uv run python scripts/run_experiment.py \
+    --experiment E-016_Deleaked_FullRebuild \
+    --model emilyalsentzer/Bio_ClinicalBERT \
+    --stage2-init outputs/evaluations/E-002_FullICD10_ClinicalBERT/model \
+    --train-stage1 \
+    --stage1-model emilyalsentzer/Bio_ClinicalBERT \
+    --gold-path data/gold/medsynth_gold_apso_deleaked.parquet \
+    --epochs 20 --code-filter billable
+```
 
 > **⚠️ Reconciliation note (2026-06-01 verified run).** The recipe above is the
 > *originally documented* regime. A full reproduction run on 2026-06-01 was executed
 > and verified end-to-end, and it differs in three ways worth reconciling before
 > treating either as canonical:
-> 1. **Stage-1 experiment name.** The verified run trained Stage-1 *under* the
->    `E-010_40ep_E002Init` experiment, so `--stage1-experiment` in calibrate/evaluate
->    must be `E-010_40ep_E002Init`. The default (`E-003_Hierarchical_ICD10`) points at
->    an on-disk Stage-1 left in a broken split layout (config/tokenizer present, no
->    `model.safetensors`) — using it silently loads an unloadable/old model. If you
->    train Stage-1 under E-003 as step 5 above, the E-003 path is correct; if you do
->    not, point at where Stage-1 was actually trained.
+> 1. **Stage-1 experiment name.** The verified run trained Stage-1 *under* the same
+>    experiment name, so `--stage1-experiment` in calibrate/evaluate must match where
+>    Stage-1 was actually trained. The script default (`E-003_Hierarchical_ICD10`)
+>    points at an on-disk Stage-1 left in a broken split layout (config/tokenizer
+>    present, no `model.safetensors`) — using it silently loads an unloadable/old
+>    model. Always point `--stage1-experiment` at where Stage-1 was actually trained.
 > 2. **E-002 epochs.** The verified run used `--epochs 30` and the model had
 >    converged (val plateaued by epoch 27). 40 is the historical value; 30 is
 >    sufficient. Either works — 40 is not required for convergence.
-> 3. **Headline is provisional.** The reproduced 0.838 matches 83.9%, but under the
->    current redaction regime (ICD-10 codes redacted, semantic diagnosis labels
->    retained) it is biased upward by residual label leakage and is **not yet a
->    publishable number**. A leakage-free baseline requires semantic-label redaction
->    (tracked as an open question).
+> 3. **The headline is the code-only (leaky) regime.** The reproduced 0.838/0.849
+>    figure is measured with the diagnosis description still in the note (only the
+>    ICD-10 code is redacted). Running the same pipeline end-to-end on the de-leaked
+>    data — ICD-10 code *and* its associated diagnosis text removed — drops E2E
+>    accuracy to 0.567. That 28.2-point gap is the description leakage. The code-only
+>    number is a baseline, not the task-as-intended result; see the Results section.
 >
 > `build_graph.py` and `verify_scripts.py` (steps 0 and 3 above) were part of the
 > original recipe but were not re-run/verified in the 2026-06-01 session; they are
 > retained here as-is pending a read-through.
 
-#### Verified reproduction pipeline (2026-06-01)
+#### Verified reproduction pipeline (2026-06-01, code-only regime)
 
 This is the exact invocation order run and verified end-to-end in the 2026-06-01
-session. Every argument below was confirmed against the scripts or run logs.
+session (situation 1 — code-only redaction). Every argument below was confirmed
+against the scripts or run logs.
 
 ```mermaid
 flowchart TD
@@ -366,8 +419,8 @@ flowchart TD
     C["train.py --mode flat<br/><i>E-002 encoder, --epochs 30</i>"]
     D["train.py --stage 1<br/><i>22-way chapter router</i>"]
     E["train.py --stage 2<br/><i>--stage2-init E-002, --epochs 20</i>"]
-    F["calibrate.py<br/><i>--stage1-experiment E-010, temperatures</i>"]
-    G["evaluate.py --mode hierarchical<br/><i>971 split, E2E 0.838</i>"]
+    F["calibrate.py<br/><i>--stage1-experiment matches train, temperatures</i>"]
+    G["evaluate.py --mode hierarchical<br/><i>971 split, E2E 0.838 (code-only/leaky)</i>"]
     A --> B --> C --> D --> E --> F --> G
 ```
 
@@ -378,7 +431,7 @@ uv run python scripts/prepare_data.py
 
 # 2. Splits — filter-then-split on billable codes; writes the 971-record test split
 uv run python scripts/prepare_splits.py \
-    --experiment E-010_40ep_E002Init \
+    --experiment E-009_Balanced_E002Init \
     --gold-path data/gold/medsynth_gold_apso.parquet \
     --code-filter billable
 
@@ -388,44 +441,46 @@ uv run python scripts/train.py \
     --experiment E-002_FullICD10_ClinicalBERT \
     --mode flat --code-filter billable --epochs 30
 
-# 4. Stage-1 router (22-way chapter classifier), trained UNDER E-010
+# 4. Stage-1 router (22-way chapter classifier), trained under the experiment
 uv run python scripts/train.py \
-    --experiment E-010_40ep_E002Init \
+    --experiment E-009_Balanced_E002Init \
     --mode hierarchical --stage 1 --code-filter billable
 
 # 5. Stage-2 resolvers — 19 per-chapter heads, warm-started from E-002 (skips P/Q/U)
 #    Hyperparameters from notebook 05: epochs 20, lr 2e-5, batch 16, warmup 0.1.
 uv run python scripts/train.py \
-    --experiment E-010_40ep_E002Init \
+    --experiment E-009_Balanced_E002Init \
     --mode hierarchical --stage 2 \
     --stage2-init outputs/evaluations/E-002_FullICD10_ClinicalBERT \
     --code-filter billable --epochs 20
 
 # 6. Temperature calibration (Stage-1 + 19 resolvers)
-#    CRITICAL: --stage1-experiment must match where Stage-1 was TRAINED (E-010),
+#    CRITICAL: --stage1-experiment must match where Stage-1 was TRAINED,
 #    NOT the script default (E-003_Hierarchical_ICD10).
 uv run python scripts/calibrate.py \
-    --experiment E-010_40ep_E002Init \
-    --stage1-experiment E-010_40ep_E002Init \
+    --experiment E-009_Balanced_E002Init \
+    --stage1-experiment E-009_Balanced_E002Init \
     --threshold 0.7
 
 # 7. End-to-end evaluation on the 971 test split
 #    Same --stage1-experiment caveat as calibrate.
 uv run python scripts/evaluate.py \
-    --experiment E-010_40ep_E002Init \
+    --experiment E-009_Balanced_E002Init \
     --mode hierarchical \
-    --stage1-experiment E-010_40ep_E002Init \
+    --stage1-experiment E-009_Balanced_E002Init \
     --threshold 0.7
 ```
 
-**Verified result (provisional, D005 regime):** E2E accuracy 0.838, Macro F1 0.766,
-ECE 0.049, Coverage@0.7 86.0%. Stage-1 chapter accuracy 0.952, Stage-2 within-chapter
-0.881. Reproduces the historical 83.9% headline; see the reconciliation note above for
-why it is provisional.
+**Verified result (situation 1 — code-only redaction):** E2E accuracy 0.838–0.849,
+Macro F1 0.766–0.774, ECE 0.024–0.049, Coverage@0.7 81–86%. Stage-1 chapter accuracy
+~0.95, Stage-2 within-chapter ~0.86–0.88. This is the leaky baseline. The end-to-end
+de-leaked run (situation 2) under the same recipe scores E2E 0.567 (Macro F1 0.446,
+ECE 0.070); the difference between the two is the quantified diagnosis-description
+leakage.
 
 > Scope: this diagram covers the **core reproduction path only**. Sibling/optional
-> entry points — graph reranker fit, SupCon/hybrid variants (E-014), ModernBERT
-> trials (E-012/E-013), MIMIC-IV validation, `serve.py` — exist in the repo but were
+> entry points — graph reranker fit, SupCon/hybrid variants, ModernBERT
+> trials, MIMIC-IV validation, `serve.py` — exist in the repo but were
 > not traced this session and are intentionally omitted rather than drawn from
 > assumption.
 
@@ -443,7 +498,7 @@ uv run python scripts/cleanup.py --dry-run
 uv run python scripts/cleanup.py
 
 # Keep the current best experiment, clean everything else
-uv run python scripts/cleanup.py --keep E-010_40ep_E002Init
+uv run python scripts/cleanup.py --keep E-016_Deleaked_FullRebuild
 
 # Clean a specific experiment only
 uv run python scripts/cleanup.py --experiment E-003_Hierarchical_ICD10
@@ -457,8 +512,8 @@ What is **deleted:** `checkpoint-N/` and `checkpoints/` directories only.
 from src.inference import HierarchicalPredictor
 
 predictor = HierarchicalPredictor(
-    experiment_name='E-010_40ep_E002Init',
-    stage1_experiment='E-003_Stage1_Router',
+    experiment_name='E-016_Deleaked_FullRebuild',
+    stage1_experiment='E-016_Deleaked_FullRebuild',
 )
 
 note = """
@@ -470,7 +525,6 @@ Objective: Fasting glucose 14.2 mmol/L, BMI 31.
 
 result = predictor.predict(note, top_k=5)
 print(f"Top prediction: {result['codes'][0]} ({result['scores'][0]:.1%})")
-# Top prediction: E11.65 (84.2%)
 ```
 
 ### Experiment Tracking
@@ -548,10 +602,14 @@ table (74,719 codes) downloaded from HF Hub. Results are frozen in the manifest:
 - **placeholder_x** (25): Codes requiring 7th character extension
 
 ### APSO-Flip Preprocessing
-Clinical notes are restructured so the Assessment section appears at
-Token 0, preventing diagnostic evidence from being truncated by
-Bio_ClinicalBERT's 512-token context window. ICD-10 strings are
-redacted from note text to prevent label leakage.
+Clinical notes are restructured so the Assessment section appears at Token 0,
+preventing diagnostic evidence from being truncated by Bio_ClinicalBERT's 512-token
+context window. ICD-10 code strings are redacted from the note text. **Code-only
+redaction is not sufficient to prevent label leakage**, however: the Assessment
+section also contains the human-readable diagnosis description (e.g. "pain in left
+knee" for M25.562), which leaks the answer. The de-leaked pipeline additionally
+redacts these diagnosis descriptions; comparing the two regimes end-to-end is how the
+84.9% → 56.7% leakage figure is measured.
 
 ### Hierarchical Decomposition
 The two-stage pipeline decomposes 1,926-way ICD-10 classification into
@@ -560,10 +618,10 @@ reducing the effective label space per resolver from 1,926 to ~100.
 
 ### Transfer Learning Chain
 Each stage initialises from the best available prior model:
-`Bio_ClinicalBERT → E-002 (40-epoch flat ICD-10) → E-010 Stage-2 resolvers`.
+`Bio_ClinicalBERT → E-002 (40-epoch flat ICD-10) → Stage-2 resolvers`.
 This accumulates ICD-10 knowledge across experiments. The epoch count of
 E-002 is critical — 40 epochs produces substantially richer representations
-than 20 epochs (+4.1pp E2E accuracy on Stage-2 resolvers).
+than 20 epochs on the flat ICD-10 task.
 
 ---
 
@@ -575,9 +633,12 @@ than 20 epochs (+4.1pp E2E accuracy on Stage-2 resolvers).
 - **Low-resource constraint:** ~4 training examples per ICD-10 code is
   an extremely challenging regime. Results reflect the limits of this
   constraint rather than the architecture ceiling.
+- **Residual leakage:** the de-leaked gold still carries ~18.6% residual
+  diagnosis-description leakage, so the 56.7% de-leaked figure slightly
+  over-estimates a perfectly-clean ceiling.
 - **Z-chapter difficulty:** Administrative codes (Z-chapter, 263 classes)
-  achieve 47.1% E2E accuracy due to highly similar clinical language
-  across codes. This is the primary remaining improvement target.
+  achieve 58.3% E2E accuracy (de-leaked regime) due to highly similar
+  clinical language across codes. This is the primary remaining improvement target.
 - **Apple Silicon tested:** Training was conducted on Apple M5 Max with
   MPS. CUDA compatibility is expected but untested.
 
