@@ -715,3 +715,33 @@ were benign as expected. Number recorded in D014.
 **Next:** README/Our_paper reconciliation (still show 83.9%/0.849 as clean — now
 demonstrably inflated); the --train-stage1 fully-de-leaked follow-up; then the
 deferred items (inference parity, serving_local_models.md, Q11).
+
+## 2026-06-03 (cont.) — E-016 full de-leaked rebuild: the TRUE clean number 0.567
+
+Jason was right to push for a genuine end-to-end run. E-015 retrained Stage-2 only and
+reused the leaky-trained E-003 Stage-1 router — NOT end-to-end on the new data, and its
+Stage-1 cratered to 0.758 on de-leaked notes (train/serve mismatch). E-016 fixes this:
+`--train-stage1` + `--gold-path ...deleaked.parquet` trains BOTH stages on the de-leaked
+gold, then calibrates/evaluates against the new router.
+
+Result: **E2E 0.567, Macro F1 0.446, ECE 0.0703.** Stage-1 recovered to 0.948 (from
+0.758) — mismatch gone. So E-015's 0.482 was indeed an artifact-contaminated lower
+bound; the true clean number is 0.567, +0.085 higher.
+
+Headline: description leakage inflated end-to-end accuracy from 0.849 to 0.567 — a
+28.2-point (≈33% relative) drop. 0.567 is the clean, fully-de-leaked, end-to-end number
+for the paper; 0.849 is the leaky baseline. Only remaining caveat: 18.6% residual leak
+in the de-leaked gold means 0.567 slightly over-estimates a perfectly-clean ceiling.
+
+Confirmed E-003's Stage-1 was Bio_ClinicalBERT (from its saved config — vocab 28996,
+the experiments.json record states the model string twice), so E-016's --stage1-model
+matched it: only the data differs from the original router. Clean A/B for Stage-1 too.
+
+Recipe match to E-009 held: Bio_ClinicalBERT both stages, epochs 20, seed 42, billable,
+E-002 Stage-2 init, threshold 0.7. ~139 min total (Stage-1 training added on top of the
+19 Stage-2 resolvers). Benign LayerNorm/classifier-reinit warnings as before.
+
+Recorded in D014 (E-016 now the headline; E-015 retained as the lower-bound step).
+
+**Next:** README/Our_paper rewrite to 0.567 clean vs 0.849 leaky (they still show
+83.9%/0.849 as clean); Q11 items; inference parity; branch merge.

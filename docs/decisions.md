@@ -674,11 +674,40 @@ This exactly realises the D014 caveat ("not fully-de-leaked end-to-end") and sho
 it is material, not academic. Additionally, residual leakage (18.6%) means even a
 fully-Stage-1-retrained number would slightly over-estimate true clean performance.
 
-**Follow-up (logged):** a `--train-stage1` rerun on the de-leaked gold to remove the
-Stage-1 mismatch and isolate the pure leakage effect. Until then, report 0.482 as
-"de-leaked, Stage-1 reused (lower bound)" alongside 0.849, NOT as a single clean
-replacement number.
+**Follow-up COMPLETED — E-016, the true clean end-to-end de-leaked run (2026-06-03).**
+E-015's Stage-1-reuse lower bound was resolved by a full rebuild: `--train-stage1`
+with `--gold-path ...deleaked.parquet`, so BOTH stages train on the de-leaked data
+(Stage-1 router + Stage-2 resolvers), then calibrate + evaluate against the new
+router. Experiment `E-016_Deleaked_FullRebuild`. Same recipe otherwise (Bio_ClinicalBERT
+for both stages — E-003's Stage-1 was also Bio_ClinicalBERT, confirmed from its config;
+epochs 20, seed 42, billable, E-002 Stage-2 init). ~139 min.
 
-Calibration note: avg Stage-2 ECE improved 0.408→0.192 post-temperature; several
-chapters collapsed to the T=0.05 floor (C, N, S) — over-confident small resolvers,
-worth a glance in the follow-up but not blocking.
+    Metric        E-009 (leaky)  E-015 (S1 reused, LB)  E-016 (full de-leaked)
+    Stage-1 acc       0.9835          0.758  ← mismatch       0.948  ← fixed
+    Stage-2 within    0.8628          0.637                   0.598
+    E2E accuracy      0.849           0.482                   0.567
+    Macro F1          0.774           0.368                   0.446
+    ECE               0.0242          0.1313                  0.0703
+    Cov@0.7           0.8115          0.475                   0.482
+    N (test)          971             966                     966
+
+**HEADLINE CLEAN NUMBER: E-016 E2E = 0.567** (Macro F1 0.446, ECE 0.0703). This is the
+true leakage-corrected, fully-end-to-end-de-leaked result: every stage trained on
+de-leaked data and evaluated on de-leaked data, no leaky component anywhere. The
+Stage-1 accuracy recovered to 0.948 (from E-015's mismatched 0.758), confirming
+E-015's 0.482 was an artifact-contaminated lower bound — retraining Stage-1 on the
+de-leaked data recovered +0.085 E2E (0.482→0.567) by removing the train/serve
+mismatch, exactly as predicted.
+
+**The finding for the paper:** removing the diagnosis-description leakage drops true
+end-to-end accuracy from **0.849 → 0.567**, a 28.2-point absolute fall (≈33% relative).
+The leakage was inflating the headline by roughly a third. Report 0.567 as the clean
+number and 0.849 as the leaky baseline. Remaining caveat: the de-leaked gold still
+carries 18.6% residual leakage (D012), so 0.567 still slightly OVER-estimates a
+perfectly-clean ceiling — state this, but it is a small documented effect, not an
+artifact. E-015 (0.482) is retained in the record as the intermediate lower-bound
+step that demonstrated the Stage-1 mismatch was material.
+
+Calibration note: E-016 Stage-1 calibrated cleanly (ECE 0.120→0.035, T=1.72). Avg
+Stage-2 ECE 0.413→0.196; a few small resolvers (A, B, C, T) hit the T=0.05 floor —
+over-confident on tiny chapters, worth a glance later but not blocking the headline.
