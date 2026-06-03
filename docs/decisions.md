@@ -579,3 +579,72 @@ human adjudication is load-bearing. (b) LLM-audited samples (50; 500 stratified;
 (D012, 18.6%) is the exhaustive measure; the LLM clean-rates (96% fired) are
 sampled. (c) "Clean rate" is over the records the rule *fires on*, not all records.
 (d) Audit reproducibility depends on the pinned local stack (§4).
+
+---
+
+## D014 — De-leaked rerun (E-015): experiment spec, gold provenance, Stage-1 reuse (2026-06-03)
+
+Records the controlled rerun that produces the first leakage-corrected number, the
+provenance facts needed to make it a valid A/B against the canonical 0.849 (D010),
+and a reproducibility gap in D010 that this entry closes.
+
+**Gold provenance — what 0.849 actually trained on (closes a D010 gap).** D010
+recorded the 0.849 number but NOT its exact data input. The experiments log
+(`outputs/experiments.json`, E-009_Balanced_E002Init → train_stage2 → params)
+shows the authoritative answer: **`gold_path: data/gold/medsynth_gold_apso.parquet`**.
+This is exactly the file the Q8 description-redactor was applied to, so the
+de-leaked gold (`medsynth_gold_apso_deleaked.parquet`) is the correct counterpart
+and the A/B is valid. (The `medsynth_gold_augmented.parquet` referenced as the
+`--gold-path` default and in other experiments' logs was NOT E-009's input; it is
+unrelated to this comparison and is not even present on disk.)
+
+**E-009 recipe recovered (from experiments.json), mirrored exactly for E-015.**
+model `emilyalsentzer/Bio_ClinicalBERT`; mode hierarchical; stage 2; epochs 20;
+batch 16; lr 2e-05; weight_decay 0.01; warmup 0.1; max_length 512; code_filter
+billable; stage2_init `E-002_FullICD10_ClinicalBERT`; chapters all; seed 42;
+calibrate stage1_experiment `E-003_Hierarchical_ICD10`, threshold 0.7. The rerun
+changes exactly ONE variable: `--gold-path` → `medsynth_gold_apso_deleaked.parquet`.
+Epochs held at 20 (NOT the 40 used by E-010/012/013) precisely to keep the A/B
+clean against E-009.
+
+**Stage-1 reuse — a deliberate control, with a caveat to report.** The rerun
+retrains Stage-2 only and REUSES the E-003 Stage-1 chapter router (which was
+trained on leaky data). Rationale: Stage-1 is the coarse 22-way chapter routing;
+the description leakage primarily aids fine-grained within-chapter Stage-2
+resolution. Holding Stage-1 fixed (identical to 0.849) means the measured delta is
+cleanly attributable to Stage-2 retraining on de-leaked data — the better
+controlled experiment. CAVEAT for the paper: the number is therefore NOT
+"fully de-leaked end-to-end"; Stage-1 still saw leaky data in training. This must
+be stated. A fully-clean variant (retrain Stage-1 on de-leaked data too) is a
+possible follow-up.
+
+**Experiment name: E-015_E009_Deleaked.** Chosen as the next number in the REAL
+sequence on disk (E-009, E-010, E-010_hybrid_Z, E-012, E-013, E-014 already exist
+— see Q11 on docs drift), signalling it is E-009's recipe on de-leaked gold.
+
+**Invocation (validated via --dry-run before launch).** Run from project root with
+`PYTHONPATH=.` (run_experiment.py lacks the self-bootstrap that prepare_data.py
+has — Q11):
+
+    PYTHONPATH=. uv run python scripts/run_experiment.py \
+      --experiment E-015_E009_Deleaked \
+      --model emilyalsentzer/Bio_ClinicalBERT \
+      --stage2-init outputs/evaluations/E-002_FullICD10_ClinicalBERT/model \
+      --stage1-experiment E-003_Hierarchical_ICD10 \
+      --gold-path data/gold/medsynth_gold_apso_deleaked.parquet \
+      --epochs 20 --code-filter billable
+
+**De-leaked gold provenance.** Produced by `scripts/prepare_data.py
+--redact-descriptions` (flag gates phase_3d AND switches the output filename so
+both golds coexist). Verified on disk: 9,660 billable rows (matches original),
+[REDACTED] present (code redaction, 3c), [DIAGNOSIS] present (desc redaction, 3d),
+0 [DIAGNOSIS] in the original gold, residual leak 18.6% — identical to the
+validated v5 (D012). The local-LLM auditor is NOT involved in any of this (D013);
+the gold is fully deterministic.
+
+**Expected outcome.** E-015 E2E accuracy is expected BELOW the 0.849 baseline; the
+delta is the description-leakage contribution to the inflated number. A large drop
+⇒ leakage was inflating heavily; a small drop ⇒ the model was mostly learning real
+signal. Either is a legitimate, reportable result. Result to be recorded here and
+in the journal once the run completes. Residual leakage (18.6%) means the corrected
+number is itself a slight over-estimate of true clean performance — state as such.

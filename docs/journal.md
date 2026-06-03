@@ -630,3 +630,62 @@ is the leakage contribution). Inference parity (prepare_inference_input) DEFERRE
 at inference the code is unknown, so code-keyed redaction can't apply as-is —
 real train/serve asymmetry needing its own design pass; the rerun measures the
 leakage effect, not a deployable model.
+
+## 2026-06-03 — Q8 redactor MIGRATED into pipeline + de-leaked gold built; E-015 rerun launched (D014)
+
+Morning session. Took the validated v5 redactor from notebook to production pipeline,
+generated the de-leaked gold, and launched the leakage-corrected rerun. The
+"read-the-source-before-running" discipline paid off repeatedly — caught three
+would-be-silent traps before any of them cost a training run.
+
+**Migration (committed 74d7cda, branch q8/description-redaction).** Added
+`redact_descriptions` (v5 logic) to src/preprocessing.py — article-tolerant
+full-phrase match, [DIAGNOSIS] placeholder mid-sentence / drop-line standalone,
+remove-all-occurrences, min-2-token guard, dictionary + CDC fallback, rebuilds
+apso_note with the same block as redact_icd10_sections. Added phase_3d +
+--redact-descriptions flag to scripts/prepare_data.py; the flag gates the phase AND
+switches the output filename (medsynth_gold_apso.parquet vs _deleaked.parquet) so
+both golds coexist for a clean A/B; flag-off is byte-identical to the 0.849 pipeline.
+Committed the phrasing dictionary as a versioned artifact at
+data/ontology/q8_phrasing_dictionary.json.
+
+**Port-verification gate (the key discipline).** Before trusting the migrated code,
+re-measured residual on gold via the installed function: 9,660 scored, residual
+18.6%, removed 75.6% — IDENTICAL to the notebook v5 (D012). Behaviour-tested the
+five canonical cases too (standalone-drop, placeholder, article-tolerance, guard,
+remove-all) — all pass. The port is faithful.
+
+**Three traps caught by reading first (none reached a training run):**
+1. config.resolve_path('data','ontology') — invalid; resolve_path is a config-key
+   lookup, 'ontology' is not a registered key. Fixed to PROJECT_ROOT / 'data' /
+   'ontology' (matching graph_reranker.py).
+2. data_loader.load_gold_parquet globs medsynth_gold_apso_*.parquet and takes
+   last-by-sort — fragile. Avoided by always passing --gold-path explicitly (the
+   training scripts support it; glob is only a fallback).
+3. --use-presplit reads cached per-experiment splits — but for a NEW experiment name
+   the splits don't exist yet, so it splits the de-leaked gold fresh (seed 42). Safe;
+   omitted the flag anyway for clarity.
+
+**De-leaked gold built & verified.** prepare_data.py --redact-descriptions ran
+clean (3a→3d→4 visible; 3b/3c silent but confirmed via markers). Exported
+medsynth_gold_apso_deleaked.parquet. Verified: 9,660 rows, [REDACTED] present,
+[DIAGNOSIS] present (2,951), 0 [DIAGNOSIS] in original, residual 18.6%. Original
+gold untouched.
+
+**Gold provenance pinned (closes a D010 gap).** experiments.json confirms E-009/0.849
+trained on medsynth_gold_apso.parquet — exactly the file we de-leaked. A/B valid.
+Recovered the full E-009 recipe; mirrored it exactly for E-015, changing only the
+gold path. Stage-1 reused from E-003 (deliberate control; number is not
+fully-end-to-end-de-leaked — caveat in D014).
+
+**E-015 launched.** Dry-run validated all paths (de-leaked gold, E-003 Stage-1
+reuse, E-002 init, Stage-2 only, epochs 20). Unloaded the oMLX audit model first to
+free memory for training (the LLM plays no role in the run — D013). ~75 min Stage-2
+train + calibrate + evaluate. Number to land in D014 + here.
+
+**Gaps logged as Q11** (non-blocking, post-number): no unit tests; run_experiment.py
+missing sys.path bootstrap; docs drift (E-012/013/014 undocumented).
+
+**Next:** record the E-015 number; compare to 0.849 (delta = leakage contribution);
+then README/paper reconciliation and the deferred items (inference parity,
+serving_local_models.md, Q11).

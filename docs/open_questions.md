@@ -284,3 +284,37 @@ than a higher-scoring but non-reproducible LLM redactor.
 
 **Status:** PARKED (2026-06-02). Revisit only after the first publishable number
 exists, and only for audit-judge hardening.
+
+---
+
+## Q11 — Repo hygiene gaps surfaced during the Q8 migration (low priority, post-number)
+
+Three real but non-blocking gaps found while migrating the redactor and tracing the
+rerun. Logged so they are not forgotten; none blocks the E-015 number.
+
+**(a) No unit test suite.** A project targeting reproducible/publishable numbers has
+no automated tests. The redaction logic especially (the v5 redactor: article
+tolerance, min-2-token guard, remove-all, placeholder-vs-drop-line, apso rebuild)
+is intricate and currently verified only by throwaway in-session scripts. The
+config-path bug (resolve_path('data','ontology')) this session would have been
+caught instantly by a single test exercising the flag path. The v5 behaviour checks
+already written in-session (standalone-drop, placeholder, article-tolerance, guard,
+remove-all) are the obvious seed for tests/test_preprocessing.py. Priority: real but
+post-first-number.
+
+**(b) run_experiment.py lacks sys.path bootstrap.** Unlike prepare_data.py (which
+walks up to artifacts.yaml and inserts PROJECT_ROOT on sys.path), run_experiment.py
+does not, so it fails with ModuleNotFoundError: src unless launched with
+PYTHONPATH=. Fix: add the same _find_root() bootstrap block for consistency. Minor
+papercut.
+
+**(c) Docs vs experiments drift.** The experiments directory contains runs the docs
+have no context for: E-010_hybrid_Z, E-012_40ep_ClinicalModernBERT,
+E-013_40ep_BioClinicalModernBERT, E-014_SupCon_Z. The decisions/journal record
+effectively stops around E-010. These later experiments are undocumented here.
+Worth a reconciliation pass (what they were, whether any supersedes the E-009
+baseline) — but AFTER the leakage-corrected number, since that is the current
+through-line.
+
+**Status:** OPEN, low priority. Revisit after the E-015 number and the README/paper
+reconciliation.
