@@ -711,3 +711,124 @@ step that demonstrated the Stage-1 mismatch was material.
 Calibration note: E-016 Stage-1 calibrated cleanly (ECE 0.120→0.035, T=1.72). Avg
 Stage-2 ECE 0.413→0.196; a few small resolvers (A, B, C, T) hit the T=0.05 floor —
 over-confident on tiny chapters, worth a glance later but not blocking the headline.
+
+## D015 — Full de-leaked rebuild (all backbones): the backbone ranking INVERTED (2026-06-04)
+
+The decisive follow-up to D014. Where D014/E-016 produced the first clean
+end-to-end ClinicalBERT number (0.567), this entry records the full rebuild of
+EVERY leaky-regime experiment on de-leaked data — both ModernBERT backbones, the
+SupCon chain, and MIMIC — run end-to-end by the tested orchestrator
+(`scripts/run_full_deleaked_rebuild.py`, run `20260603_200854`). It produced the
+single most important finding of the project: **removing description leakage does
+not merely deflate scores, it reverses which model backbone is best.**
+
+**Provenance / controls.** De-leaked gold `medsynth_gold_apso_deleaked.parquet`
+(D014 provenance). All models trained AND evaluated fully de-leaked (Stage-1 +
+Stage-2), no leaky component. Split is now CONTENT-ADDRESSED (sorted by id before
+partitioning — see the split-determinism fix, commit 6ebee5e), so the test
+partition is reproducible and IDENTICAL across every backbone — the A/B is exact,
+not approximate. N(test) = 966.
+
+**RESULT — de-leaked backbone comparison (all hierarchical, same test set):**
+
+    Backbone                 Leaky E2E   De-leaked E2E   Exp      within-ch  Stage-1
+    Clinical ModernBERT        0.488        0.769  ←BEST  E-024     0.807      0.953
+    ClinicalBERT (Bio_)        0.849        0.592         E-021     0.620      0.956
+    BioClinical ModernBERT     0.070        0.398         E-026     0.423      0.940
+
+    LEAKY ranking:     ClinicalBERT (0.849) >> ClinicalModernBERT (0.488) >> BioClinical (0.070)
+    DE-LEAKED ranking: ClinicalModernBERT (0.769) >> ClinicalBERT (0.592) >> BioClinical (0.398)
+
+**HEADLINE: the ranking inverts.** On the leaky benchmark ClinicalBERT appeared to
+beat Clinical ModernBERT decisively (0.849 vs 0.488), and the paper had concluded
+"domain pretraining outweighs architectural modernity." De-leaked, Clinical
+ModernBERT (0.769) beats ClinicalBERT (0.592) by ~18 points. The leaked
+description signal was strong enough that the older ClinicalBERT exploited it best,
+manufacturing a backbone conclusion that is the OPPOSITE of the truth on clean data.
+
+**Why this is real, not an artifact (scrutiny applied before accepting it).**
+(1) Same test set: E-021 and E-024 share identical test ids (content-addressed
+split — verified by set comparison on the M-chapter test parquet, equal N=111,
+same ids). (2) The gain is UNIFORM: ModernBERT beats ClinicalBERT in 17 of 19
+chapters, deltas +0.09 to +0.36, spread across the code space rather than
+concentrated — the signature of a stronger backbone, not a localised residual leak.
+The two exceptions (A n=6, B n=16) are tiny-N noise. (3) Routers are near-identical
+(0.953 vs 0.956), localising the entire difference to Stage-2 within-chapter
+resolution (0.807 vs 0.620), exactly where description leakage operated.
+
+**Headline number update vs D014.** D014 cited E-016 = 0.567 as the clean
+ClinicalBERT number (old position-addressed split). The rebuild's E-021 = 0.592 on
+the content-addressed split is the number to cite going forward — it is reproducible
+(anyone can regenerate the exact partition from the gold), where E-016's 0.567 was
+on a partition that could not be reliably reproduced (the very fragility the split
+fix addressed). Cite 0.592 as primary; 0.567 corroborates. Leakage drop is
+0.849 → 0.592 ≈ 25.7pp (~30% relative).
+
+**Caveats (unchanged, restated):** 18.6% residual leak (D012) means de-leaked
+numbers slightly OVER-estimate a perfectly clean ceiling. ModernBERT used
+max_length=512 (matched to ClinicalBERT for a fair A/B, NOT ModernBERT-optimal —
+the one paper-derived, non-registry-verified hyperparameter choice). E-026's leaky
+0.070 → de-leaked 0.398 went UP (leakage depressed it, not inflated) — an asymmetry
+not fully explained; likely the leaky E-013 run was a training failure (resolvers
+hit best-epoch-1) rather than a leakage effect, so the de-leaked rerun simply
+trained properly. Stated honestly in the paper, not papered over.
+
+## D016 — SupCon "solves the Z chapter" was ~97% leakage artifact (2026-06-04)
+
+Re-evaluation of the E-014 SupCon result on de-leaked data (experiment E-022,
+same rebuild run). The leaky benchmark had reported Supervised Contrastive
+fine-tuning lifting the administrative Z-chapter by +21.2pp (62.1%→83.3%) and the
+system to 86.7%, described as "the Z-chapter problem is solved."
+
+**RESULT (de-leaked, E-022 hybrid = E-021 router + SupCon-Z override):**
+
+    Quantity                 Leaky claim            De-leaked (E-022)
+    Z resolver (val acc)     62.1% → 83.3% (+21.2)  0.614 → 0.674 (+6.1pp)
+    Hybrid system E2E        85.8% → 86.7% (+0.9)   0.592 → 0.597 (+0.5pp)
+
+**Finding:** the dramatic leaky Z gain was overwhelmingly leakage. De-leaked,
+SupCon yields a modest genuine improvement on the Z resolver's validation accuracy
+(~6pp) that nearly vanishes at the system level (+0.5pp). The effect is small enough
+to be partition-sensitive (an earlier de-leaked attempt, E-018 on the old split,
+showed ~0). The claim that SupCon "solves" the Z chapter is WITHDRAWN; the honest
+statement is that contrastive learning gives a small, real, system-negligible
+improvement that the leaky benchmark overstated by roughly an order of magnitude at
+the system level. A second independent instance of the same lesson as D015: a leaky
+benchmark can manufacture an apparent algorithmic win that does not exist.
+
+Calibrate/hybrid used the DE-LEAKED router (E-021), explicitly overriding the
+scripts' leaky E-003/E-010 defaults (the override the orchestrator phase-specs
+enforce and the tests guard). Note: the rebuild's orchestrator initially reported
+this step's output as MISSING due to a phase-spec output-path bug (train_supcon_z
+saves flat, spec expected nested) — fixed in commit d870b6f with a regression test;
+the SupCon result itself was unaffected (recovered by running the final 3 steps
+manually).
+
+## D017 — MIMIC-IV de-leaked: 8.1%, domain shift dominates independent of leakage (2026-06-04)
+
+Real-world validation of the de-leaked model (E-021) against 4,877 real MIMIC-IV
+discharge summaries, replacing D014-era leaky-model MIMIC figures.
+
+    Metric          Leaky model    De-leaked model (E-021)
+    E2E accuracy       12.0%             8.1%
+    Macro F1           0.069            0.042
+    ECE                0.298            0.318
+    Coverage@0.7       22.7%            20.2%
+
+**Finding:** both the leaky (12.0%) and de-leaked (8.1%) models collapse to
+near-floor on real notes. The synthetic-to-real gap is driven by DOMAIN SHIFT and is
+largely INDEPENDENT of leakage — real notes use abbreviations, shorthand, copy-paste
+artefacts, and institution-specific terminology absent from the synthetic training
+data. Whatever the synthetic headline, neither model is usable on real notes without
+domain adaptation.
+
+**Caveat (train/serve asymmetry):** the de-leaked model was trained on
+description-redacted notes, but real MIMIC notes contain descriptions, so the
+de-leaked 8.1% carries a train/serve mismatch and is not a perfectly clean
+real-world estimate. A fully fair measurement needs inference-time parity between
+training and serving text (open follow-up, cf. D014 inference-parity thread). Either
+way both regimes land near the floor — domain shift dominates regardless.
+
+Provenance note: `validate_mimic_evaluate.py`'s hardcoded `MEDSYNTH_REFERENCE_DELEAKED`
+still prints 0.567/56.7% (the E-016 reference); the de-leaked synthetic reference to
+cite is now E-021 = 0.592 (D015). The 8.1% MIMIC number itself is unaffected.
