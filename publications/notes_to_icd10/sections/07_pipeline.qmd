@@ -24,7 +24,7 @@ wraps the class for single-note use.
 from src.inference import HierarchicalPredictor
 
 predictor = HierarchicalPredictor(
-    experiment_name="E-010_40ep_E002Init",
+    experiment_name="E-024_Hier_ClinicalModernBERT_Deleaked",
     stage1_experiment="E-003_Hierarchical_ICD10",
 )
 
@@ -71,7 +71,7 @@ a critical requirement for valid model application:
    → Objective, ensuring the most diagnostically informative content falls
    within the first 512 tokens.
 
-2. **ICD-10 redaction:** Any ICD-10 code patterns in the note text are
+2. **ICD-10 code & description redaction (de-leaked):** ICD-10 code patterns AND their human-readable descriptions in the note text are
    replaced with `[REDACTED]` before tokenisation.
 
 When `preprocessed=True` is passed to `predict()` (used during evaluation

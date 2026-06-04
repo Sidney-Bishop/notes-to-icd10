@@ -4,162 +4,139 @@ title: "Conclusions"
 
 # Conclusions
 
+::: {.callout-note icon=false}
+## Plain-Language Summary
+We built a two-stage hierarchical ICD-10 coder, reported strong results — and
+then found that our synthetic benchmark was leaking the diagnostic answer into
+the note text. Correcting the leak cut the headline accuracy by ~30% relative
+and, more importantly, **reversed which model backbone is best**. The lasting
+contribution of this work is therefore a cautionary one about evaluating
+clinical-NLP systems on synthetic data.
+:::
+
 ---
 
 ## Summary of Findings {#sec-conclusions-summary}
 
-This project demonstrates that **hierarchical ICD-10 code prediction from
-free-text clinical notes is viable** on a synthetic dataset at the scale of
-1,926 billable codes, achieving 85.8% top-1 accuracy and 86.4% selective
-automation rate at 95.6% precision.
+This study divides into a development phase on a benchmark we later found to be
+compromised, and a corrected re-evaluation on de-leaked data. The findings
+below are stated in their corrected form; numbers are de-leaked unless noted.
 
-The experimental progression from flat baseline to hierarchical best result
-yielded three findings that have implications beyond this specific task:
+### Finding 1: The leakage that inflated and distorted the results
 
-### Finding 1: Hierarchical Architecture Requires Warm Initialisation
+The certified redaction that produced our gold data removed ICD-10 *codes* from
+the note text but left their human-readable *descriptions* in place. A note
+labelled `M25.562` still contained "pain in left knee" — letting the model read
+the answer rather than infer it. Removing this leakage dropped ClinicalBERT's
+hierarchical end-to-end accuracy from a reported **85.8% to 59.2%** (~30%
+relative), concentrated almost entirely in within-chapter code resolution. This
+is the single most consequential fact in the study and the lens through which
+every other result must be read.
 
-The hierarchical two-stage architecture produces dramatically better results
-than flat ICD-10 classification (85.8% vs 73.3%) — but **only when Stage-2
-resolvers are properly initialised**. Without warm initialisation from a
-flat ICD-10 pre-trained model, the architecture collapses (11.1% — worse
-than random on many chapters).
+### Finding 2: Leakage inverted the backbone ranking — the central result
 
-This finding generalises: any hierarchical decomposition of an extreme
-multi-class problem should be expected to require pre-trained representations
-at the lower level. Cold-start training from a general-domain model is
-insufficient when the training data per class is very small.
+On the leaky benchmark, Bio_ClinicalBERT appeared to beat Clinical ModernBERT
+decisively (85.8% vs 48.8%), and we had concluded that "domain pretraining
+outweighs architectural modernity." **On de-leaked data the ranking reverses:**
+Clinical ModernBERT reaches **76.9%**, beating ClinicalBERT's 59.2% by ~18
+points, and does so uniformly — winning 17 of 19 chapters. The leaked signal
+was strong enough that the older model exploited it best, manufacturing an
+apparent backbone conclusion that is the *opposite* of the truth on clean data.
+A leaky benchmark did not merely inflate scores; it ranked the backbones
+backwards.
 
-### Finding 2: Pre-Training Depth Has Compounding Returns
+### Finding 3: The hierarchical architecture requires warm initialisation
 
-The +4.1 percentage point improvement from 20-epoch to 40-epoch E-002
-initialisation is the largest single gain in the experimental progression.
-The flat E-002 model had not converged at 20 epochs, and the richer
-representations from 40 epochs transferred substantially better to
-within-chapter classification.
+This lesson survives de-leaking because it concerns the training recipe rather
+than the leaked signal. A cold-started Stage-2 collapses (≈11% E2E) despite a
+near-perfect chapter router; warm-starting the resolvers from a flat ICD-10
+classifier is necessary for the architecture to function. Both the leaky and
+de-leaked regimes agree on this.
 
-**Practical implication:** When using a pre-trained model as a warm-start
-initialiser for a downstream task, train the pre-training model to full
-convergence. Stopping early for compute efficiency may cost more in downstream
-performance than the compute saved.
+### Finding 4: Calibrated confidence enables selective automation — at a more modest operating point
 
-### Finding 3: Calibrated Confidence Scores Enable Reliable Selective Automation
-
-Temperature scaling calibration reduced the E-010 ECE from 0.640 to 0.031
-— a dramatic improvement that makes confidence scores operationally useful.
-At ECE = 0.031, the system's stated 70% confidence corresponds to actual
-accuracy close to 70%, enabling the confidence threshold to be set
-based on operational requirements rather than empirical tuning.
-
-The 86.4% Coverage@0.7 at 95.6% precision represents a practical operating
-point where the majority of routine cases are handled automatically and
-human review is concentrated on genuinely ambiguous cases.
-
-### Finding 4: Domain Pretraining Outweighs Architectural Modernity
-
-A direct backbone comparison (E-012) replaced Bio_ClinicalBERT with
-Clinical ModernBERT — a 2025 model with 22 transformer layers, 8,192-token
-context, and MIMIC-IV pretraining. The result was decisive: 48.8% E2E
-accuracy vs 85.8% for ClinicalBERT, a 37 percentage point deficit.
-
-Two factors explain this: the APSO-Flip strategy eliminates the context
-window advantage by front-loading critical content, and ClinicalBERT's
-MIMIC-III pretraining produces representations that transfer more effectively
-to few-shot ICD-10 classification than either ModernBERT variant.
-
-This conclusion was confirmed by a second backbone test: BioClinical ModernBERT
-(E-013, 53.5B token corpus from 20 institutions) achieved only 7.0% E2E
-accuracy — Stage-2 resolvers for several chapters never improved beyond epoch 1.
-
-**The backbone choice is doubly empirically justified.** Future improvements
-should focus on data, training strategy, and architecture for the specific
-task rather than switching encoder backbones.
+Temperature scaling produces well-calibrated confidence scores (de-leaked ECE
+0.039 for the best model), making a confidence threshold meaningful. On
+de-leaked data the best model (Clinical ModernBERT) auto-codes 73.7% of cases
+at 90.0% precision at τ = 0.7 — a more modest profile than the leaky figures
+(86.4% / 95.6%) implied, but a defensible one resting on data that does not
+leak the answer.
 
 ---
 
-## The Z-Chapter Problem — Solved {#sec-conclusions-z}
+## The Z-Chapter: a Cautionary Sub-Story {#sec-conclusions-z}
 
-The Z-chapter (administrative codes) was the dominant remaining challenge at
-62.1% accuracy in E-010 — the primary drag on overall system performance.
+The administrative Z-chapter was the hardest chapter, and on the leaky
+benchmark Supervised Contrastive (SupCon) fine-tuning appeared to "solve" it —
+lifting Z accuracy by +21.2pp and the system to 86.7%. **This result did not
+survive de-leaking.** On clean data, SupCon yields a modest genuine improvement
+on the Z resolver's validation accuracy (~6pp) that nearly vanishes at the
+system level (+0.5pp, 59.2%→59.7%), and is small enough to be sensitive to the
+data partition. The dramatic leaky gain was leakage, not contrastive learning.
+This is a second, independent illustration of the same lesson: a leaky
+benchmark can manufacture an algorithmic "win" that does not exist.
 
-**E-014 Supervised Contrastive fine-tuning resolves this.** Z-chapter accuracy
-improved from 62.1% to 83.3% (+21.2pp), bringing it close to the system-wide
-average of ~88%. The full-system E2E accuracy rose from 85.8% to 86.7% with the
-SupCon Z resolver as a drop-in replacement.
+The technique is not without merit — a small real effect remains, and
+contrastive objectives may still help where classes are genuinely
+feature-similar — but the claim that SupCon solves the Z chapter is withdrawn.
 
-The Z-chapter problem was confirmed to be a **feature similarity problem**, not
-a data quantity problem: notes for different Z-codes are nearly lexically identical,
-and standard cross-entropy training cannot distinguish them. SupCon fine-tuning
-addresses this directly by shaping the embedding space so that same-code notes
-cluster together and different-code notes separate — regardless of surface text similarity.
+---
 
-The technique is general. Future work may apply SupCon fine-tuning to other
-chapters with similar feature-similarity challenges: Chapter E (endocrine/metabolic,
-74.4% in E-010) and Chapter H (eye/ear, 83.3% in E-010) are the next candidates.
+## Real-World Validation {#sec-conclusions-real}
+
+On 4,877 real MIMIC-IV discharge summaries, the de-leaked system scores **8.1%**
+end-to-end (the leaky model scored 12.0%). Both collapse to near-floor, so the
+synthetic-to-real gap is driven by **domain shift** and is largely independent
+of leakage. Real notes use abbreviations, shorthand, copy-paste artefacts, and
+institution-specific terminology absent from the synthetic training data.
+Whatever the synthetic headline, neither model is usable on real notes without
+domain adaptation.
 
 ---
 
 ## Reproducibility {#sec-conclusions-repro}
 
-All results in this document are fully reproducible from the project
-repository. The experiment registry (`outputs/experiments.json`) records
-every experiment with full parameter provenance. The `Run notes.md` file
-provides exact commands for reproducing each result from scratch, including
-expected runtimes and intermediate verification steps.
+All de-leaked results use a content-addressed split (keyed by record id), so the
+test partition is reproducible and identical across every model — which is what
+makes the backbone comparison exact. The full chain (flat pre-training →
+hierarchical training → calibration → evaluation, for each backbone, plus the
+SupCon and MIMIC steps) is driven by a single tested orchestrator.
 
 ```bash
 # Complete reproduction from scratch
-uv sync
-uv run python verify_scripts.py
-# Then follow Run notes.md step by step
-# Total runtime: ~12 hours on Apple M5 Max
+uv run python scripts/run_full_deleaked_rebuild.py
+# Total runtime: ~20 hours on Apple-silicon (MPS)
 ```
 
-The 94-test unit test suite (`uv run pytest tests/ -v`) verifies the
-correctness of core infrastructure components — path resolution,
-experiment logging, input validation, and preprocessing — without
-requiring GPU access.
+The orchestration logic, split logic, and pre-flight verification are covered
+by 170 unit tests (no GPU required), added during the corrective work to ensure
+the rebuild was trustworthy.
 
 ---
 
 ## Broader Context {#sec-conclusions-context}
 
-This project contributes a well-engineered, documented research prototype
-that demonstrates the viability of hierarchical transfer learning for
-ICD-10 coding from synthetic clinical notes. It is not a production system
-and makes no claim of clinical utility without real-world validation.
-
-**MIMIC-IV validation (19 May 2026) confirms a substantial synthetic-to-real
-gap:** 85.8% on MedSynth synthetic notes drops to 12.0% on MIMIC-IV real
-discharge summaries. Root cause analysis establishes that this is a **domain
-shift problem**, not a token truncation problem — the APSO-Flip correctly
-places `Discharge Diagnosis:` within the 512-token window (median 47 tokens,
-99.8% fit rate), but the model has learned to recognise GPT-4o's synthetic
-prose style rather than the underlying clinical concepts.
-
-This finding is important and publishable in its own right: it quantifies
-exactly the synthetic-to-real generalisation gap, establishes the diagnosis
-of its cause, and points clearly to the path forward — fine-tuning on real
-clinical data. The hierarchical architecture, APSO-Flip strategy, and SupCon
-techniques are all transferable to a real-data training regime.
-Either outcome is scientifically valuable: a small gap validates the approach
-for further development; a large gap identifies the key bottleneck.
+Automated ICD-10 coding at the scale of the full billable code set remains
+unsolved on real data. This study's contribution is less a coding system than a
+methodological warning: **synthetic benchmarks for clinical NLP can leak the
+answer in subtle, description-level ways that survive code-level redaction, and
+the resulting distortion is not limited to inflated scores — it can invert
+architectural conclusions and fabricate apparent algorithmic gains.** Reviewers
+and practitioners should treat strong results on synthetic clinical data with
+corresponding caution, and should test for description-level leakage explicitly,
+not only for verbatim code leakage.
 
 ::: {.callout-tip icon=false}
 ## 🎯 The Bottom Line
 
-Hierarchical ICD-10 coding from free-text clinical notes is technically
-feasible at the scale of 1,926 codes, with 85.8% accuracy and 86.4%
-selective automation at 95.6% precision on synthetic data. The key to
-making it work is aggressive warm initialisation from a well-trained flat
-classifier. The primary remaining gap is the Z-chapter (62.1%), which
-requires contrastive fine-tuning rather than more data or training time.
-MIMIC-IV validation is complete (19 May 2026): 12.0% E2E on real notes vs
-85.8% on synthetic. The gap is domain shift, not architecture. Fine-tuning on
-real clinical data is the critical next step. The backbone (Bio_ClinicalBERT),
-architecture (hierarchical), and techniques (APSO-Flip, SupCon) are all
-validated and transferable.
+We set out to build an ICD-10 coder and report that it worked well. The more
+useful result is what we found when we checked our own benchmark: a
+description-level leak that inflated the headline from a true 59.2% to a
+reported 85.8%, reversed the backbone ranking (Clinical ModernBERT, not
+ClinicalBERT, is best on clean data), and manufactured a SupCon "win" that does
+not exist. The architecture is sound and warm-starting is essential — but the
+headline lesson is about evaluation, not architecture. Leaky synthetic
+benchmarks can be confidently, measurably wrong.
 :::
-
----
 
 ## References {.unnumbered}

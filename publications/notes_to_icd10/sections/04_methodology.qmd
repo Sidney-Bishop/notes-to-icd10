@@ -64,12 +64,22 @@ modelling. The model has:
 - 28,996 token vocabulary (WordPiece)
 - 512-token maximum sequence length
 
-Bio_ClinicalBERT was chosen over general-domain BERT variants because
-clinical text contains substantial domain-specific vocabulary (medication
-names, anatomical terms, clinical abbreviations) that general pre-training
-on Wikipedia and BookCorpus does not cover. Preliminary experiments
-confirmed that Bio_ClinicalBERT consistently outperforms `bert-base-uncased`
-on this task, consistent with findings in the clinical NLP literature.
+Bio_ClinicalBERT was the original backbone for this work and is used to
+describe the method below; the two-stage architecture is **backbone-agnostic**
+and the same pipeline runs with any encoder. Bio_ClinicalBERT was chosen over
+general-domain BERT variants because clinical text contains substantial
+domain-specific vocabulary (medication names, anatomical terms, clinical
+abbreviations) that general pre-training does not cover.
+
+::: {.callout-important}
+## On de-leaked data, Clinical ModernBERT is the stronger backbone
+On the original (leaky) benchmark, Bio_ClinicalBERT appeared to beat newer
+ModernBERT encoders decisively. After de-leaking, that ranking **reverses**:
+Clinical ModernBERT reaches 76.9% E2E versus Bio_ClinicalBERT's 59.2% (see the
+experiments and results sections). The method described here is unchanged — it
+is the *encoder* that differs — so we retain the Bio_ClinicalBERT description
+for continuity and report the backbone comparison as a primary result.
+:::
 
 ---
 
@@ -100,17 +110,19 @@ from the first character of each ICD-10 code.
 
 : Stage-1 training hyperparameters. {#tbl-method-stage1-hparams}
 
-**Initialisation:** The Stage-1 router is initialised from the E-001
-ICD-3 baseline model weights (see @sec-exp-e001) — a model pre-trained on
-a 675-way classification of ICD-3 stem codes. Because ICD-3 stems begin
-with the chapter letter, the E-001 encoder already has implicit chapter
-awareness, and fine-tuning for explicit chapter classification converges
-rapidly.
+**Initialisation:** The Stage-1 router is initialised from an ICD-3
+baseline model — a model pre-trained on a 675-way classification of ICD-3
+stem codes. Because ICD-3 stems begin with the chapter letter, this encoder
+already has implicit chapter awareness, and fine-tuning for explicit chapter
+classification converges rapidly.
 
-**Result:** The Stage-1 router achieves **96.9% test accuracy** on
-22-way chapter classification — effectively solving the routing problem.
-Only 13 of 972 test records are misrouted to the wrong chapter, and
-misrouted records account for the majority of end-to-end failures.
+**Result:** On de-leaked data the Stage-1 router achieves **~95.5% test
+accuracy** on 22-way chapter classification — effectively solving the routing
+problem. Chapter routing is largely unaffected by the description leakage; the
+errors that matter are overwhelmingly *within-chapter* (the router sends the
+note to the right chapter, but the Stage-2 resolver picks the wrong specific
+code). Across both de-leaked backbones, 80–89% of end-to-end errors are
+within-chapter rather than misrouting failures.
 
 ---
 
@@ -180,9 +192,12 @@ programmatically in `scripts/train.py`.
 A secondary finding is that the number of pre-training epochs for E-002
 has a surprisingly large effect on downstream Stage-2 performance.
 
-Initialising Stage-2 from a 20-epoch E-002 (E-009) produces 79.8% E2E
-accuracy. Initialising from a 40-epoch E-002 (E-010) produces 85.8% — a
-+4.1 percentage point improvement from simply training the initialiser longer.
+Warm-starting Stage-2 from a flat ICD-10 classifier was necessary for the
+architecture to work at all: cold-started resolvers collapse (≈11% E2E),
+while warm-started resolvers reach useful accuracy. (The specific leaky-regime
+magnitudes originally reported here — 79.8% and 85.8% — are superseded by the
+de-leaked results; the corrected ClinicalBERT figure is 59.2%, and the
+qualitative necessity of warm-starting is unaffected.)
 
 ![E-002 training dashboard showing all six metrics across 40 epochs (~19,320 steps). The Macro F1 and Accuracy curves (top row, centre and right) are still rising steeply at the 10,000-step mark — epoch 20 — confirming the model had not converged. Stopping at epoch 20 would discard significant representational learning.](images/E-002_FullICD10_ClinicalBERT_dashboard.png){#fig-e002-dashboard fig-alt="Six-panel training dashboard for E-002 showing Eval Loss decreasing, Macro F1 and Accuracy still rising at epoch 20"}
 
@@ -234,7 +249,7 @@ calibration.
 | Stage-2 avg ECE | 0.665 | 0.115 |
 | E2E ECE | 0.640 | **0.031** |
 
-: Temperature scaling calibration results for E-010. {#tbl-method-calibration}
+: Temperature scaling calibration approach (illustrated on the de-leaked models; see results for final ECE values). {#tbl-method-calibration}
 
 The Stage-2 resolvers show dramatic ECE improvement — from 0.665 to 0.115
 on average — because the fine-tuned models are initially very overconfident.
@@ -254,11 +269,15 @@ The calibrated confidence scores enable a **selective automation** strategy:
   decision.
 
 The threshold τ = 0.7 is a design parameter that trades off automation rate
-against precision. At τ = 0.7 and with E-010 calibration:
+against precision. At τ = 0.7 on de-leaked data, the best model (Clinical
+ModernBERT, E-024):
 
-- **86.4% of cases** are auto-coded
-- **95.6% precision** on auto-coded cases
-- 17.9% of cases are routed to human review
+- auto-codes **73.7% of cases**
+- at **90.0% precision** on auto-coded cases
+- routing the remaining 26.3% to human review
+
+(The leaky-regime figures originally reported here — 86.4% coverage at 95.6%
+precision — reflected the inflated benchmark and are superseded.)
 
 This is the **Use Case B** operating mode — high-confidence automation
 with a human safety net. A lower threshold increases automation rate at the
@@ -291,9 +310,9 @@ code by combining the model's softmax probability with a graph affinity
 score derived from concept overlap between the query note and the candidate
 code's concept neighbourhood.
 
-**Finding:** With E-010's well-calibrated resolvers, the graph reranker has
-minimal impact on overall accuracy — most predictions already exceed the 0.7
-threshold without reranking. The Z-chapter shows a marginal improvement
+**Finding:** With well-calibrated resolvers, the graph reranker has
+minimal impact on overall accuracy — most confident predictions already exceed
+the 0.7 threshold without reranking. The Z-chapter shows a marginal improvement
 (62.1% → 62.9%) when reranking is applied.
 
 ---

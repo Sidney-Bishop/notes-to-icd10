@@ -177,6 +177,35 @@ matches both the dotted format (`M25.562`) and the raw format (`M25562`).
 The redaction operates at both training and evaluation time, ensuring that
 no code leakage is possible.
 
+::: {.callout-warning}
+## This was not sufficient -- the leakage that defined this study
+We originally concluded that this code-pattern redaction made "no code leakage
+possible." **That conclusion was wrong.** The regex removed the *codes* but
+left their human-readable *descriptions* in the note text. A note assigned
+`M25.562` still contained the phrase "pain in left knee" -- a near-verbatim
+restatement of that code's definition. The model could therefore read the
+answer from the description without performing any clinical reasoning -- exactly
+the "artificially inflated accuracy" failure mode this step was meant to
+prevent, achieved through a channel the regex did not cover.
+
+The consequences were substantial: on de-leaked data the headline accuracy
+fell from a reported 85.8% to 59.2%, and -- more importantly -- the ranking of
+model backbones **reversed** (see the experiments and results sections). This
+leakage, and its correction, is the central subject of the corrected study.
+:::
+
+### De-leaking: the v5 deterministic redactor
+
+To remove the description leakage we built a second, deterministic redactor
+(v5) that strips code-description phrases from the assessment text, producing
+the **de-leaked gold** used for all corrected results. A residual ~18.6% of
+records retain partial description overlap that could not be removed safely
+without damaging legitimate clinical content; the de-leaked numbers therefore,
+if anything, *slightly over-estimate* a perfectly clean ceiling. All results
+reported as "de-leaked" use this gold; numbers labelled "leaky" use the
+original code-only-redacted gold and are retained only to document the
+discrepancy.
+
 ---
 
 ## Train/Validation/Test Splits {#sec-data-splits}
@@ -225,7 +254,7 @@ Registered in DuckDB for queryability but never modified.
 with code status annotations (`billable`, `noisy`, `placeholder`). Stored
 as Parquet.
 
-**Gold layer** — APSO-flipped, ICD-10-redacted records ready for model
+**Gold layer** — APSO-flipped, code- and description-redacted (de-leaked) records ready for model
 input, with the final `apso_note` column. This is the layer consumed by
 all training and inference code. Stored as timestamped Parquet with a full
 JSONL audit trail.
@@ -234,7 +263,7 @@ JSONL audit trail.
 Raw CSV (HuggingFace)
     ↓ DuckDB registration
 Silver Parquet (validated, annotated)
-    ↓ APSO-Flip + ICD-10 redaction
+    ↓ APSO-Flip + ICD-10 code & description redaction (de-leaked)
 Gold Parquet (model-ready)
     ↓ Deterministic splits (seed=42)
 Train / Val / Test Parquet

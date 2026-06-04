@@ -16,7 +16,7 @@ it honestly reflects the system's capabilities.
 The simplest metric: of all test records, what fraction did the model
 predict correctly?
 
-$$\text{Accuracy} = \frac{\text{Correct predictions}}{\text{Total predictions}} = \frac{811}{966} = 83.9\%$$
+$$\text{Accuracy} = \frac{\text{Correct predictions}}{\text{Total predictions}} = \frac{743}{966} = 76.9\%$$
 
 **What it tells you:** How often the system gets the right answer.
 
@@ -85,7 +85,7 @@ $$\text{Weighted F1} = \sum_{i=1}^{N} \frac{\text{support}_i}{\text{total}} \tim
 Negatives across all classes before computing F1. For single-label
 classification this is mathematically identical to accuracy:
 
-$$\text{Micro F1} = \text{Accuracy} = \frac{\sum TP_i}{\sum (TP_i + FP_i)} = 83.9\%$$
+$$\text{Micro F1} = \text{Accuracy} = \frac{\sum TP_i}{\sum (TP_i + FP_i)} = 76.9\%$$
 
 The table below summarises when each is appropriate:
 
@@ -130,10 +130,10 @@ is the primary metric in this project and why it should be the primary
 metric for any automated coding system evaluated for clinical deployment.
 :::
 
-**What Macro F1 = 0.762 means in practice:** Averaged equally across all
+**What Macro F1 = 0.672 means in practice:** Averaged equally across all
 1,926 ICD-10 codes — from the highest-performing circulatory codes (~0.98)
 to the most difficult administrative codes (~0.62) — the model achieves
-an F1 of 0.762. This is a strong result for a 1,926-class problem with
+an F1 of 0.672. This is a solid result for a 1,926-class problem with
 ~4 training examples per class. Random guessing on this task would produce
 a Macro F1 close to zero.
 
@@ -157,7 +157,7 @@ $$\text{ECE} = \sum_{b=1}^{B} \frac{|B_b|}{n} \left| \text{acc}(B_b) - \text{con
 | 0.15 – 0.30 | Moderate — needs treatment |
 | > 0.30 | Poor — confidence scores not meaningful |
 
-E-010 achieves **ECE = 0.031** after temperature scaling — excellent
+The de-leaked best model (E-024) achieves **ECE = 0.039** after temperature scaling — excellent
 calibration that makes the confidence threshold operationally meaningful.
 Before calibration, the ECE was 0.640 — the model was severely overconfident
 and the threshold could not be trusted.
@@ -169,11 +169,11 @@ and the threshold could not be trusted.
 These two metrics jointly describe the **selective automation** capability:
 
 - **Coverage@τ** — the fraction of test records where the model's top-1
-  confidence exceeds the threshold τ. At τ = 0.7: 86.4% of records are
+  confidence exceeds the threshold τ. At τ = 0.7: 73.7% of records are
   auto-coded.
 
 - **Accuracy on covered** — the precision on the auto-coded subset.
-  At τ = 0.7: 95.6% of auto-coded predictions are correct.
+  At τ = 0.7: 90.0% of auto-coded predictions are correct.
 
 Together they define the operating point: *how much can we automate, and
 at what quality?* A lower threshold automates more but at lower precision;

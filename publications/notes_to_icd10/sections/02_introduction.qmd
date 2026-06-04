@@ -90,11 +90,14 @@ window of BERT-based models means that longer notes are silently truncated —
 content beyond approximately 400 words may be lost.
 
 **Label leakage risk.** Clinical notes sometimes contain the ICD-10 code
-itself, either because the electronic health record system auto-populates it
-or because the physician explicitly documents it. A model that learns to
-detect these instances rather than the underlying clinical signal would
-achieve artificially high accuracy on synthetic data but fail on real notes
-where this pattern may not hold.
+itself, or — more insidiously — the code's human-readable *description*. A
+model that learns to detect these instances rather than the underlying clinical
+signal achieves artificially high accuracy on synthetic data but fails on real
+notes. This risk proved central to the present study: our code-pattern
+redaction removed the codes but not the descriptions, and the resulting
+description-level leakage inflated the headline accuracy and even reversed the
+apparent ranking of model backbones. Guarding against verbatim *code* leakage
+is not sufficient; description-level leakage must be checked for explicitly.
 
 **Synthetic-to-real generalisation gap.** Training on synthetic data — as
 this project does — introduces a domain shift risk. The linguistic patterns

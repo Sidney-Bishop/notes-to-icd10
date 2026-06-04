@@ -9,11 +9,16 @@ title: "Executive Summary"
 
 We built a system that reads clinical notes and automatically assigns the
 correct ICD-10 diagnostic code — the billing and classification code that
-describes a patient's condition. On a held-out test set of 966 records
-covering 1,926 distinct codes, the system achieves **86.7% top-1 accuracy** (E-010 + SupCon Z hybrid)
-and automatically codes **88.2% of cases** at high precision,
-routing the remainder to human review. It does this without access
-to any real patient data, trained entirely on a high-quality synthetic dataset.
+describes a patient's condition — and then we discovered that our own
+synthetic benchmark was **leaking the answer**. The diagnostic *descriptions*
+left in the note text (e.g. "pain in left knee" for M25.562) let the model
+read codes off the page rather than infer them. After removing that leakage,
+headline accuracy on a held-out test set of 966 records fell from a reported
+**86.7%** to a true **59.2%** — and, more strikingly, the corrected data
+**reversed which model backbone is best**. The leaky benchmark ranked
+ClinicalBERT first; on clean data, Clinical ModernBERT wins by ~18 points.
+Our central finding is therefore a cautionary one: leaky synthetic benchmarks
+do not merely inflate scores — they can invert architectural conclusions.
 :::
 
 ---
@@ -58,8 +63,10 @@ pre-trained on clinical text from MIMIC-III.
 **Stage 1 — Chapter Router:** A 22-way classifier that reads the clinical
 note and routes it to the correct ICD-10 chapter (the top level of the
 hierarchy, identified by a single letter such as M for musculoskeletal or
-Z for administrative contacts). This router achieves 96.9% accuracy — nearly
-all notes are directed to the correct chapter.
+Z for administrative contacts). On de-leaked data this router achieves 95.6%
+accuracy — nearly all notes are directed to the correct chapter (chapter
+routing is largely unaffected by leakage; the inflation was concentrated in
+within-chapter code resolution).
 
 **Stage 2 — Code Resolver:** Nineteen per-chapter classifiers that predict
 the specific ICD-10 code within the routed chapter. Each resolver handles
@@ -69,9 +76,10 @@ before chapter-specific fine-tuning begins.
 
 **Confidence-gated output:** Every prediction comes with a calibrated
 confidence score. Cases where the model is confident (≥0.7) are flagged
-for automatic coding. Cases where the model is uncertain are routed to a
-human coder for review. This selective automation strategy achieves high
-precision on auto-coded cases without sacrificing recall.
+for automatic coding; uncertain cases are routed to a human coder. On
+de-leaked data the best single model auto-codes 55.3% of cases at 83.7%
+precision on covered cases — a more modest selective-automation profile than
+the leaky figures implied, but the mechanism is intact.
 
 ---
 
@@ -79,7 +87,7 @@ precision on auto-coded cases without sacrificing recall.
 
 ```{python}
 #| label: tbl-exec-leaderboard
-#| tbl-cap: "🏆 Experiment leaderboard — all results on the same held-out test set of 966 records."
+#| tbl-cap: "Experiment leaderboard (de-leaked) — all results on the same content-addressed held-out test set of 966 records. The backbone ranking is reversed relative to the leaky benchmark."
 
 import json
 import pandas as pd
@@ -88,33 +96,21 @@ from IPython.display import display
 
 # Load from registry if available, otherwise use documented values
 results = [
-    {"Experiment": "E-001 (ICD-3 flat baseline)", "Architecture": "Flat, 675 classes",
-     "E2E Accuracy": "87.2%", "Macro F1": "0.841", "ECE": "—", "Coverage@0.7": "—",
-     "Note": "ICD-3 codes only — not directly comparable"},
-    {"Experiment": "E-002 (ICD-10 flat)", "Architecture": "Flat, 1,926 classes",
-     "E2E Accuracy": "73.3%", "Macro F1": "0.634", "ECE": "—", "Coverage@0.7": "—",
-     "Note": "Flat baseline"},
-    {"Experiment": "E-003 (cold start)", "Architecture": "Hierarchical, no init",
-     "E2E Accuracy": "11.1%", "Macro F1": "0.075", "ECE": "—", "Coverage@0.7": "—",
-     "Note": "Architecture without warm init"},
-    {"Experiment": "E-009 (20-epoch init)", "Architecture": "Hierarchical, E-002 init",
-     "E2E Accuracy": "79.8%", "Macro F1": "0.711", "ECE": "—", "Coverage@0.7": "—",
-     "Note": "20-epoch E-002 initialiser"},
-    {"Experiment": "**E-010 (best)**", "Architecture": "Hierarchical, 40-epoch init",
-     "E2E Accuracy": "**85.8%**", "Macro F1": "**0.762**", "ECE": "**0.031**",
-     "Coverage@0.7": "**86.4%**", "Note": "Current best"},
-    {"Experiment": "E-012 (backbone eval)", "Architecture": "Hierarchical, Clinical ModernBERT",
-     "E2E Accuracy": "48.8%", "Macro F1": "0.369", "ECE": "0.078",
-     "Coverage@0.7": "37.5%", "Note": "ModernBERT backbone — ClinicalBERT wins"},
-    {"Experiment": "E-013 (backbone eval)", "Architecture": "Hierarchical, BioClinical ModernBERT",
-     "E2E Accuracy": "7.0%", "Macro F1": "0.046", "ECE": "0.013",
-     "Coverage@0.7": "1.7%", "Note": "ModernBERT backbone — catastrophic failure"},
-    {"Experiment": "**E-014 + E-010 hybrid**", "Architecture": "Hierarchical + SupCon Z",
-     "E2E Accuracy": "**86.7%**", "Macro F1": "**—**", "ECE": "**0.027**",
-     "Coverage@0.7": "**88.2%**", "Note": "**Current best — SupCon Z resolver**"},
-    {"Experiment": "MIMIC-IV validation", "Architecture": "E-010 on real notes",
-     "E2E Accuracy": "12.0%", "Macro F1": "0.069", "ECE": "0.298",
-     "Coverage@0.7": "22.7%", "Note": "Real MIMIC-IV discharge summaries — domain shift"},
+    {"Experiment": "E-021 ClinicalBERT (hier)", "Architecture": "Hierarchical, ClinicalBERT",
+     "E2E Accuracy": "59.2%", "Macro F1": "0.477", "ECE": "0.088", "Coverage@0.7": "55.3%",
+     "Note": "De-leaked headline (was 85.8% leaky)"},
+    {"Experiment": "**E-024 Clinical ModernBERT**", "Architecture": "Hierarchical, Clinical ModernBERT",
+     "E2E Accuracy": "**76.9%**", "Macro F1": "**0.672**", "ECE": "**0.039**", "Coverage@0.7": "**73.7%**",
+     "Note": "**De-leaked BEST — beats ClinicalBERT by ~18pp**"},
+    {"Experiment": "E-026 BioClinical ModernBERT", "Architecture": "Hierarchical, BioClinical ModernBERT",
+     "E2E Accuracy": "39.8%", "Macro F1": "0.289", "ECE": "0.049", "Coverage@0.7": "18.3%",
+     "Note": "De-leaked (was 7.0% leaky — also inflated downward by leakage)"},
+    {"Experiment": "E-022 ClinicalBERT + SupCon Z", "Architecture": "Hierarchical + SupCon Z",
+     "E2E Accuracy": "59.7%", "Macro F1": "—", "ECE": "0.089", "Coverage@0.7": "56.1%",
+     "Note": "SupCon adds +0.5pp de-leaked (was +0.9 / '+21.2pp on Z' leaky)"},
+    {"Experiment": "MIMIC-IV validation", "Architecture": "E-021 on real notes",
+     "E2E Accuracy": "8.1%", "Macro F1": "0.042", "ECE": "0.318", "Coverage@0.7": "20.2%",
+     "Note": "Real discharge summaries — domain shift dominates (was 12.0%)"},
 ]
 
 df = pd.DataFrame(results)
@@ -122,26 +118,55 @@ from IPython.display import Markdown
 display(Markdown(df.to_markdown(index=False)))
 ```
 
-The three headline findings:
+The four headline findings (all numbers on de-leaked data):
 
-1. **Hierarchical architecture requires warm initialisation.** Without
-   pre-trained encoder weights (E-003), the architecture collapses to 11.1%
-   accuracy despite a near-perfect chapter router. With E-002 initialisation,
-   it reaches 79.8%.
+1. **Description leakage inflated the headline by ~30% relative.** The
+   certified redaction that produced our gold data stripped ICD-10 *codes*
+   from the note text but left human-readable *descriptions* in place. The
+   model learned to read those descriptions rather than reason from clinical
+   findings. Removing the leakage drops ClinicalBERT's hierarchical E2E from
+   a reported **85.8% to 59.2%** — a 25.7-point fall (~30% relative).
 
-2. **Pre-training epoch count matters more than expected.** Doubling the
-   E-002 pre-training from 20 to 40 epochs adds +4.1 percentage points
-   E2E accuracy — a larger gain than any architectural change tested.
+2. **Leakage inverted the backbone ranking — the central result.** On the
+   leaky benchmark, ClinicalBERT (85.8%) appeared to beat Clinical ModernBERT
+   (48.8%) decisively, and we had concluded "domain pretraining beats
+   architectural modernity." On de-leaked data the order **reverses**:
+   Clinical ModernBERT reaches **76.9%**, beating ClinicalBERT's 59.2% by
+   ~18 points, and does so *uniformly* — winning 17 of 19 chapters. The leaky
+   signal was so strong that the older model exploited it best; once removed,
+   the more modern architecture's genuine advantage emerges. **A leaky
+   benchmark ranked the backbones backwards.**
 
-3. **Selective automation is viable.** At a 0.7 confidence threshold,
-   86.4% of cases are auto-coded at 95.6% precision — a precision level
-   that meets or exceeds typical human coding accuracy for common codes.
+3. **The "SupCon solves the Z chapter" result was ~97% artifact.** Supervised
+   Contrastive Learning appeared to lift the administrative Z-chapter by
+   +21.2pp (62.1%→83.3%) and the system to 86.7%. De-leaked, the genuine
+   effect is a ~6pp gain on the Z resolver's validation accuracy that nearly
+   vanishes at the system level (+0.5pp, 59.2%→59.7%). The dramatic leaky
+   gain was leakage, not contrastive learning.
 
-4. **Domain pretraining beats architectural modernity — confirmed twice.** Both Clinical ModernBERT (E-012: 48.8%) and BioClinical ModernBERT (E-013: 7.0%) were tested and rejected. ClinicalBERT leads by 37–79 percentage points.
+4. **Neither model generalises to real notes.** On 4,877 real MIMIC-IV
+   discharge summaries the de-leaked system scores **8.1%** E2E (the leaky
+   model scored 12.0%). Both collapse to near-floor; the synthetic-to-real
+   gap is driven by domain shift and is largely independent of leakage.
 
-5. **The synthetic-to-real gap is 73.8pp and domain-shift driven.** MIMIC-IV validation (n=4,877) yields 12.0% E2E vs 85.8% synthetic. Token truncation is ruled out — the issue is training data, not architecture.
+### Architecture lessons (from development)
 
-6. **SupCon fine-tuning closes the Z-chapter gap.** The Z-chapter (administrative codes) improved from 62.1% to 83.3% (+21.2pp) using Supervised Contrastive Learning (E-014). The full-system E2E accuracy rose to 86.7%. Feature-similarity problems require contrastive objectives — cross-entropy is insufficient.
+These structural findings emerged during development on the leaky benchmark.
+Their *numbers* are leaky-regime and not directly comparable to the de-leaked
+figures above, but the qualitative lessons about the architecture stand:
+
+5. **The hierarchical architecture requires warm initialisation.** Without
+   pre-trained encoder weights, the two-stage architecture collapsed
+   (~11% E2E, leaky regime) despite a near-perfect chapter router — the
+   Stage-2 resolvers cannot learn from scratch on limited per-chapter data.
+   Initialising them from a flat ICD-10 classifier was necessary for the
+   architecture to work at all.
+
+6. **Confidence-gated selective automation is viable in principle.** The
+   calibrated-confidence gating mechanism cleanly separates auto-codeable
+   from review-needed cases at a chosen threshold; the de-leaked operating
+   point (55.3% coverage at 83.7% precision on covered, finding 1) is more
+   modest than the leaky figures suggested, but the mechanism itself is sound.
 
 ---
 
@@ -176,15 +201,15 @@ health system.
 | | |
 |---|---|
 | **Dataset** | MedSynth — 9,660 billable records, 1,926 ICD-10 codes |
-| **Model backbone** | `emilyalsentzer/Bio_ClinicalBERT` |
+| **Best backbone (de-leaked)** | `Simonlee711/Clinical_ModernBERT` (ClinicalBERT was the leaky-regime winner) |
 | **Architecture** | Two-stage hierarchical: 22-way router + 19 resolvers |
 | **Training hardware** | Apple M5 Max (MPS acceleration) |
 | **Total training time** | ~12 hours (full experiment chain) |
-| **Best result** | 85.8% E2E accuracy, 0.762 Macro F1 |
-| **Auto-coding rate** | 86.4% at 95.6% precision (τ = 0.7) |
-| **Calibration quality** | ECE = 0.031 (well calibrated) |
+| **Best result (de-leaked)** | Clinical ModernBERT 76.9% E2E, 0.672 Macro F1 |
+| **Auto-coding rate (de-leaked)** | 55.3% at 83.7% precision on covered (τ = 0.7) |
+| **Calibration quality (de-leaked)** | ECE = 0.088 (ClinicalBERT) / 0.039 (ModernBERT) |
 | **Codebase** | Python 3.12, HuggingFace Transformers, Polars, uv |
-| **Test coverage** | 94 unit tests, no GPU required |
-| **Backbone evaluation** | E-012: 48.8% E2E, E-013: 7.0% E2E — ClinicalBERT wins decisively |
-| **Z-chapter SupCon (E-014)** | 62.1% → 83.3% (+21.2pp) — feature similarity solved |
-| **MIMIC-IV validation** | 12.0% real-world E2E — domain shift gap quantified |
+| **Test coverage** | 170 unit tests, no GPU required |
+| **Backbone evaluation (de-leaked)** | ModernBERT 76.9% > ClinicalBERT 59.2% > BioClinical 39.8% — ranking REVERSED vs leaky |
+| **Z-chapter SupCon (de-leaked)** | +0.5pp system (the leaky +21.2pp was artifact) |
+| **MIMIC-IV validation (de-leaked)** | 8.1% real-world E2E — domain shift dominates |

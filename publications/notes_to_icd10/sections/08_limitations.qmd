@@ -50,14 +50,14 @@ real clinical notes include:
 v2.2 (331,794 deidentified discharge summaries from Beth Israel Deaconess
 Medical Center) was completed. The synthetic-to-real gap is substantial:
 
-| Metric | MedSynth (synthetic) | MIMIC-IV (real) | Gap |
+| Metric | MedSynth (de-leaked) | MIMIC-IV (real) | Gap |
 |---|---|---|---|
-| E2E Accuracy | 85.8% | **12.0%** | −73.8pp |
-| Macro F1 | 0.790 | 0.069 | −0.721 |
-| ECE | 0.031 | 0.298 | +0.267 |
-| Coverage@0.7 | 86.4% | 22.7% | −63.7pp |
+| E2E Accuracy | 59.2% | **8.1%** | −51.1pp |
+| Macro F1 | 0.477 | 0.042 | −0.435 |
+| ECE | 0.088 | 0.318 | +0.230 |
+| Coverage@0.7 | 55.3% | 20.2% | −35.1pp |
 
-: MIMIC-IV validation results (n=4,877 stratified sample). {#tbl-mimic-validation}
+: MIMIC-IV validation results, de-leaked model E-021 (n=4,877 stratified sample). {#tbl-mimic-validation}
 
 **Root cause analysis:** The gap is attributable to **domain shift**, not
 token truncation. Key evidence:
@@ -78,8 +78,12 @@ clinical concepts.
 
 **Path forward:** Fine-tuning on a real clinical dataset (with or without
 MIMIC-IV as training data) is the primary requirement for production use.
-The hierarchical architecture, APSO-Flip strategy, and SupCon techniques
-are all transferable — the bottleneck is training data.
+The hierarchical architecture and APSO-Flip strategy are transferable — the
+bottleneck is training data. (Note the de-leaked real-world number carries a
+train/serve asymmetry: the de-leaked model was trained on description-redacted
+text but real notes contain descriptions, so 8.1% is not a perfectly clean
+estimate of real-world capability; both regimes nonetheless land near the
+floor, so domain shift dominates regardless.)
 
 ---
 
@@ -98,7 +102,7 @@ use nearly identical language regardless of the specific Z-code being
 assigned. Standard cross-entropy training is insufficient to distinguish
 between codes whose training examples are lexically nearly identical.
 
-**Result (E-014, 11 May 2026):** Supervised Contrastive fine-tuning was implemented and evaluated. Z-chapter accuracy improved from 62.1% to 83.3% (+21.2pp). The technique is confirmed effective for feature-similarity problems. The Z-chapter gap is substantially closed — from the weakest chapter to near system-average performance.
+**Result (de-leaked, E-022):** On the leaky benchmark, SupCon fine-tuning appeared to lift the Z-chapter by +21.2pp (62.1%→83.3%). De-leaked, this gain is overwhelmingly artifact: the genuine effect is ~6pp on the Z resolver's validation accuracy and only +0.5pp at the system level (59.2%→59.7%). SupCon is *not* confirmed to solve the Z chapter; the leaky result overstated a small real effect by roughly an order of magnitude.
 
 ---
 
@@ -113,11 +117,13 @@ During evaluation, 15.6% of test records trigger the long-note warning
 (>400 words). For these records, the model may be missing information
 that would improve its prediction.
 
-**Empirical finding (E-012):** Clinical ModernBERT with an 8,192-token context
-window was evaluated as an alternative backbone (E-012). It achieved 48.8%
-E2E accuracy vs 85.8% for Bio_ClinicalBERT — the longer context window
-provided no advantage because the APSO-Flip strategy already ensures
-diagnostically critical content appears within the 512-token window.
+**Empirical finding (de-leaked, E-024):** The context window itself confers
+no advantage here — APSO-Flip already places critical content within 512
+tokens, and notes are short. But the *backbone* matters: on de-leaked data
+Clinical ModernBERT reaches 76.9% E2E versus Bio_ClinicalBERT's 59.2%,
+reversing the leaky-benchmark ranking. (On the leaky benchmark ModernBERT had
+appeared far worse, 48.8% vs 85.8% — an artifact of the leak, not a property of
+the architecture.)
 
 **Mitigation options:**
 - **Better APSO ordering** — ensure that all critical information appears
@@ -155,8 +161,8 @@ In priority order:
 
 | Priority | Work Item | Expected Impact | Effort |
 |---|---|---|---|
-| 1 | ~~MIMIC-IV-Note validation~~ | ✅ Complete — 12.0% E2E (−73.8pp gap vs synthetic) | Done |
-| 2 | ~~Z-chapter contrastive fine-tuning~~ | ✅ Complete — +21.2pp Z (E-014) | Done |
+| 1 | ~~MIMIC-IV-Note validation~~ | ✅ Complete — 8.1% E2E de-leaked (−51.1pp gap) | Done |
+| 2 | ~~Z-chapter contrastive fine-tuning~~ | ✅ Evaluated — +0.5pp system de-leaked (leaky claim +21.2pp was artifact) | Done |
 | 3 | Lower confidence threshold for Z | More Z cases auto-coded | Low |
 | 4 | Multi-label prediction | Real-world applicability | High |
 | 5 | Longer context models | Empirically evaluated (E-012) — no benefit on this dataset | Complete |
