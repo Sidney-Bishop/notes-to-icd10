@@ -155,6 +155,28 @@ configured for MPS compatibility and may need adjustment for CUDA environments.
 
 ---
 
+## Reproducibility and Run Variance {#sec-limits-repro}
+
+Reported figures are **single training runs** on a fixed content-addressed
+split (seed 42), not averages over multiple seeds. The data split is
+deterministic, and the training pipeline pins python, numpy, and torch RNG, so
+runs are reproducible up to GPU/MPS kernel non-determinism (matrix-reduction
+order on accelerators is not bit-wise stable even with a fixed seed). We did
+not measure run-to-run variance by re-seeding, so the precision of individual
+figures beyond roughly the first decimal should be read with that caveat.
+
+This does not threaten the qualitative findings. The central result — the
+~18-point backbone inversion (Clinical ModernBERT 76.9% vs ClinicalBERT
+59.2%) — is far larger than any plausible single-run variance, and the backbone
+advantage is distributed across 17 of 19 chapters rather than concentrated. The
+one finding that *is* within the noise band is the small SupCon system-level
+effect (+0.5pp), which we accordingly describe as negligible and
+partition-sensitive rather than as a result. A fully rigorous restatement would
+report mean and standard deviation over several seeds; the seeded pipeline now
+makes such a multi-seed study straightforward as future work.
+
+---
+
 ## Future Work {#sec-future}
 
 In priority order:
