@@ -77,13 +77,13 @@ MEDSYNTH_HYBRID_REFERENCE = {
 }
 
 MEDSYNTH_REFERENCE_DELEAKED = {
-    "experiment":       "E-016_Deleaked_FullRebuild",
-    "e2e_accuracy":     0.567,
-    "macro_f1":         0.446,
-    "ece":              0.0703,
-    "coverage_at_0.7":  0.482,
+    "experiment":       "E-021_Hier_ClinicalBERT_Deleaked",
+    "e2e_accuracy":     0.592,
+    "macro_f1":         0.477,
+    "ece":              0.088,
+    "coverage_at_0.7":  0.553,
     "n_records":        966,
-    "note":             "de-leaked full end-to-end rebuild (code + description redacted), single run",
+    "note":             "de-leaked hierarchical ClinicalBERT, content-addressed split (run 20260603_200854); supersedes E-016 0.567 on the old position-addressed split",
 }
 
 
@@ -407,7 +407,7 @@ def parse_args():
     parser.add_argument(
         "--deleaked-reference",
         action="store_true",
-        help="Compare against the de-leaked E-016 reference (0.567) instead of leaky E-010 (0.858)"
+        help="Compare against the de-leaked E-021 reference (0.592) instead of leaky E-010 (0.858)"
     )
     return parser.parse_args()
 
