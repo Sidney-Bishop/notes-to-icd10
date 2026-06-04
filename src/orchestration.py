@@ -285,7 +285,10 @@ def build_phase_specs(dry_run: bool = False) -> list[PhaseSpec]:
         name="supcon_train",
         cmd=_supcon_train_cmd(ESUP_BASE, ESUP),
         inputs=[f"{eb}/{ESUP_BASE}/stage2/Z/model/model.safetensors"],
-        outputs=[f"{eb}/{ESUP}/stage2/Z/model/model.safetensors"],
+        # train_supcon_z.py saves FLAT (stage2/Z/model.safetensors), unlike
+        # train.py which nests under model/. The nested path here caused a
+        # false postflight MISSING during run 20260603_200854.
+        outputs=[f"{eb}/{ESUP}/stage2/Z/model.safetensors"],
     ))
     specs.append(PhaseSpec(
         name="supcon_calibrate",
@@ -297,7 +300,9 @@ def build_phase_specs(dry_run: bool = False) -> list[PhaseSpec]:
         name="supcon_hybrid",
         cmd=_supcon_hybrid_cmd(EHIER, EHIER, ESUP),  # base+stage1 = EHIER, not leaky defaults
         inputs=[f"{eb}/{ESUP}/calibration_report.json"],
-        outputs=[],   # hybrid writes an eval dir; presence checked via log
+        # evaluate_hybrid.py writes <base>_hybrid_<ch>-<id>/eval/summary.json
+        # where <id> = override_exp.split('_')[0]. Replicate that derivation.
+        outputs=[f"{eb}/{EHIER}_hybrid_Z-{ESUP.split('_')[0]}/eval/summary.json"],
         supports_dry_run=False,   # evaluate_hybrid.py has no --dry-run
     ))
 
