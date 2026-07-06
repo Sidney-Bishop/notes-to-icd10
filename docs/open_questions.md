@@ -318,3 +318,43 @@ through-line.
 
 **Status:** OPEN, low priority. Revisit after the E-015 number and the README/paper
 reconciliation.
+
+## Q12 — Two publication runs: MIMIC output-path collision + per-preset reference/flag (2026-06-04)
+
+Surfaced while preparing the two final publication runs (leaky code-only vs
+de-leaked code+description, both fresh from the now-seeded pipeline — see backlog
+"Publication runs"). The orchestrator was being parameterised to run BOTH configs;
+three script-level issues in `scripts/validation/validate_mimic_evaluate.py` must be
+resolved before the runs, or the two MIMIC results silently corrupt each other.
+
+**(a) MIMIC output path is hardcoded — the two runs collide.** Line ~289 writes to a
+fixed `outputs/evaluations/mimic_iv_validation/` regardless of `--base-experiment`;
+the filename is `summary.json` (or `summary_supcon_z.json`). So running the leaky
+config then the de-leaked config overwrites the first's MIMIC result. Fix candidate:
+key the output dir on the experiment, e.g.
+`mimic_iv_validation_{base_experiment.split('_')[0]}/` → `..._E-041/`, `..._E-051/`.
+Only consumer of the fixed path is `src/orchestration.py` (the MIMIC phase spec's
+`outputs=`), which must be updated to match. Verified 2026-06-04: no other `src/` or
+`scripts/` reader of the fixed path.
+
+**(b) `--deleaked-reference` flag must be per-preset.** The script selects which
+MedSynth reference the MIMIC result is compared against: `--deleaked-reference` →
+`MEDSYNTH_REFERENCE_DELEAKED` (0.592); otherwise the leaky `MEDSYNTH_REFERENCE`
+(~0.858) or the hybrid one. The orchestrator's `_mimic_cmd` passes
+`--deleaked-reference` unconditionally — correct for the de-leaked run, WRONG for the
+leaky run (would compare a leaky MIMIC result against a de-leaked synthetic
+reference). Parameterisation must include the flag for the de-leaked preset and omit
+it for the leaky preset.
+
+**(c) Reference constants are hardcoded to historical experiments (E-010 / E-021),
+not the fresh runs.** `MEDSYNTH_REFERENCE` / `MEDSYNTH_REFERENCE_DELEAKED` are frozen
+numbers from earlier experiments, so the printed "domain gap" comparison for the
+fresh E-041/E-051 runs would reference a *different* run's synthetic number. Not a
+launch blocker — the raw MIMIC `summary.json` numbers are what matter; the
+comparison printout is a convenience. The correct long-term fix is (b-shape) to read
+the fresh run's own `summary.json` as the reference rather than a hardcoded constant,
+but that is a paper-writing concern, handled when the numbers are read off disk, not
+before launch.
+
+**Status:** OPEN. (a) and (b) are launch blockers for the two publication runs;
+(c) is deferred to paper-writing. Blocks the backlog "Publication runs" item.

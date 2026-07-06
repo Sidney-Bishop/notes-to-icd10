@@ -101,3 +101,28 @@ the rationale lives elsewhere. Promote to `status.md` "Next" when work starts.
       to one: verify build_graph.py and verify_scripts.py (read argparse + I/O —
       they were NOT traced this session), and decide which stage-1 experiment layout
       is canonical. Ties into the "which clone/regime is source of truth" question.
+
+## Publication runs — two fresh end-to-end runs (surfaced 2026-06-04)
+
+The two runs whose numbers go into the publication: (1) code-only redaction (leaky
+baseline), (2) code + description redaction (de-leaked). Decided to run BOTH fresh
+from the now-seeded pipeline (commit 15e42a0) into fresh parallel experiment series
+(`E-04x_*_Leaky` / `E-05x_*_Deleaked`), so both come from an identical pipeline
+differing only in the redaction level — the cleanest A/B — and neither overwrites the
+existing E-001..E-026 artifacts on disk. Disk checked 2026-06-04: ~842 GB free, two
+runs ~140 GB, fits.
+
+- [ ] Resolve Q12(a) — MIMIC output-path collision (per-experiment output dir +
+      matching orchestrator phase-spec `outputs=`). **Launch blocker.**
+- [ ] Resolve Q12(b) — `--deleaked-reference` flag threaded per-preset (present for
+      de-leaked, omitted for leaky). **Launch blocker.**
+- [ ] Finish orchestrator parameterisation: `RunConfig` + `PRESET_LEAKY` /
+      `PRESET_DELEAKED` so `build_phase_specs(run=...)` produces either config
+      (drafted in-session, NOT yet committed). Tests must cover both presets,
+      distinct MIMIC output paths, correct per-preset flag, and a "presets differ
+      only in gold + names + the deleaked flag" guard.
+- [ ] Dry-run BOTH presets (`--dry-run`) — validates the full chain without GPU.
+- [ ] Launch run 1 (leaky), then run 2 (de-leaked). Only after all tests green and
+      both dry-runs clean.
+- [ ] Propagate the two runs' numbers into the paper from one generated source of
+      truth (ties into the existing "single source-of-truth results file" item).
