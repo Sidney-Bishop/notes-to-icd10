@@ -94,7 +94,7 @@ class TestPostflight:
 
 class TestFlatDone:
     def test_true_when_model_present(self, tmp_path):
-        exp = "E-020_Flat_ClinicalBERT_Deleaked"
+        exp = orch.PRESET_DELEAKED.flat_cbert
         mdir = tmp_path / exp / "model"
         mdir.mkdir(parents=True)
         (mdir / "model.safetensors").write_text("w")
@@ -216,7 +216,7 @@ class TestSupConAndMimicSpecs:
         """
         cal = self._by_name()["supcon_calibrate"]
         idx = cal.cmd.index("--stage1-experiment")
-        assert cal.cmd[idx + 1] == "E-021_Hier_ClinicalBERT_Deleaked"
+        assert cal.cmd[idx + 1] == orch.PRESET_DELEAKED.hier_cbert
         assert "E-003_Hierarchical_ICD10" not in cal.cmd
 
     def test_supcon_hybrid_base_and_stage1_are_deleaked(self):
@@ -224,8 +224,8 @@ class TestSupConAndMimicSpecs:
         hyb = self._by_name()["supcon_hybrid"]
         base = hyb.cmd[hyb.cmd.index("--base-experiment") + 1]
         stage1 = hyb.cmd[hyb.cmd.index("--stage1-experiment") + 1]
-        assert base == "E-021_Hier_ClinicalBERT_Deleaked"
-        assert stage1 == "E-021_Hier_ClinicalBERT_Deleaked"
+        assert base == orch.PRESET_DELEAKED.hier_cbert
+        assert stage1 == orch.PRESET_DELEAKED.hier_cbert
         assert "E-010_40ep_E002Init" not in hyb.cmd
         assert "E-003_Hierarchical_ICD10" not in hyb.cmd
 
@@ -233,13 +233,13 @@ class TestSupConAndMimicSpecs:
         hyb = self._by_name()["supcon_hybrid"]
         assert "--override" in hyb.cmd
         ov = hyb.cmd[hyb.cmd.index("--override") + 1]
-        assert ov == "Z=E-022_SupCon_Z_Deleaked"
+        assert ov == f"Z={orch.PRESET_DELEAKED.supcon_z}"
 
     def test_mimic_carries_deleaked_reference_and_deleaked_base(self):
         m = self._by_name()["mimic_deleaked"]
         assert "--deleaked-reference" in m.cmd
         base = m.cmd[m.cmd.index("--base-experiment") + 1]
-        assert base == "E-021_Hier_ClinicalBERT_Deleaked"
+        assert base == orch.PRESET_DELEAKED.hier_cbert
         assert "E-010_40ep_E002Init" not in m.cmd
 
     def test_dry_run_unsupported_steps_flagged(self):

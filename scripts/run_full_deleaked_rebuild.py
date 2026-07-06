@@ -30,11 +30,16 @@ from src import orchestration as orch
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="Full de-leaked rebuild orchestrator")
+    ap = argparse.ArgumentParser(description="Full rebuild orchestrator (two presets)")
     ap.add_argument("--dry-run", action="store_true",
                     help="Plan and log every step without executing training.")
+    ap.add_argument("--preset", choices=["deleaked", "leaky"], default="deleaked",
+                    help="Which publication run: 'deleaked' (code+description "
+                         "redaction, E-05x series) or 'leaky' (code-only "
+                         "redaction, E-04x series). Default: deleaked.")
     args = ap.parse_args()
     dry = args.dry_run
+    run_cfg = orch.PRESET_LEAKY if args.preset == "leaky" else orch.PRESET_DELEAKED
 
     root = config.project_root
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -49,9 +54,12 @@ def main() -> int:
             f.write(line + "\n")
 
     ev("=" * 60)
-    ev(f"FULL DE-LEAKED REBUILD — run {ts}")
+    ev(f"FULL REBUILD ({args.preset.upper()}) — run {ts}")
     ev(f"RUNDIR: {rundir}")
     ev(f"DRY: {dry}")
+    ev(f"PRESET: {args.preset}  gold={run_cfg.gold_path}  "
+       f"series=E-0{run_cfg.id_base}x{run_cfg.suffix}  "
+       f"mimic_deleaked_ref={run_cfg.deleaked}")
 
     # ── GUARD: verify_scripts.py ────────────────────────────────────────────
     branch = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"],
@@ -70,7 +78,7 @@ def main() -> int:
         ev("GUARD: verify_scripts.py PASSED")
 
     # ── Phases ──────────────────────────────────────────────────────────────
-    specs = orch.build_phase_specs(dry_run=dry)
+    specs = orch.build_phase_specs(dry_run=dry, run=run_cfg)
     eval_base = config.resolve_path("outputs", "evaluations")
     any_fail = False
 

@@ -27,10 +27,11 @@ from typing import Optional
 
 
 # ---------------------------------------------------------------------------
-# Constants — the de-leaked rebuild configuration
+# Constants — rebuild configuration (two presets: leaky and de-leaked)
 # ---------------------------------------------------------------------------
 
 GOLD_DELEAKED = "data/gold/medsynth_gold_apso_deleaked.parquet"
+GOLD_LEAKY = "data/gold/medsynth_gold_apso.parquet"
 
 MODEL_CLINICALBERT = "emilyalsentzer/Bio_ClinicalBERT"
 MODEL_CLINICAL_MODERNBERT = "Simonlee711/Clinical_ModernBERT"
@@ -39,6 +40,61 @@ MODEL_BIOCLINICAL_MODERNBERT = "thomas-sounack/BioClinical-ModernBERT-base"
 # The roberta-base default in run_experiment.py is a trap: a hierarchical
 # rebuild that forgets --stage1-model trains its router on the wrong backbone.
 ROBERTA_DEFAULT = "roberta-base"
+
+
+@dataclass(frozen=True)
+class RunConfig:
+    """Everything that differs between the two publication runs: the gold file,
+    the experiment-name series, and whether MIMIC compares against the de-leaked
+    reference. EVERYTHING else (hyperparameters, epochs, batch, max_length,
+    seed, stage-init relationships) is identical between presets — that identity
+    is what makes leaky-vs-de-leaked a clean A/B. build_phase_specs reads names
+    off this config and nothing else.
+
+    Experiment names follow a parallel scheme: f"E-0{id_base+offset}_{role}{suffix}",
+    so the two series are structurally identical, differing only in the number
+    base and the suffix. The fixed offsets below MUST match between presets.
+
+    `deleaked` controls the MIMIC reference: the de-leaked run compares MIMIC
+    against the de-leaked MedSynth reference (--deleaked-reference); the leaky
+    run must NOT pass that flag (it compares against the leaky reference).
+    """
+    gold_path: str
+    id_base: int          # e.g. 50 -> E-050.., 40 -> E-040..
+    suffix: str           # "_Deleaked" or "_Leaky"
+    deleaked: bool        # True -> MIMIC gets --deleaked-reference
+
+    def _ename(self, offset: int, role: str) -> str:
+        return f"E-0{self.id_base + offset}_{role}{self.suffix}"
+
+    # Roles, with fixed offsets identical across presets (mirror the original
+    # de-leaked layout: flat_cbert=+0, hier_cbert=+1, supcon=+2, flat_cmbert=+3,
+    # hier_cmbert=+4, flat_bcmbert=+5, hier_bcmbert=+6).
+    @property
+    def flat_cbert(self) -> str:   return self._ename(0, "Flat_ClinicalBERT")
+    @property
+    def hier_cbert(self) -> str:   return self._ename(1, "Hier_ClinicalBERT")
+    @property
+    def flat_cmbert(self) -> str:  return self._ename(3, "Flat_ClinicalModernBERT")
+    @property
+    def hier_cmbert(self) -> str:  return self._ename(4, "Hier_ClinicalModernBERT")
+    @property
+    def flat_bcmbert(self) -> str: return self._ename(5, "Flat_BioClinicalModernBERT")
+    @property
+    def hier_bcmbert(self) -> str: return self._ename(6, "Hier_BioClinicalModernBERT")
+    @property
+    def supcon_base(self) -> str:  return self._ename(2, "SupConBase")
+    @property
+    def supcon_z(self) -> str:     return self._ename(2, "SupCon_Z")
+
+
+# The two publication presets. id_base differs (no collision), suffix differs,
+# gold differs, deleaked flag differs — and NOTHING ELSE. Fresh series; neither
+# overwrites the existing E-001..E-026 artifacts on disk.
+PRESET_DELEAKED = RunConfig(gold_path=GOLD_DELEAKED, id_base=50,
+                            suffix="_Deleaked", deleaked=True)
+PRESET_LEAKY = RunConfig(gold_path=GOLD_LEAKY, id_base=40,
+                         suffix="_Leaky", deleaked=False)
 
 
 # ---------------------------------------------------------------------------
@@ -201,26 +257,36 @@ def _supcon_hybrid_cmd(base_experiment: str, stage1_experiment: str,
     ]
 
 
-def _mimic_cmd(base_experiment: str, stage1_experiment: str) -> list[str]:
-    return [
+def _mimic_cmd(base_experiment: str, stage1_experiment: str,
+               deleaked: bool) -> list[str]:
+    cmd = [
         "env", "PYTHONPATH=.", "uv", "run", "python",
         "scripts/validation/validate_mimic_evaluate.py",
         "--base-experiment", base_experiment,
         "--stage1-experiment", stage1_experiment,
-        "--deleaked-reference",
     ]
+    # Only the de-leaked run compares MIMIC against the de-leaked MedSynth
+    # reference. The leaky run MUST NOT pass this flag, or it would compare a
+    # leaky MIMIC result against the de-leaked reference (Q12b).
+    if deleaked:
+        cmd.append("--deleaked-reference")
+    return cmd
 
 
-def build_phase_specs(dry_run: bool = False) -> list[PhaseSpec]:
+def build_phase_specs(dry_run: bool = False,
+                      run: "RunConfig" = PRESET_DELEAKED) -> list[PhaseSpec]:
     """
-    The full de-leaked rebuild as data. Pure — constructs no files, runs
-    nothing. Tests assert properties over this structure.
+    The full rebuild as data, for a given RunConfig (default: de-leaked preset,
+    preserving prior behaviour for existing callers/tests). Pure — constructs no
+    files, runs nothing. Tests assert properties over this structure, including
+    that the two presets differ ONLY in gold path, experiment names, and the
+    MIMIC --deleaked-reference flag.
     """
     eb = "outputs/evaluations"
-    gold = GOLD_DELEAKED
-    E002, EHIER = "E-020_Flat_ClinicalBERT_Deleaked", "E-021_Hier_ClinicalBERT_Deleaked"
-    E023, E024 = "E-023_Flat_ClinicalModernBERT_Deleaked", "E-024_Hier_ClinicalModernBERT_Deleaked"
-    E025, E026 = "E-025_Flat_BioClinicalModernBERT_Deleaked", "E-026_Hier_BioClinicalModernBERT_Deleaked"
+    gold = run.gold_path
+    E002, EHIER = run.flat_cbert, run.hier_cbert
+    E023, E024 = run.flat_cmbert, run.hier_cmbert
+    E025, E026 = run.flat_bcmbert, run.hier_bcmbert
 
     specs: list[PhaseSpec] = []
 
@@ -265,8 +331,8 @@ def build_phase_specs(dry_run: bool = False) -> list[PhaseSpec]:
     ))
 
     # --- SupCon Z chain (depends on EHIER from hier_clinicalbert) -----------
-    ESUP_BASE = "E-022_Deleaked_SupConBase"
-    ESUP = "E-022_SupCon_Z_Deleaked"
+    ESUP_BASE = run.supcon_base
+    ESUP = run.supcon_z
     specs.append(PhaseSpec(
         name="supcon_presplits",
         cmd=_presplits_cmd(ESUP_BASE, gold),
@@ -306,13 +372,18 @@ def build_phase_specs(dry_run: bool = False) -> list[PhaseSpec]:
         supports_dry_run=False,   # evaluate_hybrid.py has no --dry-run
     ))
 
-    # --- MIMIC de-leaked eval (depends on EHIER) ----------------------------
+    # --- MIMIC eval (depends on EHIER) --------------------------------------
+    # Output dir is keyed on the EHIER id-prefix (matching the script's
+    # mimic_iv_validation_<PREFIX>/ convention), so the leaky and de-leaked runs
+    # write to DISTINCT dirs and do not overwrite each other (Q12a). The
+    # --deleaked-reference flag is passed only for the de-leaked preset (Q12b).
+    mimic_prefix = EHIER.split("_")[0]
     specs.append(PhaseSpec(
-        name="mimic_deleaked",
-        cmd=_mimic_cmd(EHIER, EHIER),
+        name=f"mimic{run.suffix.lower()}",
+        cmd=_mimic_cmd(EHIER, EHIER, run.deleaked),
         inputs=["data/mimic/gold/mimic_gold.parquet",
                 f"{eb}/{EHIER}/stage1/model/model.safetensors"],
-        outputs=[f"{eb}/mimic_iv_validation/summary.json"],
+        outputs=[f"{eb}/mimic_iv_validation_{mimic_prefix}/summary.json"],
         supports_dry_run=False,   # validate_mimic_evaluate.py has no --dry-run
     ))
     return specs

@@ -279,18 +279,26 @@ def save_results(
     reference: dict,
     use_supcon_z: bool,
     threshold: float,
+    base_experiment: str = "E-010_40ep_E002Init",
 ) -> Path:
     """
     Save aggregate results (no patient-level data) to the evaluation directory.
 
     Only aggregate statistics are saved — no note IDs, no predictions,
     no text. This ensures no MIMIC data leaks into git-tracked files.
+
+    The output directory is keyed on the experiment id-prefix
+    (mimic_iv_validation_<PREFIX>/) so that separate runs (e.g. the leaky and
+    de-leaked publication runs) write to DISTINCT directories and do not
+    overwrite each other's result. PREFIX = base_experiment.split('_')[0].
     """
-    out_dir = config.project_root / "outputs" / "evaluations" / "mimic_iv_validation"
+    exp_prefix = base_experiment.split("_")[0]
+    out_dir = (config.project_root / "outputs" / "evaluations"
+               / f"mimic_iv_validation_{exp_prefix}")
     out_dir.mkdir(parents=True, exist_ok=True)
 
     output = {
-        "experiment":         "E-010_40ep_E002Init" + (" + E-014_SupCon_Z" if use_supcon_z else ""),
+        "experiment":         base_experiment + (" + E-014_SupCon_Z" if use_supcon_z else ""),
         "validation_dataset": "MIMIC-IV-Note v2.2 + MIMIC-IV clinical v2.2",
         "threshold":          threshold,
         "mimic_results":      {k: v for k, v in results.items() if k != "chapter_accuracy"},
@@ -340,7 +348,8 @@ def main(args) -> None:
     print_comparison(results, reference, threshold=args.threshold)
 
     # Save results (aggregate only)
-    out_path = save_results(results, reference, args.supcon_z, args.threshold)
+    out_path = save_results(results, reference, args.supcon_z, args.threshold,
+                            base_experiment=args.base_experiment)
 
     # Log to DuckDB
     with config.duckdb_connection() as conn:
