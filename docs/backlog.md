@@ -126,3 +126,38 @@ runs ~140 GB, fits.
       both dry-runs clean.
 - [ ] Propagate the two runs' numbers into the paper from one generated source of
       truth (ties into the existing "single source-of-truth results file" item).
+
+## Codebase audit — complete the Ornith review (surfaced 2026-07-06)
+
+An independent, methodical code review is in progress, driven by a local model
+(Ornith-1.0-35B-MLX-oQ8 via `claude -p` against oMLX — see
+`serving_local_models.md`). Findings are written to `ornith_review.md` at the repo
+root, which carries a coverage ledger (`[x] reviewed` / `[ ]  pending`) and a
+`## Review status` section at the top with the current verdict. The review is
+fine-tooth-comb: one file per pass, findings verified against the actual code with
+file+line citations, appended to the durable artifact.
+
+**Reviewed so far (6 of 57 files — the launch-critical path):**
+`scripts/prepare_data.py`, `scripts/prepare_splits.py`, `scripts/train.py`,
+`scripts/run_experiment.py` + `scripts/evaluate.py` (split-path trace),
+`src/adapters.py`, `src/orchestration.py`,
+`scripts/validation/validate_mimic_evaluate.py`.
+
+- [ ] **Continue the spine:** `scripts/calibrate.py`, then `src/inference.py` —
+      the last two core-path files (where the final numbers are shaped). Review
+      before the completionist sweep.
+- [ ] **Rest of `src/`:** config, data_loader, dataset, evaluation,
+      experiment_logger, gatekeeper, graph_reranker, paths, plot_utils, server
+      (~10 modules).
+- [ ] **Remaining `scripts/`:** ~18 entry points not yet reviewed (build_graph,
+      augment, cluster_analysis, cleanup, generate_manifest, serve, train_supcon_z,
+      evaluate_hybrid, etc.).
+- [ ] **`tests/`:** 12 test files (review once the code they test is understood).
+- [ ] **Root executables:** `verify_scripts.py`, `upload_to_hf.py`.
+- [ ] **`sources/` (2 files):** confirmed DEAD CODE by the review (diverged from
+      `src/`, nothing imports it) — candidate for deletion rather than review.
+- [ ] **Notebooks 01-05:** canonical pipeline source; out of scope unless a script
+      is found to diverge from them.
+
+51 files pending as of 2026-07-06. `ornith_review.md` is the source of truth for
+the ledger and all findings. Resume from the first `[ ]` in that ledger.

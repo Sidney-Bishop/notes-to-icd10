@@ -358,3 +358,62 @@ before launch.
 
 **Status:** OPEN. (a) and (b) are launch blockers for the two publication runs;
 (c) is deferred to paper-writing. Blocks the backlog "Publication runs" item.
+
+## Q13 — Ornith audit findings: reproducibility VERIFIED, plus two non-blocking gaps (2026-07-06)
+
+An independent code review (Ornith via oMLX; full record in `ornith_review.md`)
+audited the launch-critical path ahead of the two publication runs (Q12). Net
+result: the headline path is verified reproducible and the seeding is verified
+complete. Recorded here so the verified facts are not lost, and two minor gaps are
+tracked.
+
+**VERIFIED GOOD (independent confirmation):**
+
+- **Headline numbers are reproducible.** Full trace confirmed: `_hier_cmd` →
+  `run_experiment.py` (never touches `prepare_splits.py`) → `train.py::_split_dataframe`
+  (SORTED / content-addressed) → writes sorted `test_split.parquet` → `evaluate.py`
+  reads that same sorted parquet → computes the reported E2E numbers on the sorted
+  split. The backbone-inversion headline (E-021 59.2%, E-024 76.9%) is on the
+  reproducible path.
+- **Seeding is complete.** Three layers, all verified against code: (1)
+  `_set_all_seeds()` seeds python/numpy/torch before any model instantiation in all
+  three training entry points (call-site ordering checked); (2) the split is
+  content-addressed with seed 42; (3) `EncoderAdapter.train()` uses HuggingFace
+  `Trainer(args=training_args)` with `TrainingArguments(seed=cfg["seed"])`
+  (adapters.py:643-648), which seeds DataLoader shuffle + weight init. Reproducible
+  up to MPS/CUDA non-deterministic reduction kernels (~0.2-0.3pp residual, already
+  in the paper's reproducibility limitation).
+- **Q12 is complete — no hidden collisions.** A scan of every phase spec's
+  `outputs=` confirmed the MIMIC step is the ONLY fixed path that ignores the
+  experiment name; every other phase already keys outputs on the experiment name,
+  so distinct E-04x/E-05x names make the two runs inherently non-colliding
+  elsewhere.
+
+**NON-BLOCKING GAPS (tracked, not launch blockers):**
+
+**(a) `prepare_splits.py` is not content-addressed.** Unlike `train.py`'s
+`_split_dataframe`, `scripts/prepare_splits.py` does NOT sort before
+`train_test_split`, so its output depends on input row order. This path is used ONLY
+by the SupCon Z chain (`--use-presplit`), which produces the hybrid number (the Q5
+86.7% figure) — NOT the headline. So the SupCon number is non-reproducible while the
+headline is reproducible. This asymmetry matters only if the SupCon/hybrid number is
+quoted with error bars. Fix: add `df = df.sort("id")` (or a stable key) before
+splitting in `prepare_splits.py`. Consistent with D016's existing hedge that the
+SupCon effect is partition-sensitive.
+
+**(b) `train.py` CLI defaults don't match the canonical regime.** argparse defaults
+are `--code-filter all`, `--epochs 10`, `--batch-size 8`; the canonical regime is
+billable / 20 (hier) / 16. The orchestrator passes explicit correct values, so the
+publication runs are unaffected — but a human running `train.py` directly would get
+the wrong regime silently. Fix: update the defaults to match, or make the
+mismatched ones required. Low priority.
+
+Also noted: `train.py`'s Stage-2 warm-start has a silent fallback to base model
+(prints a warning, not an error) if `--stage2-init` resolves no `model.safetensors`
+in any of 5 candidate layouts — the E-003 12.7% cold-start failure mode. Not a bug,
+but verify the orchestrator's init paths are correct before the runs.
+
+**Status:** OPEN as a tracker. The VERIFIED-GOOD items are settled facts (cite
+`ornith_review.md`). Gaps (a) and (b) are low-priority fixes; neither blocks the
+publication runs. The full 57-file audit continues per the backlog "Codebase audit"
+item.
