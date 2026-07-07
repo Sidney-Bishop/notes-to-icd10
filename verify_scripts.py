@@ -79,22 +79,6 @@ def check_generate_manifest(root: Path) -> list[CheckResult]:
     ]
 
 
-def check_dvc_pointers(root: Path) -> list[CheckResult]:
-    gold = root / "data" / "gold"
-    results = []
-    for dvc_file in (root / "data" / "medsynth" / "icd10_notes.parquet.dvc",
-                     gold / "cdc_fy2026_icd10.parquet.dvc"):
-        results.append((f"{dvc_file.name} present", dvc_file.exists(),
-                        f"DVC pointer missing at {dvc_file}"))
-    results.append(("Gold parquet DVC pointer present",
-                    len(list(gold.glob("medsynth_gold_apso_*.parquet.dvc"))) > 0,
-                    "No medsynth_gold_apso_*.parquet.dvc found"))
-    results.append(("Gold MANIFEST present",
-                    len(list(gold.glob("MANIFEST_*.json"))) > 0,
-                    "No MANIFEST_*.json found — run generate_manifest.py"))
-    return results
-
-
 def check_train(root: Path) -> list[CheckResult]:
     text = (root / "scripts" / "train.py").read_text()
     return [
@@ -168,7 +152,7 @@ def check_runtime_import(root: Path) -> list[CheckResult]:
 
 ALL_CHECKS = [
     check_required_files, check_inference, check_prepare_data,
-    check_generate_manifest, check_dvc_pointers, check_train,
+    check_generate_manifest, check_train,
     check_calibrate, check_evaluate, check_prepare_splits,
     check_experiment_logger, check_runtime_import,
 ]

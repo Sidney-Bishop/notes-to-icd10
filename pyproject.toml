@@ -62,7 +62,6 @@ dependencies = [
 dev = [
     "pytest>=8.0.0",
     "black>=24.0.0",
-    "dvc[gdrive]>=3.67.1",
 ]
 
 [tool.uv.sources]

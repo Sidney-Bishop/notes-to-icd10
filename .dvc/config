@@ -1,5 +1,0 @@
-[core]
-    remote = localstore
-    autostage = true
-[remote "localstore"]
-    url = CONFIGURE_LOCAL
