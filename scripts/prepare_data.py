@@ -100,27 +100,35 @@ def phase_1a_ingest() -> pl.DataFrame:
             filename=HF_MEDSYNTH_PATH,
             repo_type="dataset"
         )
-        # Verify the downloaded file matches the canonical hash before
-        # reading or caching — rejects corrupt or tampered downloads.
+        # Verify the downloaded file matches the canonical hash BEFORE
+        # caching — rejects corrupt or tampered downloads.
         _verify_sha256(Path(hf_file), "icd10_notes.parquet")
-        df = pl.read_parquet(hf_file)
-        # Ensure canonical schema
-        if "ID" not in df.columns:
-            df = df.with_columns(pl.int_range(0, len(df)).cast(pl.Utf8).alias("ID"))
-        if df.schema["ICD10"] == pl.Utf8:
-            df = df.with_columns(
-                pl.col("ICD10").map_elements(
-                    lambda x: [x.strip().upper()] if x else [],
-                    return_dtype=pl.List(pl.Utf8)
-                ).alias("ICD10")
-            )
-        df = df.select(["ID", "Note", "Dialogue", "ICD10"])
-        df.write_parquet(raw_path, compression="zstd")
-        print(f" ✅ Cached {len(df):,} records")
+        # Copy raw HF file verbatim so the cache is byte-identical to what
+        # SHA256 was pinned for. If we reprocess-then-write here, the cached
+        # file's bytes diverge from the raw hash and re-verifying on a later
+        # run fails. Schema normalisation happens in-memory below on the
+        # cached path too (both first-run and cache-hit paths converge on the
+        # same DataFrame shape).
+        import shutil
+        shutil.copy2(hf_file, raw_path)
+        print(f" ✅ Cached MedSynth (verbatim)")
     else:
         _verify_sha256(raw_path, "icd10_notes.parquet")
-        df = pl.read_parquet(raw_path)
-        print(f" ✅ Loaded {len(df):,} records from cache")
+        print(f" ✅ Cache hit (SHA256 verified)")
+
+    # Read and normalise schema — applied identically to first-run and cache-hit.
+    df = pl.read_parquet(raw_path)
+    if "ID" not in df.columns:
+        df = df.with_columns(pl.int_range(0, len(df)).cast(pl.Utf8).alias("ID"))
+    if df.schema["ICD10"] == pl.Utf8:
+        df = df.with_columns(
+            pl.col("ICD10").map_elements(
+                lambda x: [x.strip().upper()] if x else [],
+                return_dtype=pl.List(pl.Utf8)
+            ).alias("ICD10")
+        )
+    df = df.select(["ID", "Note", "Dialogue", "ICD10"])
+    print(f" ✅ {len(df):,} records")
 
     return df.with_columns([
         pl.col("ID").cast(pl.Utf8),
@@ -144,10 +152,14 @@ def _load_cdc(gold_dir: Path, offline=False):
         filename=HF_CDC_PATH,
         repo_type="dataset"
     )
-    # Verify before caching — rejects corrupt or tampered downloads.
+    # Verify BEFORE caching — rejects corrupt or tampered downloads.
     _verify_sha256(Path(hf_file), "cdc_fy2026_icd10.parquet")
-    df = pl.read_parquet(hf_file)
-    df.write_parquet(cache, compression="zstd")
+    # Copy raw HF file verbatim so cached bytes match the pinned SHA256.
+    # (Reprocess-then-write would diverge from the raw hash and break the
+    # cache-hit re-verify on later runs.)
+    import shutil
+    shutil.copy2(hf_file, cache)
+    df = pl.read_parquet(cache)
     print(f" ✅ CDC FY2026: {len(df):,} billable codes")
     return df
 
