@@ -34,6 +34,7 @@ from src.preprocessing import build_apso_note, redact_icd10_sections, redact_des
 HF_REPO_ID      = "SidneyBishop/notes-to-icd10"
 HF_MEDSYNTH_PATH = "data/medsynth/icd10_notes.parquet"
 HF_CDC_PATH      = "data/reference/cdc_fy2026_icd10.parquet"
+HF_ONTOLOGY_PATH = "data/ontology/icd10cm_2026.parquet"
 
 # SHA256 hashes of the canonical source files on HF Hub.
 # These are the single source of truth — if either hash changes it means
@@ -43,6 +44,7 @@ HF_CDC_PATH      = "data/reference/cdc_fy2026_icd10.parquet"
 EXPECTED_SHA256 = {
     "icd10_notes.parquet":      "7fa03f67b113b57a5f17349c712946553b4b186e1a11f39d74e0821d02fc5ac8",
     "cdc_fy2026_icd10.parquet": "2433adf954c3f49296a40761b83afb98c2d61cd78ca43f335fbdd4167e5fb93d",
+    "icd10cm_2026.parquet":     "a1b9a6798ef74a377ccc829d79c23a34486209ddb6cda79f7ae7c3f8860c0b3b",
 }
 
 
@@ -148,6 +150,45 @@ def _load_cdc(gold_dir: Path, offline=False):
     df.write_parquet(cache, compression="zstd")
     print(f" ✅ CDC FY2026: {len(df):,} billable codes")
     return df
+
+
+def _ensure_ontology(ont_dir: Path, offline: bool = False) -> Path:
+    """
+    Ensure the ICD-10-CM 2026 ontology parquet is present at
+    <ont_dir>/icd10cm_2026.parquet. If missing, download from the canonical
+    HF dataset and SHA256-verify.
+
+    Unlike MedSynth and CDC, the ontology is NOT reprocessed before caching —
+    the file downloaded from HF is copied to the cache verbatim, so a
+    subsequent SHA256 check on the cached file WILL match (unlike the
+    reprocessed cases). Nevertheless we only verify at download time; the
+    cached copy is trusted as a provenance-verified derivative.
+
+    Returns the resolved local path.
+    """
+    dest = ont_dir / "icd10cm_2026.parquet"
+    if dest.exists():
+        return dest
+
+    if offline:
+        raise FileNotFoundError(
+            f"Ontology cache missing at {dest} and offline=True"
+        )
+
+    ont_dir.mkdir(parents=True, exist_ok=True)
+    print(" 📥 Downloading ICD-10-CM 2026 ontology from HF...")
+    hf_file = hf_hub_download(
+        repo_id=HF_REPO_ID,
+        filename=HF_ONTOLOGY_PATH,
+        repo_type="dataset",
+    )
+    _verify_sha256(Path(hf_file), "icd10cm_2026.parquet")
+    # Copy verbatim — no reprocessing, so hash is preserved for future audits
+    import shutil
+    shutil.copy2(hf_file, dest)
+    print(f" ✅ Ontology cached at {dest}")
+    return dest
+
 
 def phase_1b(df_raw, gold_dir, offline=False):
     print("\n── Phase 1b: CDC Validation ─────────────────────────────────")
@@ -283,6 +324,7 @@ def main():
     g = phase_3c(g)
     if a.redact_descriptions:
         ont = PROJECT_ROOT / "data" / "ontology"
+        _ensure_ontology(ont)
         g = phase_3d(g,
                      dictionary_path=ont / "q8_phrasing_dictionary.json",
                      cdc_path=ont / "icd10cm_2026.parquet")
